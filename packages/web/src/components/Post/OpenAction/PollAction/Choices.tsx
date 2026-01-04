@@ -22,10 +22,10 @@ import type { Poll } from "@/types/palus";
 
 interface ChoicesProps {
   poll: Poll;
-  onVoteSuccess?: () => void;
+  onVoteSuccess: () => void;
 }
 
-const Choices = ({ poll }: ChoicesProps) => {
+const Choices = ({ poll, onVoteSuccess }: ChoicesProps) => {
   const { options, endsAt } = poll;
   const totalVoteCount = options.reduce((acc, { voteCount }) => {
     return acc + voteCount;
@@ -46,6 +46,7 @@ const Choices = ({ poll }: ChoicesProps) => {
   const onCompleted = () => {
     setHasVoted(true);
     setIsSubmitting(false);
+    onVoteSuccess();
     toast.success("Voted successfully");
   };
 
