@@ -11,10 +11,7 @@ interface PollActionProps {
 const PollAction = ({ post }: PollActionProps) => {
   const { currentAccount } = useAccountStore();
 
-  const { isLoading, optionsCount, poll, refetch } = useDecodePoll(
-    post,
-    currentAccount
-  );
+  const { isLoading, optionsCount, poll } = useDecodePoll(post, currentAccount);
 
   if (isLoading) {
     return <PollActionShimmer optionCount={optionsCount} />;
@@ -24,7 +21,7 @@ const PollAction = ({ post }: PollActionProps) => {
     return null;
   }
 
-  return <Choices onVoteSuccess={refetch} poll={poll} />;
+  return <Choices poll={poll} />;
 };
 
 export default PollAction;

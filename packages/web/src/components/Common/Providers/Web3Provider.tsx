@@ -1,13 +1,14 @@
 import { familyAccountsConnector } from "family";
 import type { ReactNode } from "react";
+import { http } from "viem";
 import { createConfig, WagmiProvider } from "wagmi";
 import { injected, metaMask, walletConnect } from "wagmi/connectors";
 import {
   CHAIN,
   INFURA_API_KEY,
+  IS_TESTNET,
   WALLETCONNECT_PROJECT_ID
 } from "@/data/constants";
-import getRpc from "@/helpers/getRpc";
 
 const connectors = [
   metaMask({ infuraAPIKey: INFURA_API_KEY }),
@@ -20,7 +21,9 @@ const config = createConfig({
   chains: [CHAIN],
   connectors,
   transports: {
-    [CHAIN.id]: getRpc()
+    [CHAIN.id]: IS_TESTNET
+      ? http("https://rpc.testnet.lens.xyz")
+      : http("https://rpc.lens.xyz")
   }
 });
 

@@ -13,7 +13,6 @@ import { ProseKit } from "prosekit/react";
 import { useEffect, useMemo, useRef } from "react";
 import GroupSelector from "@/components/Composer/GroupSelector";
 import cn from "@/helpers/cn";
-import { usePostAttachmentStore } from "@/store/non-persisted/post/usePostAttachmentStore";
 import { useEditorHandle } from "./EditorHandle";
 import EditorMenus from "./EditorMenus";
 
@@ -25,7 +24,7 @@ interface EditorProps {
   selectedFeed: string;
   setSelectedFeed: (feed: string) => void;
   isInModal?: boolean;
-  zeroPadding?: boolean;
+  fullHeight?: boolean;
 }
 
 const Editor = ({
@@ -36,11 +35,10 @@ const Editor = ({
   selectedFeed,
   setSelectedFeed,
   isInModal,
-  zeroPadding
+  fullHeight
 }: EditorProps) => {
   const { currentAccount } = useAccountStore();
   const { postContent } = usePostStore();
-  const { attachments } = usePostAttachmentStore();
   const defaultMarkdownRef = useRef(postContent);
 
   const defaultContent = useMemo(() => {
@@ -77,8 +75,8 @@ const Editor = ({
         className={cn(
           "box-border flex w-full justify-stretch overflow-x-hidden px-3 md:px-5",
           {
-            "h-full": isInModal && !isQuote && attachments.length === 0,
-            "py-4": !zeroPadding
+            "h-full": fullHeight,
+            "pt-4": !isInModal
           }
         )}
       >
@@ -96,7 +94,7 @@ const Editor = ({
             className={cn(
               "ProseMirror relative mt-1 box-border min-h-20 flex-1 leading-6 outline-0 sm:leading-[26px]",
               {
-                "h-full": !isQuote && attachments.length === 0
+                "h-full": fullHeight
               }
             )}
             ref={editor.mount}

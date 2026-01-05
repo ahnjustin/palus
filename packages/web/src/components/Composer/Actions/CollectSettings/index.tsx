@@ -21,7 +21,7 @@ const CollectSettings = () => {
           type="button"
         >
           {collectAction.enabled ? (
-            <ShoppingBagIconSolid className="-mt-0.5 size-5" />
+            <ShoppingBagIconSolid className="-mt-0.5 size-5 text-brand-400" />
           ) : (
             <ShoppingBagIcon className="-mt-0.5 size-5" />
           )}

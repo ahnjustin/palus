@@ -32,6 +32,30 @@ const buttonVariants = cva(
         ),
         outline: true,
         variant: "primary"
+      },
+      // Non-outline Danger
+      {
+        class: cn(
+          "text-white hover:text-white active:text-gray-100",
+          "bg-red-600 hover:bg-red-700 active:bg-red-800",
+          "border border-red-600 hover:border-red-700 active:border-red-800",
+          "dark:text-white dark:hover:text-white dark:active:text-gray-100",
+          "dark:bg-red-500 dark:hover:bg-red-400 dark:active:bg-red-600",
+          "dark:border-red-500 dark:hover:border-red-400 dark:active:border-red-600"
+        ),
+        outline: false,
+        variant: "danger"
+      },
+      // Outline Danger
+      {
+        class: cn(
+          "text-red-600 active:text-red-700",
+          "border border-red-600 hover:border-red-700",
+          "dark:text-red-500 dark:active:text-red-400",
+          "dark:border-red-500 dark:hover:border-red-400"
+        ),
+        outline: true,
+        variant: "danger"
       }
     ],
     defaultVariants: {
@@ -42,7 +66,7 @@ const buttonVariants = cva(
     variants: {
       outline: { false: "", true: "" },
       size: { lg: "px-5 py-1.5", md: "px-4 py-1", sm: "px-3 py-0.5 text-sm" },
-      variant: { primary: "" }
+      variant: { danger: "", primary: "" }
     }
   }
 );

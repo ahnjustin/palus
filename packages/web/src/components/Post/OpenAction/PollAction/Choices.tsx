@@ -22,11 +22,12 @@ import type { Poll } from "@/types/palus";
 
 interface ChoicesProps {
   poll: Poll;
-  onVoteSuccess: () => void;
 }
 
-const Choices = ({ poll, onVoteSuccess }: ChoicesProps) => {
-  const { options, endsAt } = poll;
+const Choices = ({ poll }: ChoicesProps) => {
+  const { endsAt } = poll;
+  const [options, setOptions] = useState(poll.options);
+
   const totalVoteCount = options.reduce((acc, { voteCount }) => {
     return acc + voteCount;
   }, 0);
@@ -46,8 +47,19 @@ const Choices = ({ poll, onVoteSuccess }: ChoicesProps) => {
   const onCompleted = () => {
     setHasVoted(true);
     setIsSubmitting(false);
-    onVoteSuccess();
-    toast.success("Voted successfully");
+    setOptions(
+      options.map((option) => {
+        if (option.id === selectedOption) {
+          return {
+            ...option,
+            voteCount: option.voteCount + 1,
+            voted: true
+          };
+        }
+        return option;
+      })
+    );
+    toast.success("Voted successfully!");
   };
 
   const onError = useCallback((error: ApolloClientError) => {
@@ -115,11 +127,11 @@ const Choices = ({ poll, onVoteSuccess }: ChoicesProps) => {
             type="button"
           >
             {isSubmitting && option.id === selectedOption ? (
-              <Spinner className="mr-1" size="sm" />
+              <Spinner size="sm" />
             ) : (
               <CheckCircleIcon
                 className={cn(
-                  option.voted || option.id === selectedOption
+                  option.voted || (hasVoted && option.id === selectedOption)
                     ? "text-brand-400"
                     : "text-secondary",
                   "size-6"
@@ -135,7 +147,10 @@ const Choices = ({ poll, onVoteSuccess }: ChoicesProps) => {
                   ) : null}
                   <Tooltip content={option.voteCount}>
                     <span className="text-secondary">
-                      {((option.voteCount / totalVoteCount) * 100).toFixed(0)}%
+                      {option.voteCount
+                        ? ((option.voteCount / totalVoteCount) * 100).toFixed(0)
+                        : 0}
+                      %
                     </span>
                   </Tooltip>
                 </div>

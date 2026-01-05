@@ -31,6 +31,8 @@ const CollectForm = ({ setShowModal }: CollectFormProps) => {
     hasInvalidEthAddress: recipients.some(
       ({ address }) => address && !isAddress(address)
     ),
+    hasZeroPrice:
+      collectAction.payToCollect && collectAction.payToCollect.native <= 0,
     hasZeroSplits: recipients.some(({ percent }) => percent === 0),
     isRecipientsDuplicated:
       new Set(recipients.map(({ address }) => address)).size !==
@@ -102,11 +104,7 @@ const CollectForm = ({ setShowModal }: CollectFormProps) => {
           {collectAction.enabled ? "Reset" : "Cancel"}
         </Button>
         <Button
-          disabled={
-            ((collectAction.payToCollect?.native ?? 0) <= 0 &&
-              collectAction.enabled) ||
-            Object.values(validationChecks).some(Boolean)
-          }
+          disabled={Object.values(validationChecks).some(Boolean)}
           onClick={() => setShowModal(false)}
         >
           Save

@@ -1,100 +1,123 @@
 import type { AccountFragment, PostFragment } from "@palus/indexer";
+import { useMemo } from "react";
 import { decodeAbiParameters, keccak256, stringToBytes } from "viem";
 import { useReadContracts } from "wagmi";
 import { pollVoteAction } from "@/components/Post/OpenAction/PollAction/pollVoteAction";
 import { CONTRACTS } from "@/data/contracts";
 import type { Poll } from "@/types/palus";
 
+const OPTIONS_KEY = keccak256(stringToBytes("lens.param.options"));
+const END_TS_KEY = keccak256(stringToBytes("lens.param.endTimestamp"));
+
 const useDecodePoll = (
   post: PostFragment,
   account: AccountFragment | undefined
-): {
-  isLoading: boolean;
-  optionsCount: number;
-  poll: Poll | null;
-  refetch: () => void;
-} => {
-  const contract = {
-    abi: pollVoteAction,
-    address: CONTRACTS.pollVoteAction
-  } as const;
+) => {
+  const contract = useMemo(
+    () =>
+      ({
+        abi: pollVoteAction,
+        address: CONTRACTS.pollVoteAction
+      }) as const,
+    []
+  );
 
-  const unknownActions =
-    post.__typename === "Post"
-      ? post.actions.filter(
-          (action) => action.__typename === "UnknownPostAction"
-        )
+  const pollAction = useMemo(() => {
+    if (post.__typename !== "Post") return null;
+
+    return (
+      post.actions
+        .filter((a) => a.__typename === "UnknownPostAction")
+        .find((a) => a.address === CONTRACTS.pollVoteAction) ?? null
+    );
+  }, [post]);
+
+  const { options, endsAtSeconds } = useMemo(() => {
+    const config = pollAction?.config;
+    if (!config)
+      return {
+        endsAtSeconds: null as bigint | null,
+        options: null as string[] | null
+      };
+
+    const encodedOptions = config.find((kv) => kv.key === OPTIONS_KEY)?.data;
+    const encodedEndTimestamp = config.find(
+      (kv) => kv.key === END_TS_KEY
+    )?.data;
+
+    // IMPORTANT: decodeAbiParameters will throw if you pass undefined.
+    const options = encodedOptions
+      ? (decodeAbiParameters(
+          [{ type: "string[]" }],
+          encodedOptions
+        )[0] as string[])
       : null;
-  const pollAction = unknownActions?.find(
-    (action) => action.address === CONTRACTS.pollVoteAction
-  );
 
-  const encodedOptions = pollAction?.config.find(
-    (rawKeyValue) =>
-      rawKeyValue.key === keccak256(stringToBytes("lens.param.options"))
-  );
-  const decodedOptions = decodeAbiParameters(
-    [{ type: "string[]" }],
-    encodedOptions?.data
-  );
+    const endsAtSeconds = encodedEndTimestamp
+      ? (decodeAbiParameters(
+          [{ type: "uint256" }],
+          encodedEndTimestamp
+        )[0] as bigint)
+      : null;
 
-  const encodedEndTimestamp = pollAction?.config.find(
-    (rawKeyValue) =>
-      rawKeyValue.key === keccak256(stringToBytes("lens.param.endTimestamp"))
-  );
-  const decodedEndTimestamp = decodeAbiParameters(
-    [{ type: "uint256" }],
-    encodedEndTimestamp?.data
-  );
+    return { endsAtSeconds, options };
+  }, [pollAction]);
 
-  const { data, isLoading, refetch } = useReadContracts({
-    contracts: [
+  const accountAddress = account?.address;
+
+  const contracts = useMemo(() => {
+    return [
       {
         ...contract,
         args: [post.feed.address, post.id],
-        functionName: "getVoteCounts"
+        functionName: "getVoteCounts" as const
       },
       {
         ...contract,
-        args: [post.feed.address, post.id, account?.address],
-        functionName: "hasVoted"
+        args: [post.feed.address, post.id, accountAddress],
+        functionName: "hasVoted" as const
       },
       {
         ...contract,
-        args: [post.feed.address, post.id, account?.address],
-        functionName: "getVotedOption"
+        args: [post.feed.address, post.id, accountAddress],
+        functionName: "getVotedOption" as const
       }
-    ],
-    query: {
-      enabled: Boolean(account?.address)
-    }
-  });
+    ];
+  }, [contract, post.feed.address, post.id, accountAddress]);
 
-  const options = decodedOptions[0];
-  const endsAt = decodedEndTimestamp[0];
-  const voteCounts = data?.[0].result as bigint[] | undefined;
-  const hasVoted = data?.[1].result as boolean | undefined;
-  const votedOption = data?.[2].result as number | undefined;
+  const { data, isLoading, refetch } = useReadContracts({ contracts });
 
-  if (!options) {
-    return { isLoading: false, optionsCount: 0, poll: null, refetch: () => {} };
-  }
+  const poll = useMemo<Poll | null>(() => {
+    if (!options) return null;
 
-  const poll: Poll = {
-    endsAt: endsAt ? new Date(Number(endsAt) * 1000) : new Date(),
-    id: post.id,
-    options:
-      options && voteCounts
+    const voteCounts = data?.[0].result as bigint[] | undefined;
+    const hasVoted = data?.[1].result as boolean | undefined;
+    const votedOption = data?.[2].result as number | undefined;
+
+    const endsAt = endsAtSeconds
+      ? new Date(Number(endsAtSeconds) * 1000)
+      : new Date();
+
+    return {
+      endsAt,
+      id: post.id,
+      options: voteCounts
         ? options.map((text, index) => ({
             id: index,
             text,
-            voteCount: Number(voteCounts[index]),
+            voteCount: Number(voteCounts[index] ?? 0n),
             voted: Boolean(hasVoted) && votedOption === index
           }))
         : []
-  };
+    };
+  }, [options, endsAtSeconds, data, post.id]);
 
-  return { isLoading, optionsCount: options.length, poll, refetch };
+  return {
+    isLoading,
+    optionsCount: options?.length ?? 0,
+    poll,
+    refetch
+  };
 };
 
 export default useDecodePoll;

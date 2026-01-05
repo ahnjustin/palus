@@ -1,4 +1,4 @@
-import type { PostFragment } from "@palus/indexer";
+import type { PostActionConfigInput, PostFragment } from "@palus/indexer";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { useCallback, useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -7,6 +7,9 @@ import Attachment from "@/components/Composer/Actions/Attachment";
 import CollectSettings from "@/components/Composer/Actions/CollectSettings";
 import ContentWarning from "@/components/Composer/Actions/ContentWarning";
 import Gif from "@/components/Composer/Actions/Gif";
+import PollSettings from "@/components/Composer/Actions/PollSettings";
+import PollEditor from "@/components/Composer/Actions/PollSettings/PollEditor";
+import pollActionParams from "@/components/Composer/Actions/PollSettings/pollActionParams";
 import RulesSettings from "@/components/Composer/Actions/RulesSettings";
 import NewAttachments from "@/components/Composer/NewAttachments";
 import QuotedPost from "@/components/Post/QuotedPost";
@@ -35,6 +38,7 @@ import {
 } from "@/store/non-persisted/post/usePostAudioStore";
 import { usePostContentWarningStore } from "@/store/non-persisted/post/usePostContentWarningStore";
 import { usePostLicenseStore } from "@/store/non-persisted/post/usePostLicenseStore";
+import { usePostPollStore } from "@/store/non-persisted/post/usePostPollStore";
 import { usePostRulesStore } from "@/store/non-persisted/post/usePostRulesStore";
 import { usePostStore } from "@/store/non-persisted/post/usePostStore";
 import {
@@ -87,6 +91,10 @@ const NewPublication = ({
   const { addAttachments, attachments, isUploading, setAttachments } =
     usePostAttachmentStore();
 
+  // Poll store
+  const { pollConfig, resetPollConfig, setShowPollEditor, showPollEditor } =
+    usePostPollStore();
+
   // License store
   const { setLicense } = usePostLicenseStore();
 
@@ -123,6 +131,8 @@ const NewPublication = ({
     setParentPost(undefined);
     setRules(undefined);
     setContentWarning(undefined);
+    setShowPollEditor(false);
+    resetPollConfig();
     setVideoThumbnail(DEFAULT_VIDEO_THUMBNAIL);
     setAudioPost(DEFAULT_AUDIO_POST);
     setLicense(null);
@@ -225,6 +235,14 @@ const NewPublication = ({
         });
       }
 
+      const actions: PostActionConfigInput[] = [];
+      if (collectAction.enabled) {
+        actions.push({ ...collectActionParams(collectAction) });
+      }
+      if (showPollEditor) {
+        actions.push({ ...pollActionParams(pollConfig) });
+      }
+
       return await createPost({
         variables: {
           request: {
@@ -234,9 +252,7 @@ const NewPublication = ({
             }),
             ...(isComment && { commentOn: { post: post?.id } }),
             ...(isQuote && { quoteOf: { post: quotedPost?.id } }),
-            ...(collectAction.enabled && {
-              actions: [{ ...collectActionParams(collectAction) }]
-            }),
+            ...(Boolean(actions.length) && { actions }),
             ...(rules && {
               rules: { required: [{ followersOnlyRule: rules }] }
             })
@@ -262,6 +278,11 @@ const NewPublication = ({
     enableOnContentEditable: true
   });
 
+  const isSubmitDisabledByPoll = showPollEditor
+    ? !pollConfig.options.length ||
+      pollConfig.options.some((option) => !option.length)
+    : false;
+
   return (
     <Card
       className={cn(
@@ -277,17 +298,20 @@ const NewPublication = ({
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         <Editor
           feed={feed}
+          fullHeight={
+            isModal && !isQuote && attachments.length === 0 && !showPollEditor
+          }
           isComment={isComment}
           isEditing={Boolean(editingPost)}
           isInModal={isModal}
           isQuote={isQuote}
           selectedFeed={selectedFeed}
           setSelectedFeed={setSelectedFeed}
-          zeroPadding={isModal}
         />
         {postContentError ? (
           <H6 className="mt-1 px-5 pb-3 text-red-500">{postContentError}</H6>
         ) : null}
+        {showPollEditor ? <PollEditor /> : null}
         <LinkPreviews />
         <NewAttachments attachments={attachments} />
         {quotedPost ? (
@@ -311,6 +335,7 @@ const NewPublication = ({
           />
           <Gif setGifAttachment={(gif: IGif) => setGifAttachment(gif)} />
           <ContentWarning />
+          <PollSettings />
           {editingPost ? null : <CollectSettings />}
           <div className="flex w-full items-center justify-end gap-x-4">
             {editingPost ? null : <RulesSettings />}
@@ -320,12 +345,13 @@ const NewPublication = ({
                 isSubmitting ||
                 isUploading ||
                 videoThumbnail.uploading ||
-                postContentError.length > 0
+                postContentError.length > 0 ||
+                isSubmitDisabledByPoll
               }
               loading={isSubmitting}
               onClick={handleCreatePost}
             >
-              {editingPost ? "Update" : isComment ? "Comment" : "Post"}
+              {editingPost ? "Update" : isComment ? "Reply" : "Post"}
             </Button>
           </div>
         </div>
