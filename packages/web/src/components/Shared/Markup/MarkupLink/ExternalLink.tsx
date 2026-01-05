@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Link } from "react-router";
 import injectReferrerToUrl from "@/helpers/injectReferrerToUrl";
 import stopEventPropagation from "@/helpers/stopEventPropagation";
@@ -10,26 +11,51 @@ const ExternalLink = ({ title }: MarkupLinkProps) => {
 
   let href = title;
 
-  if (!href) {
-    return null;
-  }
+  const url = useMemo(() => {
+    if (!href) {
+      return null;
+    }
 
-  if (!href.includes("://")) {
-    href = `https://${href}`;
-  }
+    if (replaceLensLinks) {
+      try {
+        const parsedUrl = new URL(href);
+        const { host, pathname } = parsedUrl;
+        let localPath: string | null = null;
 
-  if (replaceLensLinks) {
-    try {
-      const url = new URL(href);
-      if (url.host === "orb.club") {
-        href = location.origin + url.pathname.replace("p", "posts");
-      } else if (url.host === "app.soclly.com") {
-        href = location.origin + url.pathname;
+        switch (host) {
+          case "orb.club":
+          case "orb.ac":
+            if (pathname.startsWith("/p/")) {
+              localPath = pathname.replace("/p/", "/posts/");
+            } else if (pathname.startsWith("/post/")) {
+              localPath = pathname.replace("/post/", "/posts/");
+            }
+            break;
+          case "app.soclly.com":
+            if (pathname.startsWith("/posts/") || pathname.startsWith("/u/")) {
+              localPath = pathname;
+            } else if (pathname.startsWith("/group/")) {
+              localPath = pathname.replace("/group/", "/g/");
+            }
+            break;
+          case "hey.xyz":
+          case "lenster.xyz":
+            localPath = pathname;
+            break;
+        }
+
+        if (localPath) {
+          href = location.origin + localPath;
+        }
+      } catch {
+        // Invalid URL, fallback to original href
       }
-    } catch {}
-  }
+    }
 
-  const url = injectReferrerToUrl(href);
+    return injectReferrerToUrl(href);
+  }, [href, replaceLensLinks]);
+
+  if (!url) return null;
 
   return (
     <Link

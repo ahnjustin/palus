@@ -7,7 +7,7 @@ const ReplaceLensLinksToggle = () => {
 
   return (
     <ToggleWithHelper
-      description="Overwrite Orb and Soclly links to open in Palus"
+      description="Overwrite Orb, Hey, and Soclly links to open in Palus"
       heading="Replace Lens links"
       icon={<LinkIcon className="size-5" />}
       on={replaceLensLinks}
