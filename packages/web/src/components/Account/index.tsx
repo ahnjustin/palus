@@ -44,7 +44,9 @@ const ViewAccount = () => {
       request: {
         ...(address
           ? { address }
-          : { username: { localName: username as string } })
+          : {
+              username: { localName: username?.replace(".lens", "") as string }
+            })
       }
     }
   });

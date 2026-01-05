@@ -46,6 +46,9 @@ const ViewPost = () => {
   const { cachedPost, setCachedPost } = usePostLinkStore();
 
   const showQuotes = pathname === `/posts/${slug}/quotes`;
+  const slugParts = slug?.split("-");
+  const isLegacyId =
+    slugParts?.[0].startsWith("0x") && slugParts?.[1].startsWith("0x");
 
   const { data, error, loading } = usePostQuery({
     onCompleted: (data) => {
@@ -54,7 +57,11 @@ const ViewPost = () => {
       }
     },
     skip: !slug,
-    variables: { request: { post: slug } }
+    variables: {
+      request: {
+        ...(isLegacyId ? { legacyId: slug } : { post: slug })
+      }
+    }
   });
 
   const { data: comments } = useHiddenCommentsQuery({
