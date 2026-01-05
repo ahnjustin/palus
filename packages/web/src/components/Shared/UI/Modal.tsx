@@ -9,6 +9,7 @@ import {
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { cva, type VariantProps } from "class-variance-authority";
 import { Fragment, memo, type ReactNode } from "react";
+import stopEventPropagation from "@/helpers/stopEventPropagation";
 
 const modalVariants = cva(
   "w-full scale-100 bg-white text-left shadow-xl dark:bg-gray-800",
@@ -61,7 +62,10 @@ const Modal = ({
         open={show}
       >
         <span className="hidden sm:inline-block sm:h-screen sm:align-middle" />
-        <DialogBackdrop className="fixed inset-0 bg-gray-500/75 dark:bg-gray-900/80" />
+        <DialogBackdrop
+          className="fixed inset-0 bg-gray-500/75 dark:bg-gray-900/80"
+          onClick={stopEventPropagation}
+        />
         <TransitionChild
           as={Fragment}
           enter="ease-out duration-100"
