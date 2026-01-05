@@ -114,6 +114,10 @@
       @apply mb-4;
     }
 
+    & .list-content p {
+      @apply mb-0;
+    }
+
     & a,
     & span[data-mention="account"],
     & span[data-mention="group"] {
