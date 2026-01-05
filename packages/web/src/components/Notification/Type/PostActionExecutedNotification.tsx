@@ -1,4 +1,8 @@
-import { ShoppingBagIcon } from "@heroicons/react/24/outline";
+import {
+  BoltIcon,
+  ChartBarIcon,
+  ShoppingBagIcon
+} from "@heroicons/react/24/outline";
 import type {
   PostActionExecutedNotificationFragment,
   TippingPostActionExecuted
@@ -11,6 +15,7 @@ import { TipIcon } from "@/components/Shared/Icons/TipIcon";
 import Markup from "@/components/Shared/Markup";
 import PostLink from "@/components/Shared/Post/PostLink";
 import { Tooltip } from "@/components/Shared/UI";
+import { CONTRACTS } from "@/data/contracts";
 import formatRelativeOrAbsolute from "@/helpers/datetime/formatRelativeOrAbsolute";
 import getPostData from "@/helpers/getPostData";
 import truncateUrl from "@/helpers/truncateUrl";
@@ -34,11 +39,7 @@ const PostActionExecutedNotification = ({
   const filteredContent = postData?.content || "";
   const actions = notification.actions;
   const firstAction = actions[0];
-  const firstAccount =
-    firstAction?.__typename === "SimpleCollectPostActionExecuted" ||
-    firstAction.__typename === "TippingPostActionExecuted"
-      ? firstAction.executedBy
-      : undefined;
+  const firstAccount = firstAction.executedBy;
   const length = actions.length - 1;
   const moreThanOneAccount = length > 1;
   const actionType =
@@ -46,7 +47,10 @@ const PostActionExecutedNotification = ({
       ? "collected"
       : firstAction.__typename === "TippingPostActionExecuted"
         ? "tipped"
-        : undefined;
+        : firstAction.__typename === "UnknownPostActionExecuted" &&
+            firstAction.action.address === CONTRACTS.pollVoteAction
+          ? "voted on"
+          : "acted on";
 
   const text = moreThanOneAccount
     ? `and ${length} ${plur("other", length)} ${actionType} your`
@@ -67,18 +71,14 @@ const PostActionExecutedNotification = ({
         <div className="flex items-center space-x-3">
           {actionType === "collected" && <ShoppingBagIcon className="size-6" />}
           {actionType === "tipped" && <TipIcon className="size-6" />}
+          {actionType === "voted on" && <ChartBarIcon className="size-6" />}
+          {actionType === "acted on" && <BoltIcon className="size-6" />}
           <div className="flex items-center space-x-1">
             {actions.slice(0, 10).map((action, index: number) => {
-              const account =
-                action.__typename === "SimpleCollectPostActionExecuted" ||
-                action.__typename === "TippingPostActionExecuted"
-                  ? action.executedBy
-                  : undefined;
-
+              const account = action.executedBy;
               if (!account) {
                 return null;
               }
-
               return (
                 <div className="not-first:-ml-2" key={index}>
                   <NotificationAccountAvatar account={account} />
