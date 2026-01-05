@@ -17,7 +17,7 @@ import useLoadMoreOnIntersect from "@/hooks/useLoadMoreOnIntersect";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
 
 interface PostExecutorsProps {
-  postId: string;
+  postId: string | number;
   filter: PostActionFilter;
 }
 
@@ -97,8 +97,7 @@ const PostExecutors = ({ postId, filter }: PostExecutorsProps) => {
               hideUnfollowButton={
                 currentAccount?.address === action.account.address
               }
-              showBio
-              showUserPreview={false}
+              showUserPreview
             />
           </motion.div>
         ))}

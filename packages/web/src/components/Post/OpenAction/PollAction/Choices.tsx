@@ -9,7 +9,8 @@ import plur from "plur";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { encodeAbiParameters, keccak256, stringToBytes } from "viem";
-import { Card, Spinner, Tooltip } from "@/components/Shared/UI";
+import PostExecutors from "@/components/Shared/Modal/PostExecutors";
+import { Card, Modal, Spinner, Tooltip } from "@/components/Shared/UI";
 import { CONTRACTS } from "@/data/contracts";
 import cn from "@/helpers/cn";
 import getTimetoNow from "@/helpers/datetime/getTimetoNow";
@@ -27,6 +28,7 @@ interface ChoicesProps {
 const Choices = ({ poll }: ChoicesProps) => {
   const { endsAt } = poll;
   const [options, setOptions] = useState(poll.options);
+  const [showPostExecutorsModal, setShowPostExecutorsModal] = useState(false);
 
   const totalVoteCount = options.reduce((acc, { voteCount }) => {
     return acc + voteCount;
@@ -110,80 +112,100 @@ const Choices = ({ poll }: ChoicesProps) => {
   };
 
   return (
-    <Card forceRounded onClick={stopEventPropagation}>
-      <div className="space-y-2 p-2">
-        {options.map((option, index) => (
-          <button
-            className={cn(
-              "flex w-full items-center space-x-2.5 rounded-xl p-2 text-left text-sm enabled:hover:bg-gray-100 dark:enabled:hover:bg-gray-800",
-              {
-                "border border-gray-300 dark:border-gray-700":
-                  !isPollLive && option.voteCount === highestVoteCount
-              }
-            )}
-            disabled={isSubmitting || !isPollLive || hasVoted}
-            key={index}
-            onClick={() => handleVote(option.id)}
-            type="button"
-          >
-            {isSubmitting && option.id === selectedOption ? (
-              <Spinner size="sm" />
-            ) : (
-              <CheckCircleIcon
-                className={cn(
-                  option.voted || (hasVoted && option.id === selectedOption)
-                    ? "text-brand-400"
-                    : "text-secondary",
-                  "size-6"
-                )}
-              />
-            )}
-            <div className="w-full space-y-2">
-              <div className="flex items-center justify-between gap-x-2">
-                <div className="font-bold">{option.text}</div>
-                <div className="flex items-center gap-x-1">
-                  {!isPollLive && option.voteCount === highestVoteCount ? (
-                    <TrophyIcon className="size-4 text-secondary" />
-                  ) : null}
-                  <Tooltip content={option.voteCount}>
-                    <span className="text-secondary">
-                      {option.voteCount
-                        ? ((option.voteCount / totalVoteCount) * 100).toFixed(0)
-                        : 0}
-                      %
-                    </span>
-                  </Tooltip>
+    <>
+      <Card forceRounded onClick={stopEventPropagation}>
+        <div className="space-y-2 p-2">
+          {options.map((option, index) => (
+            <button
+              className={cn(
+                "flex w-full items-center space-x-2.5 rounded-xl p-2 text-left text-sm enabled:hover:bg-gray-100 dark:enabled:hover:bg-gray-800",
+                {
+                  "border border-gray-300 dark:border-gray-700":
+                    !isPollLive && option.voteCount === highestVoteCount
+                }
+              )}
+              disabled={isSubmitting || !isPollLive || hasVoted}
+              key={index}
+              onClick={() => handleVote(option.id)}
+              type="button"
+            >
+              {isSubmitting && option.id === selectedOption ? (
+                <Spinner size="sm" />
+              ) : (
+                <CheckCircleIcon
+                  className={cn(
+                    option.voted || (hasVoted && option.id === selectedOption)
+                      ? "text-brand-400"
+                      : "text-secondary",
+                    "size-6"
+                  )}
+                />
+              )}
+              <div className="w-full space-y-2">
+                <div className="flex items-center justify-between gap-x-2">
+                  <div className="font-bold">{option.text}</div>
+                  <div className="flex items-center gap-x-1">
+                    {!isPollLive && option.voteCount === highestVoteCount ? (
+                      <TrophyIcon className="size-4 text-secondary" />
+                    ) : null}
+                    <Tooltip content={option.voteCount}>
+                      <span className="text-secondary">
+                        {option.voteCount
+                          ? ((option.voteCount / totalVoteCount) * 100).toFixed(
+                              0
+                            )
+                          : 0}
+                        %
+                      </span>
+                    </Tooltip>
+                  </div>
+                </div>
+                <div className="flex h-2.5 overflow-hidden rounded-full bg-gray-300 dark:bg-gray-700">
+                  <div
+                    className="bg-brand-400"
+                    style={{
+                      width: `${(option.voteCount / totalVoteCount) * 100}%`
+                    }}
+                  />
                 </div>
               </div>
-              <div className="flex h-2.5 overflow-hidden rounded-full bg-gray-300 dark:bg-gray-700">
-                <div
-                  className="bg-brand-400"
-                  style={{
-                    width: `${(option.voteCount / totalVoteCount) * 100}%`
-                  }}
-                />
-              </div>
-            </div>
-          </button>
-        ))}
-      </div>
-      <div className="flex items-center justify-between border-border border-t px-5 py-3">
-        <div className="flex items-center space-x-2 text-secondary text-xs">
-          <Bars3BottomLeftIcon className="size-4" />
-          <span>
-            {humanize(totalVoteCount || 0)} {plur("vote", totalVoteCount || 0)}
-          </span>
-          <span>·</span>
-          <Tooltip content={dayjs(endsAt).format("MMM D, YYYY, h:mm A")}>
-            {isPollLive ? (
-              <span>{getTimetoNow(new Date(endsAt))} left</span>
-            ) : (
-              <span>Poll ended</span>
-            )}
-          </Tooltip>
+            </button>
+          ))}
         </div>
-      </div>
-    </Card>
+        <div className="flex items-center justify-between border-border border-t px-5 py-3">
+          <div className="flex items-center space-x-2 text-secondary text-xs">
+            <Bars3BottomLeftIcon className="size-4" />
+            <button
+              onClick={() => setShowPostExecutorsModal(true)}
+              type="button"
+            >
+              <span>
+                {humanize(totalVoteCount || 0)}{" "}
+                {plur("vote", totalVoteCount || 0)}
+              </span>
+            </button>
+            <span>·</span>
+            <Tooltip content={dayjs(endsAt).format("MMM D, YYYY, h:mm A")}>
+              {isPollLive ? (
+                <span>{getTimetoNow(new Date(endsAt))} left</span>
+              ) : (
+                <span>Poll ended</span>
+              )}
+            </Tooltip>
+          </div>
+        </div>
+      </Card>
+      <Modal
+        onClose={() => setShowPostExecutorsModal(false)}
+        show={showPostExecutorsModal}
+        title="Voters"
+      >
+        <PostExecutors
+          filter={{ address: CONTRACTS.pollVoteAction }}
+          postId={poll.id}
+        />
+      </Modal>
+    </>
   );
 };
 
