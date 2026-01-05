@@ -1,7 +1,9 @@
 import type { AccountFragment, PostFragment } from "@palus/indexer";
+import { useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { decodeAbiParameters, keccak256, stringToBytes } from "viem";
-import { useReadContracts } from "wagmi";
+import { useChainId, useConfig, useReadContracts } from "wagmi";
+import { readContractsQueryOptions } from "wagmi/query";
 import { pollVoteAction } from "@/components/Post/OpenAction/PollAction/pollVoteAction";
 import { CONTRACTS } from "@/data/contracts";
 import type { Poll } from "@/types/palus";
@@ -13,6 +15,10 @@ const useDecodePoll = (
   post: PostFragment,
   account: AccountFragment | undefined
 ) => {
+  const chainId = useChainId();
+  const config = useConfig();
+  const queryClient = useQueryClient();
+
   const contract = useMemo(
     () =>
       ({
@@ -45,7 +51,6 @@ const useDecodePoll = (
       (kv) => kv.key === END_TS_KEY
     )?.data;
 
-    // IMPORTANT: decodeAbiParameters will throw if you pass undefined.
     const options = encodedOptions
       ? (decodeAbiParameters(
           [{ type: "string[]" }],
@@ -85,7 +90,38 @@ const useDecodePoll = (
     ];
   }, [contract, post.feed.address, post.id, accountAddress]);
 
-  const { data, isLoading, refetch } = useReadContracts({ contracts });
+  const queryOptions = useMemo(() => ({ contracts }), [contracts]);
+
+  const { data, isLoading, refetch } = useReadContracts(queryOptions);
+
+  const updatePollCache = (votedOptionIndex: number) => {
+    const { queryKey } = readContractsQueryOptions(config, {
+      ...queryOptions,
+      chainId
+    });
+
+    queryClient.setQueryData(queryKey, (oldData: any) => {
+      if (!oldData) return oldData;
+
+      const newData = [...oldData];
+
+      if (newData[0]?.result) {
+        const counts = [...(newData[0].result as bigint[])];
+        counts[votedOptionIndex] = (counts[votedOptionIndex] || 0n) + 1n;
+        newData[0] = { ...newData[0], result: counts };
+      }
+
+      newData[1] = { ...newData[1], result: true, status: "success" };
+
+      newData[2] = {
+        ...newData[2],
+        result: votedOptionIndex,
+        status: "success"
+      };
+
+      return newData;
+    });
+  };
 
   const poll = useMemo<Poll | null>(() => {
     if (!options) return null;
@@ -116,7 +152,8 @@ const useDecodePoll = (
     isLoading,
     optionsCount: options?.length ?? 0,
     poll,
-    refetch
+    refetch,
+    updatePollCache
   };
 };
 

@@ -21,15 +21,15 @@ interface ProvidersProps {
 const Providers = ({ children }: ProvidersProps) => {
   return (
     <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <Web3Provider>
+      <Web3Provider>
+        <QueryClientProvider client={queryClient}>
           <ApolloProvider client={lensApolloClient}>
             <HelmetProvider>
               <ThemeProvider>{children}</ThemeProvider>
             </HelmetProvider>
           </ApolloProvider>
-        </Web3Provider>
-      </QueryClientProvider>
+        </QueryClientProvider>
+      </Web3Provider>
     </ErrorBoundary>
   );
 };
