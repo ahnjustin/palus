@@ -36,10 +36,10 @@ export const MAX_IMAGE_UPLOAD = 8;
 
 // Named transforms for ImageKit
 export const TRANSFORMS = {
-  ATTACHMENT: "tr:w-1000",
-  AVATAR_BIG: "tr:w-350,h-350",
-  AVATAR_SMALL: "tr:w-100,h-100",
-  AVATAR_TINY: "tr:w-50,h-50",
-  COVER: "tr:w-1350,h-350",
-  EXPANDED_AVATAR: "tr:w-1000,h-1000"
+  ATTACHMENT: "tr:w-1000,c-at_max",
+  AVATAR_BIG: "tr:w-350,h-350,c-at_max",
+  AVATAR_SMALL: "tr:w-100,h-100,c-at_max",
+  AVATAR_TINY: "tr:w-50,h-50,c-at_max",
+  COVER: "tr:w-1350,h-350,c-at_max",
+  EXPANDED_AVATAR: "tr:w-1000,h-1000,c-at_max"
 };
