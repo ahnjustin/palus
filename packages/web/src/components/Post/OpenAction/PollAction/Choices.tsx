@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { encodeAbiParameters, keccak256, stringToBytes } from "viem";
 import PostExecutors from "@/components/Shared/Modal/PostExecutors";
 import { Card, Modal, Spinner, Tooltip } from "@/components/Shared/UI";
+import { ScrollArea } from "@/components/Shared/UI/ScrollArea";
 import { CONTRACTS } from "@/data/contracts";
 import cn from "@/helpers/cn";
 import getTimetoNow from "@/helpers/datetime/getTimetoNow";
@@ -105,11 +106,11 @@ const Choices = ({ poll, onVoteSuccess }: ChoicesProps) => {
   return (
     <>
       <Card forceRounded onClick={stopEventPropagation}>
-        <div className="space-y-2 p-2">
+        <ScrollArea className="max-h-72 overflow-y-auto p-2">
           {options.map((option, index) => (
             <button
               className={cn(
-                "flex w-full items-center space-x-2.5 rounded-xl p-2 text-left text-sm enabled:hover:bg-gray-100 dark:enabled:hover:bg-gray-800",
+                "not-last:mb-2.5 flex w-full items-center space-x-2.5 rounded-xl p-2 text-left text-sm enabled:hover:bg-gray-100 dark:enabled:hover:bg-gray-800",
                 {
                   "border border-gray-300 dark:border-gray-700":
                     !isPollLive && option.voteCount === highestVoteCount
@@ -162,7 +163,7 @@ const Choices = ({ poll, onVoteSuccess }: ChoicesProps) => {
               </div>
             </button>
           ))}
-        </div>
+        </ScrollArea>
         <div className="flex items-center justify-between border-border border-t px-5 py-3">
           <div className="flex items-center space-x-2 text-secondary text-xs">
             <Bars3BottomLeftIcon className="size-4" />
