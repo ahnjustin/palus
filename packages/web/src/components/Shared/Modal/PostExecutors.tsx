@@ -1,4 +1,4 @@
-import { ShoppingBagIcon } from "@heroicons/react/24/outline";
+import { BoltIcon, ShoppingBagIcon } from "@heroicons/react/24/outline";
 import {
   type PostActionFilter,
   useWhoExecutedActionOnPostQuery,
@@ -9,6 +9,7 @@ import { motion } from "motion/react";
 import { useCallback } from "react";
 import { Virtualizer } from "virtua";
 import SingleAccount from "@/components/Shared/Account/SingleAccount";
+import { TipIcon } from "@/components/Shared/Icons/TipIcon";
 import AccountListShimmer from "@/components/Shared/Shimmer/AccountListShimmer";
 import { EmptyState, ErrorMessage } from "@/components/Shared/UI";
 import cn from "@/helpers/cn";
@@ -58,7 +59,15 @@ const PostExecutors = ({ postId, filter }: PostExecutorsProps) => {
       <div className="p-5">
         <EmptyState
           hideCard
-          icon={<ShoppingBagIcon className="size-8" />}
+          icon={
+            filter.tipping ? (
+              <TipIcon className="size-8" />
+            ) : filter.simpleCollect ? (
+              <ShoppingBagIcon className="size-8" />
+            ) : (
+              <BoltIcon className="size-8" />
+            )
+          }
           message="No actions."
         />
       </div>
