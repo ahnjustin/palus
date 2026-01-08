@@ -191,7 +191,7 @@ const NewPublication = ({
     return isComment ? "Comment" : isQuote ? "Quote" : "Post";
   };
 
-  const handleCreatePost = useCallback(async () => {
+  const handleCreatePost = async () => {
     if (!currentAccount) {
       return toast.error(ERRORS.SignWallet);
     }
@@ -262,7 +262,7 @@ const NewPublication = ({
     } catch (error) {
       onError(error);
     }
-  }, [pollConfig]);
+  };
 
   const setGifAttachment = (gif: IGif) => {
     const attachment: NewAttachment = {
