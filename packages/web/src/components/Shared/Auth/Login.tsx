@@ -7,8 +7,13 @@ import {
   useChallengeMutation
 } from "@palus/indexer";
 import { AnimatePresence, motion } from "motion/react";
-import type { Dispatch, SetStateAction } from "react";
-import { useCallback, useState } from "react";
+import {
+  type Dispatch,
+  type SetStateAction,
+  useCallback,
+  useEffect,
+  useState
+} from "react";
 import { toast } from "sonner";
 import { useAccount, useDisconnect, useSignMessage } from "wagmi";
 import SingleAccount from "@/components/Shared/Account/SingleAccount";
@@ -67,6 +72,11 @@ const Login = ({ setHasAccounts }: LoginProps) => {
       lastLoggedInAccountRequest: { address }
     }
   });
+
+  useEffect(() => {
+    // Ensure correct network on mount
+    handleWrongNetwork();
+  }, []);
 
   const allAccounts = data?.accountsAvailable.items || [];
   const lastLogin = data?.lastLoggedInAccount;
