@@ -16,6 +16,7 @@ import AccountPreview from "./AccountPreview";
 import FollowUnfollowButton from "./FollowUnfollowButton";
 
 interface SingleAccountProps {
+  className?: string;
   hideFollowButton?: boolean;
   hideUnfollowButton?: boolean;
   isBig?: boolean;
@@ -28,6 +29,7 @@ interface SingleAccountProps {
 }
 
 const SingleAccount = ({
+  className,
   hideFollowButton = false,
   hideUnfollowButton = false,
   isBig = false,
@@ -57,12 +59,16 @@ const SingleAccount = ({
   );
 
   const UserName = () => (
-    <div>
-      <div className={cn({ "flex items-center gap-x-1": showAddress })}>
+    <div className="min-w-0">
+      <div
+        className={cn("flex min-w-0 flex-col", {
+          "flex gap-x-1": showAddress
+        })}
+      >
         <div
           className={cn(
             { "font-bold": isBig },
-            "flex max-w-sm items-center gap-x-0.5"
+            "flex min-w-0 max-w-sm items-center gap-x-0.5"
           )}
         >
           <div className="truncate font-semibold">
@@ -71,7 +77,7 @@ const SingleAccount = ({
           {account.score < 9000 ? null : <TopAccount />}
         </div>
         <Slug
-          className="text-sm"
+          className="truncate text-sm"
           prefix="@"
           slug={getAccount(account).username}
         />
@@ -94,7 +100,7 @@ const SingleAccount = ({
       showUserPreview={showUserPreview}
       username={account.username?.localName}
     >
-      <div className="mr-8 flex items-center gap-x-3">
+      <div className="flex items-center gap-x-3">
         <UserAvatar />
         <UserName />
       </div>
@@ -102,8 +108,8 @@ const SingleAccount = ({
   );
 
   return (
-    <div className="flex flex-col gap-y-2">
-      <div className="flex items-center justify-between">
+    <div className={cn("flex min-w-0 flex-col gap-y-2", className)}>
+      <div className="flex items-center justify-between gap-4">
         {linkToAccount && account.address ? (
           <AccountLink account={account}>
             <AccountInfo />

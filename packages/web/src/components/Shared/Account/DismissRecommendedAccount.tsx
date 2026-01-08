@@ -23,7 +23,12 @@ const DismissRecommendedAccount = ({
   };
 
   return (
-    <button disabled={loading} onClick={handleDismiss} type="reset">
+    <button
+      className="flex-none"
+      disabled={loading}
+      onClick={handleDismiss}
+      type="reset"
+    >
       {loading ? (
         <Spinner size="xs" />
       ) : (

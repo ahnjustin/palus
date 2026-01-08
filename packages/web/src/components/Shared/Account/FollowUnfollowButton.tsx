@@ -14,7 +14,7 @@ interface FollowUnfollowButtonProps {
 }
 
 const FollowUnfollowButton = ({
-  buttonClassName = "",
+  buttonClassName = "flex-none",
   hideFollowButton = false,
   hideUnfollowButton = false,
   account,
