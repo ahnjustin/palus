@@ -1,11 +1,10 @@
 import type { UnknownActionConfigInput } from "@palus/indexer";
+import dayjs from "dayjs";
 import { encodeAbiParameters, keccak256, stringToBytes } from "viem";
 import { CONTRACTS } from "@/data/contracts";
+import type { PollConfig } from "@/store/non-persisted/post/usePostPollStore";
 
-const pollActionParams = (pollConfig: {
-  length: number;
-  options: string[];
-}) => {
+const pollActionParams = (pollConfig: PollConfig) => {
   return {
     unknown: {
       address: CONTRACTS.pollVoteAction,
@@ -23,11 +22,7 @@ const pollActionParams = (pollConfig: {
           raw: {
             data: encodeAbiParameters(
               [{ name: "endTimestamp", type: "uint72" }],
-              [
-                BigInt(
-                  Math.floor(Date.now() / 1000) + pollConfig.length * 86400
-                )
-              ]
+              [BigInt(dayjs().add(pollConfig.durationInDays, "day").unix())]
             ),
             key: keccak256(stringToBytes("lens.param.endTimestamp"))
           }

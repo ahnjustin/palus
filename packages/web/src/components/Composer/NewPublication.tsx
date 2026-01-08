@@ -191,7 +191,7 @@ const NewPublication = ({
     return isComment ? "Comment" : isQuote ? "Quote" : "Post";
   };
 
-  const handleCreatePost = async () => {
+  const handleCreatePost = useCallback(async () => {
     if (!currentAccount) {
       return toast.error(ERRORS.SignWallet);
     }
@@ -262,7 +262,7 @@ const NewPublication = ({
     } catch (error) {
       onError(error);
     }
-  };
+  }, [pollConfig]);
 
   const setGifAttachment = (gif: IGif) => {
     const attachment: NewAttachment = {
@@ -280,7 +280,8 @@ const NewPublication = ({
 
   const isSubmitDisabledByPoll = showPollEditor
     ? !pollConfig.options.length ||
-      pollConfig.options.some((option) => !option.length)
+      pollConfig.options.some((option) => !option.length) ||
+      pollConfig.durationInDays < 1
     : false;
 
   return (

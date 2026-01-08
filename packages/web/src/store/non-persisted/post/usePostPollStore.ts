@@ -1,20 +1,22 @@
 import { createTrackedStore } from "@/store/createTrackedStore";
 
+export interface PollConfig {
+  durationInDays: number;
+  options: string[];
+}
+
 interface State {
-  pollConfig: {
-    length: number;
-    options: string[];
-  };
+  pollConfig: PollConfig;
   resetPollConfig: () => void;
-  setPollConfig: (pollConfig: { length: number; options: string[] }) => void;
+  setPollConfig: (pollConfig: PollConfig) => void;
   setShowPollEditor: (showPollEditor: boolean) => void;
   showPollEditor: boolean;
 }
 
 const { useStore: usePostPollStore } = createTrackedStore<State>((set) => ({
-  pollConfig: { length: 7, options: ["", ""] },
+  pollConfig: { durationInDays: 7, options: ["", ""] },
   resetPollConfig: () =>
-    set(() => ({ pollConfig: { length: 7, options: ["", ""] } })),
+    set(() => ({ pollConfig: { durationInDays: 7, options: ["", ""] } })),
   setPollConfig: (pollConfig) => set(() => ({ pollConfig })),
   setShowPollEditor: (showPollEditor) => set(() => ({ showPollEditor })),
   showPollEditor: false

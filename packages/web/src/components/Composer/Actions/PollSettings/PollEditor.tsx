@@ -24,7 +24,7 @@ const PollEditor = () => {
             outline
             size="sm"
           >
-            {pollConfig.length} {plur("day", pollConfig.length)}
+            {pollConfig.durationInDays} {plur("day", pollConfig.durationInDays)}
           </Button>
           <Modal
             onClose={() => setShowPollLengthModal(false)}
@@ -34,22 +34,22 @@ const PollEditor = () => {
             <div className="p-5">
               <Input
                 label="Poll length (days)"
-                max={30}
+                max={365}
                 min={1}
-                onChange={(e) =>
+                onChange={(e) => {
                   setPollConfig({
                     ...pollConfig,
-                    length: Number(e.target.value)
-                  })
-                }
+                    durationInDays: Number(e.target.value)
+                  });
+                }}
                 type="number"
-                value={pollConfig.length}
+                value={pollConfig.durationInDays}
               />
               <div className="mt-5 flex space-x-2">
                 <Button
                   className="ml-auto"
                   onClick={() => {
-                    setPollConfig({ ...pollConfig, length: 7 });
+                    resetPollConfig();
                     setShowPollLengthModal(false);
                   }}
                   outline
