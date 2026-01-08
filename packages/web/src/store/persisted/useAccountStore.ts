@@ -5,13 +5,17 @@ import { createPersistedTrackedStore } from "@/store/createTrackedStore";
 interface State {
   currentAccount?: AccountFragment;
   setCurrentAccount: (currentAccount?: AccountFragment) => void;
+  isSignless: boolean;
+  setIsSignless: (isSignless: boolean) => void;
 }
 
 const { useStore: useAccountStore } = createPersistedTrackedStore<State>(
   (set, _get) => ({
     currentAccount: undefined,
+    isSignless: false,
     setCurrentAccount: (currentAccount?: AccountFragment) =>
-      set(() => ({ currentAccount }))
+      set(() => ({ currentAccount })),
+    setIsSignless: (isSignless: boolean) => set(() => ({ isSignless }))
   }),
   { name: Localstorage.AccountStore }
 );

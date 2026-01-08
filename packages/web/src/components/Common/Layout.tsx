@@ -19,7 +19,8 @@ import ReloadTabsWatcher from "./ReloadTabsWatcher";
 const Layout = () => {
   const { pathname } = useLocation();
   const { theme } = useTheme();
-  const { currentAccount, setCurrentAccount } = useAccountStore();
+  const { currentAccount, setCurrentAccount, setIsSignless } =
+    useAccountStore();
   const isMounted = useIsClient();
   const { accessToken } = hydrateAuthTokens();
 
@@ -35,6 +36,7 @@ const Layout = () => {
   const { loading } = useMeQuery({
     onCompleted: ({ me }) => {
       setCurrentAccount(me.loggedInAs.account);
+      setIsSignless(me.isSignless);
     },
     onError,
     skip: !accessToken

@@ -1,4 +1,5 @@
 import { useAccount } from "wagmi";
+import Signless from "@/components/Settings/Manager/Signless";
 import BackButton from "@/components/Shared/BackButton";
 import NotLoggedIn from "@/components/Shared/NotLoggedIn";
 import PageLayout from "@/components/Shared/PageLayout";
@@ -23,7 +24,15 @@ const ManagerSettings = () => {
           icon={<BackButton path="/settings" />}
           title="Manager settings"
         />
-        {disabled ? <WrongWallet /> : <AccountManager />}
+        {disabled ? (
+          <WrongWallet />
+        ) : (
+          <>
+            <Signless />
+            <div className="divider" />
+            <AccountManager />
+          </>
+        )}
       </Card>
     </PageLayout>
   );
