@@ -86,6 +86,16 @@ const useDecodePoll = (
         ...contract,
         args: [post.feed.address, post.id, accountAddress],
         functionName: "getVotedOption" as const
+      },
+      {
+        ...contract,
+        args: [post.feed.address, post.id, accountAddress],
+        functionName: "getVotedOptions" as const
+      },
+      {
+        ...contract,
+        args: [post.feed.address, post.id],
+        functionName: "getAllowMultipleAnswers" as const
       }
     ];
   }, [contract, post.feed.address, post.id, accountAddress]);
@@ -129,6 +139,8 @@ const useDecodePoll = (
     const voteCounts = data?.[0].result as bigint[] | undefined;
     const hasVoted = data?.[1].result as boolean | undefined;
     const votedOption = data?.[2].result as number | undefined;
+    const votedOptions = data?.[3].result as boolean[] | undefined;
+    const allowMultipleAnswers = data?.[4].result as boolean | undefined;
 
     const endsAt = endsAtSeconds
       ? new Date(Number(endsAtSeconds) * 1000)
@@ -142,7 +154,9 @@ const useDecodePoll = (
             id: index,
             text,
             voteCount: Number(voteCounts[index] ?? 0n),
-            voted: Boolean(hasVoted) && votedOption === index
+            voted: allowMultipleAnswers
+              ? votedOptions?.[index] === true
+              : Boolean(hasVoted) && votedOption === index
           }))
         : []
     };
