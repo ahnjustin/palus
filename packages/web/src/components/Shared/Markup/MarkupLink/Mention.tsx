@@ -11,7 +11,7 @@ const Mention = ({ mentions, title }: MarkupLinkProps) => {
   }
 
   const mention: PostMentionFragment | undefined = mentions?.find(
-    (m) => m.replace.from === title
+    (m) => m.replace.from.toLowerCase() === title.toLowerCase()
   );
 
   if (!mention) {
