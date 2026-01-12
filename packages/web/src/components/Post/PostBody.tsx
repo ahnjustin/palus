@@ -17,7 +17,6 @@ import { isRepost } from "@/helpers/postHelpers";
 interface PostBodyProps {
   contentClassName?: string;
   post: AnyPostFragment;
-  quoted?: boolean;
   showMore?: boolean;
   embedded?: boolean;
 }

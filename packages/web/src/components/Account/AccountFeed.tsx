@@ -80,7 +80,12 @@ const AccountFeed = ({ username, address, type }: AccountFeedProps) => {
     variables: { request }
   });
 
-  const posts = data?.posts?.items;
+  // Filter out quote comments from the main feed
+  const posts = data?.posts?.items.filter((post) =>
+    type === AccountFeedType.Feed && post.__typename === "Post"
+      ? !post.commentOn
+      : true
+  );
   const pageInfo = data?.posts?.pageInfo;
   const hasMore = pageInfo?.next;
 

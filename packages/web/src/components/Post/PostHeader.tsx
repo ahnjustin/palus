@@ -26,7 +26,7 @@ const PostHeader = ({
   quoted = false,
   embedded = false
 }: PostHeaderProps) => {
-  const { setQuotedPost } = usePostStore();
+  const { setQuotedPost, setIgnoreQuotedPost } = usePostStore();
 
   const targetPost = isRepost(post) ? post?.repostOf : post;
   const rootPost = timelineItem ? timelineItem?.primary : targetPost;
@@ -55,7 +55,10 @@ const PostHeader = ({
         <button
           aria-label="Remove Quote"
           className="rounded-full border border-gray-200 p-1.5 hover:bg-gray-300/20 dark:border-gray-800"
-          onClick={() => setQuotedPost()}
+          onClick={() => {
+            setIgnoreQuotedPost(true);
+            setQuotedPost();
+          }}
           type="reset"
         >
           <XMarkIcon className="size-4 text-gray-500 dark:text-gray-200" />

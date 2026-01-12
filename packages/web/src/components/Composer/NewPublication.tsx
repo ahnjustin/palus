@@ -1,5 +1,9 @@
-import type { PostActionConfigInput, PostFragment } from "@palus/indexer";
-import { useMediaQuery } from "@uidotdev/usehooks";
+import {
+  type PostActionConfigInput,
+  type PostFragment,
+  usePostLazyQuery
+} from "@palus/indexer";
+import { useDebounce, useMediaQuery } from "@uidotdev/usehooks";
 import { useCallback, useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
@@ -24,6 +28,8 @@ import collectActionParams from "@/helpers/collectActionParams";
 import errorToast from "@/helpers/errorToast";
 import getAccount from "@/helpers/getAccount";
 import getMentions from "@/helpers/getMentions";
+import getURLs from "@/helpers/getURLs";
+import { getPostIdFromLensUrl } from "@/helpers/lensURLs";
 import { IS_STANDALONE } from "@/helpers/mediaQueries";
 import uploadMetadata from "@/helpers/uploadMetadata";
 import useCreatePost from "@/hooks/useCreatePost";
@@ -49,7 +55,6 @@ import { useAccountStore } from "@/store/persisted/useAccountStore";
 import type { IGif } from "@/types/giphy";
 import type { NewAttachment } from "@/types/misc";
 import { Editor, useEditorContext, withEditorContext } from "./Editor";
-import LinkPreviews from "./LinkPreviews";
 
 interface NewPublicationProps {
   className?: string;
@@ -75,10 +80,12 @@ const NewPublication = ({
     editingPost,
     quotedPost,
     parentPost,
+    ignoreQuotedPost,
     setPostContent,
     setEditingPost,
     setParentPost,
-    setQuotedPost
+    setQuotedPost,
+    setIgnoreQuotedPost
   } = usePostStore();
 
   // Audio store
@@ -121,12 +128,16 @@ const NewPublication = ({
 
   const isStandalone = useMediaQuery(IS_STANDALONE);
 
+  const [getPost] = usePostLazyQuery();
+  const debouncedPostContent = useDebounce(postContent, 1000);
+
   const reset = () => {
     editor?.setMarkdown("");
     setIsSubmitting(false);
     setPostContent("");
     setAttachments([]);
     setQuotedPost(undefined);
+    setIgnoreQuotedPost(false);
     setEditingPost(undefined);
     setParentPost(undefined);
     setRules(undefined);
@@ -168,6 +179,30 @@ const NewPublication = ({
   useEffect(() => {
     setPostContentError("");
   }, [audioPost]);
+
+  useEffect(() => {
+    if (isQuote || ignoreQuotedPost || !postContent || !debouncedPostContent) {
+      return;
+    }
+
+    const lookForPostIdInURLs = async () => {
+      const urls = getURLs(debouncedPostContent);
+      if (urls.length) {
+        const postId = getPostIdFromLensUrl(urls[0]);
+        if (!postId) {
+          return;
+        }
+        const { data } = await getPost({
+          variables: { request: { post: postId } }
+        });
+        if (data?.post && data.post.__typename === "Post") {
+          setQuotedPost(data.post);
+        }
+      }
+    };
+
+    lookForPostIdInURLs();
+  }, [isQuote, ignoreQuotedPost, debouncedPostContent, postContent]);
 
   useEffect(() => {
     if (postContent.length > 25000) {
@@ -313,7 +348,6 @@ const NewPublication = ({
           <H6 className="mt-1 px-5 pb-3 text-red-500">{postContentError}</H6>
         ) : null}
         {showPollEditor ? <PollEditor /> : null}
-        <LinkPreviews />
         <NewAttachments attachments={attachments} />
         {quotedPost ? (
           <Wrapper className="m-5" zeroPadding>
