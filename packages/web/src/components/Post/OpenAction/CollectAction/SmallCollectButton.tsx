@@ -1,3 +1,5 @@
+import { ShoppingBagIcon } from "@heroicons/react/24/outline";
+import { ShoppingBagIcon as ShoppingBagIconSolid } from "@heroicons/react/24/solid";
 import type { PostFragment } from "@palus/indexer";
 import { useState } from "react";
 import { Button, Modal } from "@/components/Shared/UI";
@@ -13,11 +15,12 @@ const SmallCollectButton = ({ post }: SmallCollectButtonProps) => {
 
   return (
     <>
-      <Button
-        onClick={() => setShowCollectModal(true)}
-        outline={!hasSimpleCollected}
-        size="sm"
-      >
+      <Button onClick={() => setShowCollectModal(true)} outline>
+        {hasSimpleCollected ? (
+          <ShoppingBagIconSolid className="size-4 text-brand-500" />
+        ) : (
+          <ShoppingBagIcon className="size-4" />
+        )}
         {hasSimpleCollected ? "Collected" : "Collect"}
       </Button>
       <Modal

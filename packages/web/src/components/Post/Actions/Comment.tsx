@@ -3,7 +3,9 @@ import type { PostFragment } from "@palus/indexer";
 import { memo } from "react";
 import { useNavigate } from "react-router";
 import { Tooltip } from "@/components/Shared/UI";
+import cn from "@/helpers/cn";
 import humanize from "@/helpers/humanize";
+import nFormatter from "@/helpers/nFormatter";
 import { useNewPostModalStore } from "@/store/non-persisted/modal/useNewPostModalStore";
 import { usePostStore } from "@/store/non-persisted/post/usePostStore";
 
@@ -14,18 +16,25 @@ interface CommentProps {
 
 const Comment = ({ post, showCount }: CommentProps) => {
   const count = post.stats.comments;
-  const iconClassName = showCount ? "w-[20px]" : "w-[20px] sm:w-[18px]";
   const { setShow: setShowNewPostModal } = useNewPostModalStore();
   const { setParentPost } = usePostStore();
   const navigate = useNavigate();
   const canComment =
     post.operations?.canComment.__typename === "PostOperationValidationPassed";
+  const hasCommented =
+    post.operations?.hasCommented.optimistic ||
+    post.operations?.hasCommented.onChain;
 
   return (
     <div className="flex items-center space-x-1 text-gray-500 dark:text-gray-200">
       <button
         aria-label="Comment"
-        className="rounded-full p-1.5 outline-offset-2 hover:bg-gray-300/20"
+        className={cn(
+          hasCommented
+            ? "text-brand-500 hover:bg-brand-300/20"
+            : "text-gray-500 hover:bg-gray-300/20 dark:text-gray-200",
+          "rounded-full p-1.5 outline-offset-2"
+        )}
         onClick={() => {
           if (canComment) {
             setParentPost(post);
@@ -41,11 +50,20 @@ const Comment = ({ post, showCount }: CommentProps) => {
           placement="top"
           withDelay
         >
-          <ChatBubbleLeftIcon className={iconClassName} />
+          <ChatBubbleLeftIcon className="size-5" />
         </Tooltip>
       </button>
-      {count > 0 && !showCount ? (
-        <span className="w-3 text-sm sm:text-xs">{count}</span>
+      {count > 0 && showCount ? (
+        <span
+          className={cn(
+            hasCommented
+              ? "text-brand-500"
+              : "text-gray-500 dark:text-gray-200",
+            "w-3 text-sm"
+          )}
+        >
+          {nFormatter(count)}
+        </span>
       ) : null}
     </div>
   );

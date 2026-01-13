@@ -2,6 +2,7 @@ import type { ApolloCache, NormalizedCacheObject } from "@apollo/client";
 import { HeartIcon } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartIconSolid } from "@heroicons/react/24/solid";
 import {
+  type AccountFragment,
   type PostFragment,
   PostReactionType,
   useAddReactionMutation,
@@ -14,17 +15,16 @@ import { Tooltip } from "@/components/Shared/UI";
 import { ERRORS } from "@/data/errors";
 import cn from "@/helpers/cn";
 import errorToast from "@/helpers/errorToast";
-import { useAccountStore } from "@/store/persisted/useAccountStore";
+import nFormatter from "@/helpers/nFormatter";
 import type { ApolloClientError } from "@/types/errors";
 
 interface LikeProps {
   post: PostFragment;
   showCount: boolean;
+  currentAccount?: AccountFragment;
 }
 
-const Like = ({ post, showCount }: LikeProps) => {
-  const { currentAccount } = useAccountStore();
-
+const Like = ({ currentAccount, post, showCount }: LikeProps) => {
   const [hasReacted, toggleReact] = useToggle(post.operations?.hasReacted);
   const [reactions, { decrement, increment }] = useCounter(
     post.stats.reactions
@@ -98,8 +98,6 @@ const Like = ({ post, showCount }: LikeProps) => {
     });
   };
 
-  const iconClassName = showCount ? "w-[20px]" : "w-[20px] sm:w-[18px]";
-
   return (
     <div
       className={cn(
@@ -122,14 +120,21 @@ const Like = ({ post, showCount }: LikeProps) => {
           withDelay
         >
           {hasReacted ? (
-            <HeartIconSolid className={iconClassName} />
+            <HeartIconSolid className="w-[20px]" />
           ) : (
-            <HeartIcon className={iconClassName} />
+            <HeartIcon className="w-[20px]" />
           )}
         </Tooltip>
       </button>
-      {reactions > 0 && !showCount ? (
-        <span className="w-3 text-sm sm:text-xs">{reactions}</span>
+      {reactions > 0 && showCount ? (
+        <span
+          className={cn(
+            hasReacted ? "text-brand-500" : "text-gray-500 dark:text-gray-200",
+            "w-3 text-sm"
+          )}
+        >
+          {nFormatter(reactions)}
+        </span>
       ) : null}
     </div>
   );

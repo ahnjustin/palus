@@ -1,25 +1,30 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import type { PostFragment } from "@palus/indexer";
+import type { AccountFragment, PostFragment } from "@palus/indexer";
 import { TipIcon } from "@/components/Shared/Icons/TipIcon";
 import MenuTransition from "@/components/Shared/MenuTransition";
 import TipMenu from "@/components/Shared/TipMenu";
 import { Tooltip } from "@/components/Shared/UI";
 import cn from "@/helpers/cn";
+import nFormatter from "@/helpers/nFormatter";
 import stopEventPropagation from "@/helpers/stopEventPropagation";
 
 interface TipActionProps {
   post: PostFragment;
   showCount: boolean;
+  currentAccount?: AccountFragment;
 }
 
-const TipAction = ({ post, showCount }: TipActionProps) => {
+const TipAction = ({ currentAccount, post, showCount }: TipActionProps) => {
+  if (currentAccount?.address === post.author.address) {
+    return null;
+  }
+
   const hasTipped = post.operations?.hasTipped;
   const { tips } = post.stats;
 
-  const iconClassName = showCount ? "w-[20px]" : "w-[20px] sm:w-[18px]";
-
   return (
     <div className="flex items-center space-x-1 text-gray-500 dark:text-gray-200">
+      {/* @ts-ignore */}
       <Menu as="div" className="relative">
         <MenuButton
           aria-label="Tip"
@@ -33,7 +38,7 @@ const TipAction = ({ post, showCount }: TipActionProps) => {
         >
           <Tooltip content="Tip" placement="top" withDelay>
             <TipIcon
-              className={cn({ "text-brand-500": hasTipped }, iconClassName)}
+              className={cn("size-5", { "text-brand-500": hasTipped })}
             />
           </Tooltip>
         </MenuButton>
@@ -44,19 +49,21 @@ const TipAction = ({ post, showCount }: TipActionProps) => {
             static
           >
             <MenuItem>
-              {({ close }) => <TipMenu closePopover={close} post={post} />}
+              {({ close }: { close: () => void }) => (
+                <TipMenu closePopover={close} post={post} />
+              )}
             </MenuItem>
           </MenuItems>
         </MenuTransition>
       </Menu>
-      {(tips || 0) > 0 && !showCount && (
+      {(tips || 0) > 0 && showCount && (
         <span
           className={cn(
             hasTipped ? "text-brand-500" : "text-gray-500 dark:text-gray-200",
-            "w-3 text-sm sm:text-xs"
+            "w-3 text-sm"
           )}
         >
-          {tips || 0}
+          {nFormatter(tips || 0)}
         </span>
       )}
     </div>

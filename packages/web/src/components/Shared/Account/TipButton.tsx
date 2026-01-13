@@ -37,7 +37,9 @@ const TipButton = ({ account }: TipButtonProps) => {
           static
         >
           <MenuItem>
-            {({ close }) => <TipMenu account={account} closePopover={close} />}
+            {({ close }: { close: () => void }) => (
+              <TipMenu account={account} closePopover={close} />
+            )}
           </MenuItem>
         </MenuItems>
       </MenuTransition>

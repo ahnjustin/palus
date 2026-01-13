@@ -3,7 +3,9 @@ import type { PostFragment } from "@palus/indexer";
 import plur from "plur";
 import { useState } from "react";
 import { Modal, Tooltip } from "@/components/Shared/UI";
+import cn from "@/helpers/cn";
 import humanize from "@/helpers/humanize";
+import nFormatter from "@/helpers/nFormatter";
 import CollectActionBody from "./CollectActionBody";
 
 interface CollectActionProps {
@@ -14,10 +16,11 @@ interface CollectActionProps {
 const CollectAction = ({ post, showCount }: CollectActionProps) => {
   const [showCollectModal, setShowCollectModal] = useState(false);
   const { collects } = post.stats;
+  const hasSimpleCollected = post.operations?.hasSimpleCollected;
 
   return (
     <div
-      className={`items-center space-x-1 text-gray-500 dark:text-gray-200 ${showCount ? "sm:hidden" : "flex"}`}
+      className={`items-center space-x-1 text-gray-500 dark:text-gray-200 ${showCount ? "flex" : "sm:hidden"}`}
     >
       <button
         aria-label="Collect"
@@ -30,11 +33,24 @@ const CollectAction = ({ post, showCount }: CollectActionProps) => {
           placement="top"
           withDelay
         >
-          <ShoppingBagIcon className="w-[20px]" />
+          <ShoppingBagIcon
+            className={cn("size-5", {
+              "text-brand-500": hasSimpleCollected
+            })}
+          />
         </Tooltip>
       </button>
-      {collects > 0 && !showCount ? (
-        <span className="text-sm sm:text-xs">{collects}</span>
+      {collects > 0 && showCount ? (
+        <span
+          className={cn(
+            hasSimpleCollected
+              ? "text-brand-500"
+              : "text-gray-500 dark:text-gray-200",
+            "text-sm"
+          )}
+        >
+          {nFormatter(collects)}
+        </span>
       ) : null}
       <Modal
         onClose={() => setShowCollectModal(false)}

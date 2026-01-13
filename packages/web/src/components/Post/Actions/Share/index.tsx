@@ -6,6 +6,7 @@ import MenuTransition from "@/components/Shared/MenuTransition";
 import { Spinner, Tooltip } from "@/components/Shared/UI";
 import cn from "@/helpers/cn";
 import humanize from "@/helpers/humanize";
+import nFormatter from "@/helpers/nFormatter";
 import { isRepost } from "@/helpers/postHelpers";
 import stopEventPropagation from "@/helpers/stopEventPropagation";
 import Quote from "./Quote";
@@ -36,8 +37,6 @@ const ShareMenu = ({ post, showCount }: ShareMenuProps) => {
     targetPost.operations?.canQuote.__typename ===
     "PostOperationValidationPassed";
 
-  const iconClassName = "w-[20px]";
-
   if (!canRepost && !canQuote) {
     return null;
   }
@@ -67,7 +66,7 @@ const ShareMenu = ({ post, showCount }: ShareMenuProps) => {
               placement="top"
               withDelay
             >
-              <ArrowsRightLeftIcon className={iconClassName} />
+              <ArrowsRightLeftIcon className="size-5" />
             </Tooltip>
           )}
         </MenuButton>
@@ -95,14 +94,14 @@ const ShareMenu = ({ post, showCount }: ShareMenuProps) => {
           </MenuItems>
         </MenuTransition>
       </Menu>
-      {shares > 0 && !showCount ? (
+      {shares > 0 && showCount ? (
         <span
           className={cn(
             hasShared ? "text-brand-500" : "text-gray-500 dark:text-gray-200",
-            "w-3 text-sm sm:text-xs"
+            "w-3 text-sm"
           )}
         >
-          {shares}
+          {nFormatter(shares)}
         </span>
       ) : null}
     </div>
