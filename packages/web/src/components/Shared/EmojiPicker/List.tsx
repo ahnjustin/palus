@@ -42,7 +42,7 @@ const List = ({ setEmoji }: ListProps) => {
       <div className="w-full p-2 pt-4 pb-0">
         <Input
           autoFocus
-          className="px-3 py-2 text-sm"
+          className="px-3 py-2 text-base sm:text-sm"
           iconLeft={<MagnifyingGlassIcon />}
           iconRight={
             <XMarkIcon

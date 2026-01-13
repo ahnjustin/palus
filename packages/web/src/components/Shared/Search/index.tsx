@@ -99,7 +99,7 @@ const Search = ({ placeholder = "Search…" }: SearchProps) => {
     <div className="w-full">
       <Form form={form} onSubmit={handleSubmit}>
         <Input
-          className="px-3 py-3 text-sm"
+          className="px-3 py-3 text-base sm:text-sm"
           iconLeft={<MagnifyingGlassIcon />}
           iconRight={
             <XMarkIcon
