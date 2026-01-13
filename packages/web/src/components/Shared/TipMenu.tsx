@@ -159,7 +159,7 @@ const TipMenu = ({ closePopover, post, account }: TipMenuProps) => {
   }
 
   return (
-    <div className="m-5 space-y-3">
+    <div className="m-4 space-y-3">
       <div className="space-y-2">
         <div className="flex items-center space-x-1 text-gray-500 text-xs dark:text-gray-200">
           <span>Balance:</span>
@@ -236,26 +236,30 @@ const TipMenu = ({ closePopover, post, account }: TipMenuProps) => {
           />
         </div>
       ) : null}
-      {isSubmitting || balanceLoading ? (
-        <Button
-          className={cn("flex justify-center", submitButtonClassName)}
-          disabled
-          icon={<Spinner className="my-0.5" size="xs" />}
-        />
-      ) : canTip ? (
-        <Button
-          className={submitButtonClassName}
-          disabled={!amount || isSubmitting || !canTip}
-          onClick={handleTip}
-        >
-          <b>Tip ${amount.toFixed(2)}</b>
-        </Button>
-      ) : (
-        <TopUpButton
-          amountToTopUp={Math.ceil((amount - Number(nativeBalance)) * 20) / 20}
-          className="w-full"
-        />
-      )}
+      <div className="pt-1">
+        {isSubmitting || balanceLoading ? (
+          <Button
+            className={cn("flex justify-center", submitButtonClassName)}
+            disabled
+            icon={<Spinner className="my-0.5" size="xs" />}
+          />
+        ) : canTip ? (
+          <Button
+            className={submitButtonClassName}
+            disabled={!amount || isSubmitting || !canTip}
+            onClick={handleTip}
+          >
+            <b>Tip ${amount.toFixed(2)}</b>
+          </Button>
+        ) : (
+          <TopUpButton
+            amountToTopUp={
+              Math.ceil((amount - Number(nativeBalance)) * 20) / 20
+            }
+            className="w-full"
+          />
+        )}
+      </div>
     </div>
   );
 };
