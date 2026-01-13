@@ -14,7 +14,7 @@ import TopUpButton from "@/components/Shared/Account/TopUp/Button";
 import LoginButton from "@/components/Shared/LoginButton";
 import Skeleton from "@/components/Shared/Skeleton";
 import { Button, Input, Spinner } from "@/components/Shared/UI";
-import { NATIVE_TOKEN_SYMBOL, PALUS_TREASURY } from "@/data/constants";
+import { NATIVE_TOKEN_SYMBOL } from "@/data/constants";
 import cn from "@/helpers/cn";
 import errorToast from "@/helpers/errorToast";
 import usePreventScrollOnNumberInput from "@/hooks/usePreventScrollOnNumberInput";
@@ -33,7 +33,7 @@ interface TipMenuProps {
 const TipMenu = ({ closePopover, post, account }: TipMenuProps) => {
   const { currentAccount } = useAccountStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [amount, setAmount] = useState(1);
+  const [amount, setAmount] = useState(0.1);
   const [other, setOther] = useState(false);
   const handleTransactionLifecycle = useTransactionLifecycle();
   const { cache } = useApolloClient();
@@ -75,7 +75,7 @@ const TipMenu = ({ closePopover, post, account }: TipMenuProps) => {
     setIsSubmitting(false);
     closePopover();
     updateCache();
-    toast.success(`Tipped ${amount} ${NATIVE_TOKEN_SYMBOL}`);
+    toast.success(`Tipped ${amount.toFixed(2)} ${NATIVE_TOKEN_SYMBOL}`);
   };
 
   const onError = useCallback((error: ApolloClientError) => {
@@ -134,9 +134,7 @@ const TipMenu = ({ closePopover, post, account }: TipMenuProps) => {
     setIsSubmitting(true);
 
     const tipping: TippingAmountInput = {
-      native: cryptoRate.toString(),
-      // 11 is a calculated value based on the referral pool of 20% and the Lens fee of 2.1% after the 1.5% lens fees cut
-      referrals: [{ address: PALUS_TREASURY, percent: 11 }]
+      native: cryptoRate.toString()
     };
 
     if (post) {
@@ -167,15 +165,34 @@ const TipMenu = ({ closePopover, post, account }: TipMenuProps) => {
           <span>Balance:</span>
           <span>
             {nativeBalance ? (
-              `${nativeBalance} ${NATIVE_TOKEN_SYMBOL}`
+              `$${nativeBalance} ${NATIVE_TOKEN_SYMBOL}`
             ) : (
               <Skeleton className="h-2.5 w-14 rounded-full" />
             )}
           </span>
         </div>
       </div>
-      <div className="space-x-4">
+      <div className="flex gap-x-3">
         <Button
+          className="flex-1"
+          disabled={amountDisabled}
+          onClick={() => handleSetAmount(0.1)}
+          outline={amount !== 0.1}
+          size="sm"
+        >
+          $0.1
+        </Button>
+        <Button
+          className="flex-1"
+          disabled={amountDisabled}
+          onClick={() => handleSetAmount(0.5)}
+          outline={amount !== 0.5}
+          size="sm"
+        >
+          $0.5
+        </Button>
+        <Button
+          className="flex-1"
           disabled={amountDisabled}
           onClick={() => handleSetAmount(1)}
           outline={amount !== 1}
@@ -184,14 +201,7 @@ const TipMenu = ({ closePopover, post, account }: TipMenuProps) => {
           $1
         </Button>
         <Button
-          disabled={amountDisabled}
-          onClick={() => handleSetAmount(2)}
-          outline={amount !== 2}
-          size="sm"
-        >
-          $2
-        </Button>
-        <Button
+          className="flex-1"
           disabled={amountDisabled}
           onClick={() => handleSetAmount(5)}
           outline={amount !== 5}
@@ -200,15 +210,16 @@ const TipMenu = ({ closePopover, post, account }: TipMenuProps) => {
           $5
         </Button>
         <Button
+          className="flex-1"
           disabled={amountDisabled}
           onClick={() => {
-            handleSetAmount(other ? 1 : 10);
+            handleSetAmount(other ? 0.1 : 10);
             setOther(!other);
           }}
           outline={!other}
           size="sm"
         >
-          Other
+          &#8230;
         </Button>
       </div>
       {other ? (
@@ -237,7 +248,7 @@ const TipMenu = ({ closePopover, post, account }: TipMenuProps) => {
           disabled={!amount || isSubmitting || !canTip}
           onClick={handleTip}
         >
-          <b>Tip ${amount}</b>
+          <b>Tip ${amount.toFixed(2)}</b>
         </Button>
       ) : (
         <TopUpButton
