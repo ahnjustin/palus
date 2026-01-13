@@ -1,8 +1,10 @@
+import { useMediaQuery } from "@uidotdev/usehooks";
 import type { ReactNode } from "react";
 import { memo } from "react";
 import MetaTags from "@/components/Common/MetaTags";
 import SignupButton from "@/components/Shared/Navbar/SignupButton";
 import cn from "@/helpers/cn";
+import { IS_STANDALONE } from "@/helpers/mediaQueries";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
 import LoginButton from "./LoginButton";
 import Search from "./Search";
@@ -44,6 +46,8 @@ const PageLayout = ({
   hideSearch = false,
   zeroTopMargin = false
 }: PageLayoutProps) => {
+  const isStandalone = useMediaQuery(IS_STANDALONE);
+
   return (
     <>
       <MetaTags description={description} title={title} />
@@ -51,6 +55,7 @@ const PageLayout = ({
         className={cn(
           "mt-4 mb-16 min-w-0 flex-1 space-y-4 md:mt-5 md:mb-5 md:space-y-5",
           {
+            "mb-28": isStandalone,
             "mt-0 md:mt-5": zeroTopMargin
           }
         )}
