@@ -1,17 +1,16 @@
-import {
-  NotificationOrderBy,
-  useNotificationIndicatorQuery
-} from "@palus/indexer";
+import { useNotificationIndicatorQuery } from "@palus/indexer";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
 import { useNotificationStore } from "@/store/persisted/useNotificationStore";
+import { usePreferencesStore } from "@/store/persisted/usePreferencesStore";
 
 const useHasNewNotifications = () => {
   const { currentAccount } = useAccountStore();
   const { lastSeenNotificationId } = useNotificationStore();
+  const { includeLowScore } = usePreferencesStore();
 
   const { data } = useNotificationIndicatorQuery({
     skip: !currentAccount,
-    variables: { request: { orderBy: NotificationOrderBy.Default } }
+    variables: { request: { filter: { includeLowScore } } }
   });
 
   const latestNotificationWithId = data?.notifications?.items?.find(
