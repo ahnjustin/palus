@@ -1,10 +1,12 @@
 import New from "@/components/Shared/Badges/New";
 import { Tabs } from "@/components/Shared/UI";
 import { HomeFeedType } from "@/data/enums";
+import useUmami from "@/hooks/useUmami";
 import { useHomeTabStore } from "@/store/persisted/useHomeTabStore";
 
 const FeedType = () => {
   const { feedType, setFeedType } = useHomeTabStore();
+  const { track } = useUmami();
 
   const tabs = [
     { name: "Timeline", type: HomeFeedType.TIMELINE },
@@ -20,6 +22,7 @@ const FeedType = () => {
       setActive={(type) => {
         const nextType = type as HomeFeedType;
         setFeedType(nextType);
+        track("Home Feed", { type: nextType.toLowerCase() });
       }}
       tabs={tabs}
     />
