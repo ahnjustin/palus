@@ -11,7 +11,15 @@ import {
 } from "@/data/constants";
 
 const connectors = [
-  metaMask({ enableAnalytics: false, infuraAPIKey: INFURA_API_KEY }),
+  metaMask({
+    dappMetadata: {
+      iconUrl: "https://palus.app/web-app-manifest-512x512.png",
+      name: "Palus",
+      url: "https://palus.app"
+    },
+    enableAnalytics: false,
+    infuraAPIKey: INFURA_API_KEY
+  }),
   familyAccountsConnector(),
   walletConnect({ projectId: WALLETCONNECT_PROJECT_ID }),
   injected()
