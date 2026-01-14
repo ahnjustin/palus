@@ -26,7 +26,7 @@ const PostHeader = ({
   quoted = false,
   embedded = false
 }: PostHeaderProps) => {
-  const { setQuotedPost, setIgnoreQuotedPost } = usePostStore();
+  const { setQuotedPost, setIgnoreQuotedPostId } = usePostStore();
 
   const targetPost = isRepost(post) ? post?.repostOf : post;
   const rootPost = timelineItem ? timelineItem?.primary : targetPost;
@@ -56,7 +56,7 @@ const PostHeader = ({
           aria-label="Remove Quote"
           className="rounded-full border border-gray-200 p-1.5 hover:bg-gray-300/20 dark:border-gray-800"
           onClick={() => {
-            setIgnoreQuotedPost(true);
+            setIgnoreQuotedPostId(post.slug);
             setQuotedPost();
           }}
           type="reset"

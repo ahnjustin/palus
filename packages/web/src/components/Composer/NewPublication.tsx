@@ -81,12 +81,12 @@ const NewPublication = ({
     editingPost,
     quotedPost,
     parentPost,
-    ignoreQuotedPost,
+    ignoreQuotedPostId,
     setPostContent,
     setEditingPost,
     setParentPost,
     setQuotedPost,
-    setIgnoreQuotedPost
+    setIgnoreQuotedPostId
   } = usePostStore();
 
   // Audio store
@@ -138,7 +138,7 @@ const NewPublication = ({
     setPostContent("");
     setAttachments([]);
     setQuotedPost(undefined);
-    setIgnoreQuotedPost(false);
+    setIgnoreQuotedPostId(undefined);
     setEditingPost(undefined);
     setParentPost(undefined);
     setRules(undefined);
@@ -188,7 +188,12 @@ const NewPublication = ({
   }, [editingPost]);
 
   useEffect(() => {
-    if (isQuote || ignoreQuotedPost || !postContent || !debouncedPostContent) {
+    if (
+      isQuote ||
+      !postContent ||
+      !debouncedPostContent ||
+      debouncedPostContent !== postContent
+    ) {
       return;
     }
 
@@ -196,7 +201,7 @@ const NewPublication = ({
       const urls = getURLs(debouncedPostContent);
       if (urls.length) {
         const postId = getPostIdFromLensUrl(urls[0]);
-        if (!postId) {
+        if (!postId || postId === ignoreQuotedPostId) {
           return;
         }
         const { data } = await getPost({
@@ -209,7 +214,7 @@ const NewPublication = ({
     };
 
     lookForPostIdInURLs();
-  }, [isQuote, ignoreQuotedPost, debouncedPostContent, postContent]);
+  }, [isQuote, ignoreQuotedPostId, debouncedPostContent, postContent]);
 
   useEffect(() => {
     if (postContent.length > 25000) {
