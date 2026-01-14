@@ -11,7 +11,7 @@ import {
 } from "@/data/constants";
 
 const connectors = [
-  metaMask({ infuraAPIKey: INFURA_API_KEY }),
+  metaMask({ enableAnalytics: false, infuraAPIKey: INFURA_API_KEY }),
   familyAccountsConnector(),
   walletConnect({ projectId: WALLETCONNECT_PROJECT_ID }),
   injected()
