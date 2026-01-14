@@ -1,4 +1,4 @@
-import type { PostMetadataFragment } from "@palus/indexer";
+import type { ContentWarning, PostMetadataFragment } from "@palus/indexer";
 import { PLACEHOLDER_IMAGE } from "@/data/constants";
 import type { AttachmentData } from "@/types/misc";
 import getAttachmentsData from "./getAttachmentsData";
@@ -10,6 +10,7 @@ const getPostData = (
   asset?: AttachmentData;
   attachments?: AttachmentData[];
   content?: string;
+  contentWarning?: ContentWarning | null;
 } | null => {
   switch (metadata.__typename) {
     case "ArticleMetadata":
@@ -24,11 +25,15 @@ const getPostData = (
     case "SpaceMetadata":
       return {
         attachments: getAttachmentsData(metadata.attachments),
-        content: metadata.content
+        content: metadata.content,
+        contentWarning: metadata.contentWarning
       };
     case "TextOnlyMetadata":
     case "StoryMetadata":
-      return { content: metadata.content };
+      return {
+        content: metadata.content,
+        contentWarning: metadata.contentWarning
+      };
     case "ImageMetadata":
       return {
         asset: {
@@ -36,7 +41,8 @@ const getPostData = (
           uri: sanitizeDStorageUrl(metadata.image.item)
         },
         attachments: getAttachmentsData(metadata.attachments),
-        content: metadata.content
+        content: metadata.content,
+        contentWarning: metadata.contentWarning
       };
     case "AudioMetadata": {
       const audioAttachments = getAttachmentsData(metadata.attachments)[0];
@@ -54,7 +60,8 @@ const getPostData = (
           type: "Audio",
           uri: metadata.audio.item || audioAttachments?.uri
         },
-        content: metadata.content
+        content: metadata.content,
+        contentWarning: metadata.contentWarning
       };
     }
     case "VideoMetadata": {
@@ -68,7 +75,8 @@ const getPostData = (
           type: "Video",
           uri: sanitizeDStorageUrl(metadata.video.item || videoAttachments?.uri)
         },
-        content: metadata.content
+        content: metadata.content,
+        contentWarning: metadata.contentWarning
       };
     }
     default:

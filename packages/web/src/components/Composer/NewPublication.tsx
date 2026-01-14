@@ -28,6 +28,7 @@ import collectActionParams from "@/helpers/collectActionParams";
 import errorToast from "@/helpers/errorToast";
 import getAccount from "@/helpers/getAccount";
 import getMentions from "@/helpers/getMentions";
+import getPostData from "@/helpers/getPostData";
 import getURLs from "@/helpers/getURLs";
 import { getPostIdFromLensUrl } from "@/helpers/lensURLs";
 import { IS_STANDALONE } from "@/helpers/mediaQueries";
@@ -179,6 +180,12 @@ const NewPublication = ({
   useEffect(() => {
     setPostContentError("");
   }, [audioPost]);
+
+  useEffect(() => {
+    if (!editingPost) return;
+    const contentWarning = getPostData(editingPost.metadata)?.contentWarning;
+    setContentWarning(contentWarning ?? undefined);
+  }, [editingPost]);
 
   useEffect(() => {
     if (isQuote || ignoreQuotedPost || !postContent || !debouncedPostContent) {
@@ -370,8 +377,12 @@ const NewPublication = ({
           />
           <Gif setGifAttachment={(gif: IGif) => setGifAttachment(gif)} />
           <ContentWarning />
-          <PollSettings />
-          {editingPost ? null : <CollectSettings />}
+          {editingPost ? null : (
+            <>
+              <PollSettings />
+              <CollectSettings />
+            </>
+          )}
           <div className="flex w-full items-center justify-end gap-x-4">
             {editingPost ? null : <RulesSettings />}
             <Button
