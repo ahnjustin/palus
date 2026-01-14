@@ -75,7 +75,7 @@ const PostBody = ({
   return (
     <div className="relative">
       {contentWarning && !showCensored && (
-        <div className="absolute z-10 flex h-full w-full items-center justify-center">
+        <div className="absolute z-10 flex h-full min-h-12 w-full items-center justify-center">
           <Button
             onClick={(event) => {
               event.stopPropagation();
