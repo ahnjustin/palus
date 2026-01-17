@@ -13,7 +13,6 @@ import ContentWarning from "@/components/Composer/Actions/ContentWarning";
 import Gif from "@/components/Composer/Actions/Gif";
 import PollSettings from "@/components/Composer/Actions/PollSettings";
 import PollEditor from "@/components/Composer/Actions/PollSettings/PollEditor";
-import pollActionParams from "@/components/Composer/Actions/PollSettings/pollActionParams";
 import RulesSettings from "@/components/Composer/Actions/RulesSettings";
 import NewAttachments from "@/components/Composer/NewAttachments";
 import QuotedPost from "@/components/Post/QuotedPost";
@@ -32,6 +31,8 @@ import getPostData from "@/helpers/getPostData";
 import getURLs from "@/helpers/getURLs";
 import { getPostIdFromLensUrl } from "@/helpers/lensURLs";
 import { IS_STANDALONE } from "@/helpers/mediaQueries";
+import pollActionParams from "@/helpers/pollActionParams";
+import postRuleParams from "@/helpers/postRuleParams";
 import uploadMetadata from "@/helpers/uploadMetadata";
 import useCreatePost from "@/hooks/useCreatePost";
 import useEditPost from "@/hooks/useEditPost";
@@ -111,7 +112,8 @@ const NewPublication = ({
     (state) => state
   );
 
-  const { rules, setRules } = usePostRulesStore();
+  const { followersOnly, followingOnly, setFollowersOnly, setFollowingOnly } =
+    usePostRulesStore();
   const { setContentWarning } = usePostContentWarningStore();
 
   // States
@@ -141,7 +143,8 @@ const NewPublication = ({
     setIgnoreQuotedPostId(undefined);
     setEditingPost(undefined);
     setParentPost(undefined);
-    setRules(undefined);
+    setFollowersOnly(false);
+    setFollowingOnly(false);
     setContentWarning(undefined);
     setShowPollEditor(false);
     resetPollConfig();
@@ -290,6 +293,8 @@ const NewPublication = ({
         actions.push({ ...pollActionParams(pollConfig) });
       }
 
+      const rules = postRuleParams({ followersOnly, followingOnly });
+
       return await createPost({
         variables: {
           request: {
@@ -300,9 +305,7 @@ const NewPublication = ({
             ...(isComment && { commentOn: { post: post?.id } }),
             ...(isQuote && { quoteOf: { post: quotedPost?.id } }),
             ...(Boolean(actions.length) && { actions }),
-            ...(rules && {
-              rules: { required: [{ followersOnlyRule: rules }] }
-            })
+            ...(rules && { rules })
           }
         }
       });

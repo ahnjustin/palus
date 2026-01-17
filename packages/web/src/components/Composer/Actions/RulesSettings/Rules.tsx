@@ -1,4 +1,3 @@
-import type { FollowersOnlyPostRuleConfig } from "@palus/indexer";
 import type { Dispatch, SetStateAction } from "react";
 import ToggleWithHelper from "@/components/Shared/ToggleWithHelper";
 import { Button } from "@/components/Shared/UI";
@@ -9,53 +8,31 @@ interface RulesProps {
 }
 
 const Rules = ({ setShowModal }: RulesProps) => {
-  const { rules = {}, setRules } = usePostRulesStore();
-
-  const handleToggle = (key: keyof FollowersOnlyPostRuleConfig) => {
-    const updated = { ...rules };
-
-    if (updated[key]) {
-      delete updated[key];
-    } else {
-      updated[key] = true;
-    }
-
-    const hasAny = Object.keys(updated).length > 0;
-    setRules(hasAny ? updated : undefined);
-  };
+  const { followersOnly, followingOnly, setFollowersOnly, setFollowingOnly } =
+    usePostRulesStore();
 
   return (
     <>
       <div className="m-5 space-y-5">
         <ToggleWithHelper
-          description="Only people who follow you can reply"
+          description="Only people who follow you can reply, quote, or repost"
           heading={
             <span className="font-semibold">
-              Restrict <b>replies</b> to followers
+              Restrict to <span className="font-bold">my followers</span>
             </span>
           }
-          on={!!rules.repliesRestricted}
-          setOn={() => handleToggle("repliesRestricted")}
+          on={!!followersOnly}
+          setOn={() => setFollowersOnly(!followersOnly)}
         />
         <ToggleWithHelper
-          description="Only people who follow you can quote this post"
+          description="Only people who you follow can reply, quote, or repost"
           heading={
             <span className="font-semibold">
-              Restrict <b>quotes</b> to followers
+              Restrict to <span className="font-bold">accounts I follow</span>
             </span>
           }
-          on={!!rules.quotesRestricted}
-          setOn={() => handleToggle("quotesRestricted")}
-        />
-        <ToggleWithHelper
-          description="Only people who follow you can repost this"
-          heading={
-            <span className="font-semibold">
-              Restrict <b>reposts</b> to followers
-            </span>
-          }
-          on={!!rules.repostRestricted}
-          setOn={() => handleToggle("repostRestricted")}
+          on={!!followingOnly}
+          setOn={() => setFollowingOnly(!followingOnly)}
         />
       </div>
       <div className="divider" />
@@ -63,12 +40,13 @@ const Rules = ({ setShowModal }: RulesProps) => {
         <Button
           className="ml-auto"
           onClick={() => {
-            setRules(undefined);
+            setFollowersOnly(false);
+            setFollowingOnly(false);
             setShowModal(false);
           }}
           outline
         >
-          Cancel
+          Reset
         </Button>
         <Button onClick={() => setShowModal(false)}>Save</Button>
       </div>

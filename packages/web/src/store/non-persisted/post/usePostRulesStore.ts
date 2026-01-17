@@ -1,14 +1,17 @@
-import type { FollowersOnlyPostRuleConfig } from "@palus/indexer";
 import { createTrackedStore } from "@/store/createTrackedStore";
 
 interface State {
-  rules?: FollowersOnlyPostRuleConfig;
-  setRules: (rules?: FollowersOnlyPostRuleConfig) => void;
+  followersOnly: boolean;
+  followingOnly: boolean;
+  setFollowersOnly: (followersOnly: boolean) => void;
+  setFollowingOnly: (followingOnly: boolean) => void;
 }
 
 const { useStore: usePostRulesStore } = createTrackedStore<State>((set) => ({
-  rules: undefined,
-  setRules: (rules) => set(() => ({ rules }))
+  followersOnly: false,
+  followingOnly: false,
+  setFollowersOnly: (followersOnly: boolean) => set(() => ({ followersOnly })),
+  setFollowingOnly: (followingOnly: boolean) => set(() => ({ followingOnly }))
 }));
 
 export { usePostRulesStore };
