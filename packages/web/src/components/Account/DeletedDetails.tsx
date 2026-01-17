@@ -16,7 +16,7 @@ const DeletedDetails = ({ account }: DeletedDetailsProps) => {
       <div className="-mt-14 sm:-mt-24 relative ml-5 size-20 sm:size-36">
         <Image
           alt={account.address}
-          className="size-20 rounded-xl bg-gray-200 ring-3 ring-gray-50 sm:size-36 dark:bg-gray-700 dark:ring-black"
+          className="size-20 rounded-xl bg-gray-200 object-cover ring-3 ring-gray-50 sm:size-36 dark:bg-gray-700 dark:ring-black"
           height={128}
           src={`${STATIC_IMAGES_URL}/suspended.webp`}
           width={128}
