@@ -80,7 +80,7 @@ const Details = ({
         <div className="-mt-14 sm:-mt-24 relative ml-4 size-20 sm:size-36 md:ml-5">
           <Image
             alt={account.address}
-            className="size-20 cursor-pointer rounded-full bg-gray-200 ring-3 ring-gray-50 sm:size-36 dark:bg-gray-700 dark:ring-black"
+            className="size-20 cursor-pointer rounded-full bg-gray-200 object-cover ring-3 ring-gray-50 sm:size-36 dark:bg-gray-700 dark:ring-black"
             height={128}
             onClick={handleShowLightBox}
             src={getAvatar(account, TRANSFORMS.AVATAR_BIG)}
