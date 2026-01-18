@@ -15,15 +15,17 @@ import {
   SelectValue
 } from "@/components/Shared/UI";
 import getAvatar from "@/helpers/getAvatar";
+import { usePostRulesStore } from "@/store/non-persisted/post/usePostRulesStore";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
 
 interface GroupSelectorProps {
-  selected?: string;
-  onChange: (groupFeed: string) => void;
+  selected?: GroupFragment;
+  onChange: (group: GroupFragment | undefined) => void;
 }
 
 const GroupSelector = ({ selected, onChange }: GroupSelectorProps) => {
   const { currentAccount } = useAccountStore();
+  const { setGroupGate } = usePostRulesStore();
 
   const request: GroupsRequest = {
     filter: { member: currentAccount?.address },
@@ -42,18 +44,28 @@ const GroupSelector = ({ selected, onChange }: GroupSelectorProps) => {
       .map((group: GroupFragment) => ({
         icon: getAvatar(group),
         label: group.metadata?.name ?? group.address,
-        selected: group.feed?.address === selected,
-        value: group.feed?.address ?? ""
+        selected: group.feed?.address === selected?.feed?.address,
+        value: group ?? ""
       }))
-      .filter((option) => option.value !== "");
+      .filter((option) => option.value.feed?.address !== "");
   }, [data?.groups?.items, selected]);
 
   if (!options.length) {
     return null;
   }
 
+  const onValueChange = (value: string) => {
+    const selectedGroup = data?.groups?.items?.find(
+      (item) => item.address === value
+    );
+    onChange(selectedGroup);
+    if (!selectedGroup) {
+      setGroupGate(undefined);
+    }
+  };
+
   return (
-    <SelectUI defaultValue="global" onValueChange={onChange}>
+    <SelectUI defaultValue="global" onValueChange={onValueChange}>
       <SelectTrigger
         className="!h-6 w-fit border-none px-0 py-0 opacity-75 shadow-none"
         size="sm"
@@ -68,8 +80,8 @@ const GroupSelector = ({ selected, onChange }: GroupSelectorProps) => {
         {options.map((option) => (
           <SelectItem
             className="min-w-48"
-            key={option.value}
-            value={option.value}
+            key={option.value.address}
+            value={option.value.address}
           >
             <img
               alt={option.label}

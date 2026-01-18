@@ -49,9 +49,7 @@ const ViewGroup = () => {
           title="You are banned from this group"
         />
       )}
-      {currentAccount && isMember && !isBanned && (
-        <NewPost feed={group.feed?.address} />
-      )}
+      {currentAccount && isMember && !isBanned && <NewPost group={group} />}
       <GroupFeed feed={group.feed?.address} />
     </PageLayout>
   );

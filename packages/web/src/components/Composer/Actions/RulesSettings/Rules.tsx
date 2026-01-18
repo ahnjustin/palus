@@ -5,11 +5,18 @@ import { usePostRulesStore } from "@/store/non-persisted/post/usePostRulesStore"
 
 interface RulesProps {
   setShowModal: Dispatch<SetStateAction<boolean>>;
+  groupAddress?: string;
 }
 
-const Rules = ({ setShowModal }: RulesProps) => {
-  const { followersOnly, followingOnly, setFollowersOnly, setFollowingOnly } =
-    usePostRulesStore();
+const Rules = ({ setShowModal, groupAddress }: RulesProps) => {
+  const {
+    followersOnly,
+    followingOnly,
+    groupGate,
+    setFollowersOnly,
+    setFollowingOnly,
+    setGroupGate
+  } = usePostRulesStore();
 
   return (
     <>
@@ -34,14 +41,27 @@ const Rules = ({ setShowModal }: RulesProps) => {
           on={!!followingOnly}
           setOn={() => setFollowingOnly(!followingOnly)}
         />
+        {groupAddress ? (
+          <ToggleWithHelper
+            description="Only members of the group can reply"
+            heading={
+              <span className="font-semibold">
+                Restrict to <span className="font-bold">group members</span>
+              </span>
+            }
+            on={!!groupGate}
+            setOn={() => setGroupGate(groupGate ? undefined : groupAddress)}
+          />
+        ) : null}
       </div>
       <div className="divider" />
-      <div className="flex space-x-2 p-5">
+      <div className="flex space-x-2 px-5 py-3">
         <Button
           className="ml-auto"
           onClick={() => {
             setFollowersOnly(false);
             setFollowingOnly(false);
+            setGroupGate(undefined);
             setShowModal(false);
           }}
           outline

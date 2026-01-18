@@ -1,14 +1,19 @@
 import { AdjustmentsHorizontalIcon } from "@heroicons/react/24/outline";
+import type { GroupFragment } from "@palus/indexer";
 import { useState } from "react";
 import { Modal, Tooltip } from "@/components/Shared/UI";
 import cn from "@/helpers/cn";
 import { usePostRulesStore } from "@/store/non-persisted/post/usePostRulesStore";
 import Rules from "./Rules";
 
-const RulesSettings = () => {
+interface RulesSettingsProps {
+  group?: GroupFragment;
+}
+
+const RulesSettings = ({ group }: RulesSettingsProps) => {
   const [showModal, setShowModal] = useState(false);
-  const { followersOnly, followingOnly } = usePostRulesStore();
-  const hasRules = followersOnly || followingOnly;
+  const { followersOnly, followingOnly, groupGate } = usePostRulesStore();
+  const hasRules = followersOnly || followingOnly || groupGate;
 
   return (
     <>
@@ -25,7 +30,7 @@ const RulesSettings = () => {
         </button>
       </Tooltip>
       <Modal onClose={() => setShowModal(false)} show={showModal} title="Rules">
-        <Rules setShowModal={setShowModal} />
+        <Rules groupAddress={group?.address} setShowModal={setShowModal} />
       </Modal>
     </>
   );

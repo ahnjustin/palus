@@ -8,6 +8,7 @@ import { usePaste } from "@/hooks/prosekit/usePaste";
 import { usePostStore } from "@/store/non-persisted/post/usePostStore";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
 import "prosekit/basic/style.css";
+import type { GroupFragment } from "@palus/indexer";
 import { createEditor } from "prosekit/core";
 import { ProseKit } from "prosekit/react";
 import { useEffect, useMemo, useRef } from "react";
@@ -20,9 +21,9 @@ interface EditorProps {
   isComment: boolean;
   isQuote?: boolean;
   isEditing?: boolean;
-  feed?: string;
-  selectedFeed: string;
-  setSelectedFeed: (feed: string) => void;
+  group?: GroupFragment;
+  selectedGroup: GroupFragment | undefined;
+  setSelectedGroup: (group: GroupFragment | undefined) => void;
   isInModal?: boolean;
   fullHeight?: boolean;
 }
@@ -31,9 +32,9 @@ const Editor = ({
   isComment,
   isQuote,
   isEditing,
-  feed,
-  selectedFeed,
-  setSelectedFeed,
+  group,
+  selectedGroup,
+  setSelectedGroup,
   isInModal,
   fullHeight
 }: EditorProps) => {
@@ -86,8 +87,11 @@ const Editor = ({
           src={getAvatar(currentAccount)}
         />
         <div className="flex flex-1 flex-col overflow-x-hidden">
-          {isComment || feed || isQuote || isEditing ? null : (
-            <GroupSelector onChange={setSelectedFeed} selected={selectedFeed} />
+          {isComment || group || isQuote || isEditing ? null : (
+            <GroupSelector
+              onChange={setSelectedGroup}
+              selected={selectedGroup}
+            />
           )}
           <EditorMenus />
           <div

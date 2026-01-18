@@ -1,4 +1,5 @@
 import {
+  type GroupFragment,
   type PostActionConfigInput,
   type PostFragment,
   usePostLazyQuery
@@ -61,14 +62,14 @@ import { Editor, useEditorContext, withEditorContext } from "./Editor";
 interface NewPublicationProps {
   className?: string;
   post?: PostFragment;
-  feed?: string;
+  group?: GroupFragment;
   isModal?: boolean;
 }
 
 const NewPublication = ({
   className,
   post,
-  feed,
+  group,
   isModal
 }: NewPublicationProps) => {
   const { currentAccount } = useAccountStore();
@@ -112,14 +113,22 @@ const NewPublication = ({
     (state) => state
   );
 
-  const { followersOnly, followingOnly, setFollowersOnly, setFollowingOnly } =
-    usePostRulesStore();
+  const {
+    followersOnly,
+    followingOnly,
+    groupGate,
+    setFollowersOnly,
+    setFollowingOnly,
+    setGroupGate
+  } = usePostRulesStore();
   const { setContentWarning } = usePostContentWarningStore();
 
   // States
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [postContentError, setPostContentError] = useState("");
-  const [selectedFeed, setSelectedFeed] = useState<string>(feed || "");
+  const [selectedGroup, setSelectedGroup] = useState<GroupFragment | undefined>(
+    group
+  );
 
   const editor = useEditorContext();
   const getMetadata = usePostMetadata();
@@ -145,6 +154,7 @@ const NewPublication = ({
     setParentPost(undefined);
     setFollowersOnly(false);
     setFollowingOnly(false);
+    setGroupGate(undefined);
     setContentWarning(undefined);
     setShowPollEditor(false);
     resetPollConfig();
@@ -152,7 +162,7 @@ const NewPublication = ({
     setAudioPost(DEFAULT_AUDIO_POST);
     setLicense(null);
     resetCollectSettings();
-    setSelectedFeed(feed || "");
+    setSelectedGroup(group);
     setShowNewPostModal(false);
   };
 
@@ -177,8 +187,8 @@ const NewPublication = ({
   });
 
   useEffect(() => {
-    setSelectedFeed(feed || "");
-  }, [feed]);
+    setSelectedGroup(group);
+  }, [group]);
 
   useEffect(() => {
     setPostContentError("");
@@ -293,14 +303,14 @@ const NewPublication = ({
         actions.push({ ...pollActionParams(pollConfig) });
       }
 
-      const rules = postRuleParams({ followersOnly, followingOnly });
+      const rules = postRuleParams({ followersOnly, followingOnly, groupGate });
 
       return await createPost({
         variables: {
           request: {
             contentUri,
-            ...((feed || (selectedFeed && selectedFeed !== "global")) && {
-              feed: feed || selectedFeed
+            ...((group || selectedGroup) && {
+              feed: group?.feed?.address || selectedGroup?.feed?.address
             }),
             ...(isComment && { commentOn: { post: post?.id } }),
             ...(isQuote && { quoteOf: { post: quotedPost?.id } }),
@@ -348,16 +358,16 @@ const NewPublication = ({
       ) : null}
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         <Editor
-          feed={feed}
           fullHeight={
             isModal && !isQuote && attachments.length === 0 && !showPollEditor
           }
+          group={group}
           isComment={isComment}
           isEditing={Boolean(editingPost)}
           isInModal={isModal}
           isQuote={isQuote}
-          selectedFeed={selectedFeed}
-          setSelectedFeed={setSelectedFeed}
+          selectedGroup={selectedGroup}
+          setSelectedGroup={setSelectedGroup}
         />
         {postContentError ? (
           <H6 className="mt-1 px-5 pb-3 text-red-500">{postContentError}</H6>
@@ -392,7 +402,7 @@ const NewPublication = ({
             </>
           )}
           <div className="flex w-full items-center justify-end gap-x-4">
-            {editingPost ? null : <RulesSettings />}
+            {editingPost ? null : <RulesSettings group={selectedGroup} />}
             <Button
               className="flex-none"
               disabled={

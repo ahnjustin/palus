@@ -4,12 +4,14 @@ import { toKeyValueInput } from "@/helpers/keyValueInput";
 
 const postRuleParams = ({
   followersOnly,
-  followingOnly
+  followingOnly,
+  groupGate
 }: {
   followersOnly: boolean;
   followingOnly: boolean;
+  groupGate?: string;
 }): PostRulesConfigInput | undefined => {
-  if (!followingOnly && !followingOnly) {
+  if (!followingOnly && !followingOnly && !groupGate) {
     return undefined;
   }
 
@@ -39,6 +41,15 @@ const postRuleParams = ({
           toKeyValueInput("lens.param.repostsRestricted", "bool", true),
           toKeyValueInput("lens.param.quotesRestricted", "bool", true)
         ]
+      }
+    });
+  }
+  if (groupGate) {
+    rules.required.push({
+      unknownRule: {
+        address: CONTRACTS.groupGatedPostRule,
+        executeOn: [PostRuleExecuteOn.CreatingPost],
+        params: [toKeyValueInput("lens.param.group", "address", groupGate)]
       }
     });
   }

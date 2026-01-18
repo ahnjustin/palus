@@ -1,4 +1,5 @@
 import { type GroupFragment, useGroupStatsQuery } from "@palus/indexer";
+import plur from "plur";
 import { useState } from "react";
 import Members from "@/components/Shared/Modal/Members";
 import GraphStatsShimmer from "@/components/Shared/Shimmer/GraphStatsShimmer";
@@ -34,7 +35,9 @@ const MembersCount = ({ group }: MembersCountProps) => {
         type="button"
       >
         <b>{humanize(stats?.totalMembers)}</b>
-        <span className="text-gray-500 dark:text-gray-200">Members</span>
+        <span className="text-gray-500 dark:text-gray-200">
+          {plur("Member", stats?.totalMembers)}
+        </span>
       </button>
       <Modal
         onClose={() => setShowMembersModal(false)}

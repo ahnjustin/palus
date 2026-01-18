@@ -1,3 +1,4 @@
+import type { GroupFragment } from "@palus/indexer";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 import { Card, Image } from "@/components/Shared/UI";
@@ -7,10 +8,10 @@ import { useAccountStore } from "@/store/persisted/useAccountStore";
 import NewPublication from "./NewPublication";
 
 interface NewPostProps {
-  feed?: string;
+  group?: GroupFragment;
 }
 
-const NewPost = ({ feed }: NewPostProps) => {
+const NewPost = ({ group }: NewPostProps) => {
   const [searchParams] = useSearchParams();
   const text = searchParams.get("text");
   const url = searchParams.get("url");
@@ -33,7 +34,7 @@ const NewPost = ({ feed }: NewPostProps) => {
   }, [text, url, via]);
 
   if (showComposer) {
-    return <NewPublication feed={feed} />;
+    return <NewPublication group={group} />;
   }
 
   return (
