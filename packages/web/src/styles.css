@@ -173,13 +173,9 @@
     @apply list-none pl-0;
   }
 
-  .markup li,
-  .full-page-post-markup li {
-    @apply flex gap-x-2;
-  }
-
   .markup li:before,
   .full-page-post-markup li:before {
+    padding-right: 0.5rem;
     content: "•";
   }
 
