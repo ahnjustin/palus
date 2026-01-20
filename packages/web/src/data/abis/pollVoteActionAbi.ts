@@ -1,4 +1,4 @@
-export const pollVoteAction = [
+export const pollVoteActionAbi = [
   {
     inputs: [
       {

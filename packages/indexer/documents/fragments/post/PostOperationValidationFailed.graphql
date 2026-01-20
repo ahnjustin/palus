@@ -1,0 +1,3 @@
+fragment PostOperationValidationFailed on PostOperationValidationFailed {
+  __typename
+}

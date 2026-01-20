@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { decodeAbiParameters, keccak256, stringToBytes } from "viem";
 import { useChainId, useConfig, useReadContracts } from "wagmi";
 import { readContractsQueryOptions } from "wagmi/query";
-import { pollVoteAction } from "@/components/Post/OpenAction/PollAction/pollVoteAction";
+import { pollVoteActionAbi } from "@/data/abis/pollVoteActionAbi";
 import { CONTRACTS } from "@/data/contracts";
 import type { Poll } from "@/types/palus";
 
@@ -22,7 +22,7 @@ const useDecodePoll = (
   const contract = useMemo(
     () =>
       ({
-        abi: pollVoteAction,
+        abi: pollVoteActionAbi,
         address: CONTRACTS.pollVoteAction
       }) as const,
     []

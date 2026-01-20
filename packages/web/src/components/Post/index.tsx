@@ -17,7 +17,7 @@ import SingleAccount from "@/components/Shared/Account/SingleAccount";
 import BackButton from "@/components/Shared/BackButton";
 import Footer from "@/components/Shared/Footer";
 import PageLayout from "@/components/Shared/PageLayout";
-import { Card, CardHeader, WarningMessage } from "@/components/Shared/UI";
+import { Card, CardHeader } from "@/components/Shared/UI";
 import getAccount from "@/helpers/getAccount";
 import { isRepost } from "@/helpers/postHelpers";
 import { usePostLinkStore } from "@/store/non-persisted/navigation/usePostLinkStore";
@@ -92,9 +92,6 @@ const ViewPost = () => {
   }
 
   const targetPost = isRepost(post) ? post.repostOf : post;
-  const canComment =
-    targetPost.operations?.canComment.__typename ===
-    "PostOperationValidationPassed";
 
   return (
     <PageLayout
@@ -134,13 +131,7 @@ const ViewPost = () => {
                 post={post}
               />
             </Card>
-            {currentAccount && !canComment && (
-              <WarningMessage
-                message="You don't have permission to comment on this post."
-                title="You cannot comment on this post"
-              />
-            )}
-            {currentAccount && !post.isDeleted && canComment ? (
+            {currentAccount && !post.isDeleted ? (
               <NewPublication post={targetPost} />
             ) : null}
             {post.isDeleted ? null : (

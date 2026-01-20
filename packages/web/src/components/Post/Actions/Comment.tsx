@@ -8,6 +8,7 @@ import humanize from "@/helpers/humanize";
 import nFormatter from "@/helpers/nFormatter";
 import { useNewPostModalStore } from "@/store/non-persisted/modal/useNewPostModalStore";
 import { usePostStore } from "@/store/non-persisted/post/usePostStore";
+import { useAccountStore } from "@/store/persisted/useAccountStore";
 
 interface CommentProps {
   post: PostFragment;
@@ -19,8 +20,7 @@ const Comment = ({ post, showCount }: CommentProps) => {
   const { setShow: setShowNewPostModal } = useNewPostModalStore();
   const { setParentPost } = usePostStore();
   const navigate = useNavigate();
-  const canComment =
-    post.operations?.canComment.__typename === "PostOperationValidationPassed";
+  const { currentAccount } = useAccountStore();
   const hasCommented =
     post.operations?.hasCommented.optimistic ||
     post.operations?.hasCommented.onChain;
@@ -36,7 +36,7 @@ const Comment = ({ post, showCount }: CommentProps) => {
           "rounded-full p-1.5 outline-offset-2"
         )}
         onClick={() => {
-          if (canComment) {
+          if (currentAccount) {
             setParentPost(post);
             setShowNewPostModal(true);
           } else {

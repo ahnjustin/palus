@@ -16,12 +16,13 @@ import PollSettings from "@/components/Composer/Actions/PollSettings";
 import PollEditor from "@/components/Composer/Actions/PollSettings/PollEditor";
 import RulesSettings from "@/components/Composer/Actions/RulesSettings";
 import NewAttachments from "@/components/Composer/NewAttachments";
+import Shimmer from "@/components/Composer/Shimmer";
 import QuotedPost from "@/components/Post/QuotedPost";
 import ThreadBody from "@/components/Post/ThreadBody";
 import { AudioPostSchema } from "@/components/Shared/Audio";
 import Wrapper from "@/components/Shared/Embed/Wrapper";
 import EmojiPicker from "@/components/Shared/EmojiPicker";
-import { Button, Card, H6 } from "@/components/Shared/UI";
+import { Button, Card, H6, WarningMessage } from "@/components/Shared/UI";
 import { ERRORS } from "@/data/errors";
 import cn from "@/helpers/cn";
 import collectActionParams from "@/helpers/collectActionParams";
@@ -35,6 +36,7 @@ import { IS_STANDALONE } from "@/helpers/mediaQueries";
 import pollActionParams from "@/helpers/pollActionParams";
 import postRuleParams from "@/helpers/postRuleParams";
 import uploadMetadata from "@/helpers/uploadMetadata";
+import useCanComment from "@/hooks/useCanComment";
 import useCreatePost from "@/hooks/useCreatePost";
 import useEditPost from "@/hooks/useEditPost";
 import usePostMetadata from "@/hooks/usePostMetadata";
@@ -243,6 +245,12 @@ const NewPublication = ({
     setPostContentError("");
   }, [postContent]);
 
+  const {
+    data: canComment,
+    isLoading: canCommentIsLoading,
+    reason: cantCommentReason
+  } = useCanComment({ post });
+
   const getTitlePrefix = () => {
     if (hasVideo) {
       return "Video";
@@ -344,7 +352,19 @@ const NewPublication = ({
       pollConfig.durationInDays < 1
     : false;
 
-  return (
+  return canCommentIsLoading ? (
+    <Shimmer />
+  ) : isComment && !canComment ? (
+    <div className={isModal ? "p-4" : ""}>
+      <WarningMessage
+        message={
+          cantCommentReason ??
+          "You don't have permission to comment on this post."
+        }
+        title="You cannot comment on this post"
+      />
+    </div>
+  ) : (
     <Card
       className={cn(
         { "flex h-full flex-col overflow-hidden pt-5": isModal },
