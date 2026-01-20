@@ -9,6 +9,7 @@ import humanize from "@/helpers/humanize";
 import nFormatter from "@/helpers/nFormatter";
 import { isRepost } from "@/helpers/postHelpers";
 import stopEventPropagation from "@/helpers/stopEventPropagation";
+import useCanShare from "@/hooks/useCanShare";
 import Quote from "./Quote";
 import Repost from "./Repost";
 import UndoRepost from "./UndoRepost";
@@ -30,12 +31,7 @@ const ShareMenu = ({ post, showCount }: ShareMenuProps) => {
   const hasShared = hasReposted || hasQuoted;
   const shares = targetPost.stats.reposts + targetPost.stats.quotes;
 
-  const canRepost =
-    targetPost.operations?.canRepost.__typename ===
-    "PostOperationValidationPassed";
-  const canQuote =
-    targetPost.operations?.canQuote.__typename ===
-    "PostOperationValidationPassed";
+  const { canRepost, canQuote } = useCanShare({ post: targetPost });
 
   if (!canRepost && !canQuote) {
     return null;
