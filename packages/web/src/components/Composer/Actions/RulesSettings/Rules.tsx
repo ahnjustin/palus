@@ -4,6 +4,7 @@ import { type Dispatch, type SetStateAction, useEffect } from "react";
 import ToggleWithHelper from "@/components/Shared/ToggleWithHelper";
 import { Button, Tooltip } from "@/components/Shared/UI";
 import { CONTRACTS } from "@/data/contracts";
+import { useCollectActionStore } from "@/store/non-persisted/post/useCollectActionStore";
 import { usePostRulesStore } from "@/store/non-persisted/post/usePostRulesStore";
 
 interface RulesProps {
@@ -16,10 +17,14 @@ const Rules = ({ setShowModal, groupAddress }: RulesProps) => {
     followersOnly,
     followingOnly,
     groupGate,
+    collectorsOnly,
     setFollowersOnly,
     setFollowingOnly,
-    setGroupGate
+    setGroupGate,
+    setCollectorsOnly
   } = usePostRulesStore();
+
+  const { collectAction } = useCollectActionStore();
 
   const { data, loading: groupLoading } = useGroupQuery({
     skip: !groupAddress,
@@ -46,6 +51,12 @@ const Rules = ({ setShowModal, groupAddress }: RulesProps) => {
       setGroupGate(undefined);
     }
   }, [isGroupGatedFeed]);
+
+  useEffect(() => {
+    if (!collectAction.enabled) {
+      setCollectorsOnly(false);
+    }
+  }, [collectAction.enabled]);
 
   return (
     <>
@@ -92,6 +103,18 @@ const Rules = ({ setShowModal, groupAddress }: RulesProps) => {
                 groupGate || isGroupGatedFeed ? undefined : groupAddress
               )
             }
+          />
+        ) : null}
+        {collectAction.enabled ? (
+          <ToggleWithHelper
+            description="Only collectors of this post can reply"
+            heading={
+              <span className="font-semibold">
+                Restrict to <span className="font-bold">collectors</span>
+              </span>
+            }
+            on={!!collectorsOnly}
+            setOn={() => setCollectorsOnly(!collectorsOnly)}
           />
         ) : null}
       </div>

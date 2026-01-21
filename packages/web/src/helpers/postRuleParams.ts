@@ -3,15 +3,17 @@ import { CONTRACTS } from "@/data/contracts";
 import { toKeyValueInput } from "@/helpers/keyValueInput";
 
 const postRuleParams = ({
+  collectorsOnly,
   followersOnly,
   followingOnly,
   groupGate
 }: {
+  collectorsOnly: boolean;
   followersOnly: boolean;
   followingOnly: boolean;
   groupGate?: string;
 }): PostRulesConfigInput | undefined => {
-  if (!followingOnly && !followingOnly && !groupGate) {
+  if (!followingOnly && !followingOnly && !groupGate && !collectorsOnly) {
     return undefined;
   }
 
@@ -50,6 +52,24 @@ const postRuleParams = ({
         address: CONTRACTS.groupGatedPostRule,
         executeOn: [PostRuleExecuteOn.CreatingPost],
         params: [toKeyValueInput("lens.param.group", "address", groupGate)]
+      }
+    });
+  }
+  if (collectorsOnly) {
+    rules.required.push({
+      unknownRule: {
+        address: CONTRACTS.collectorOnlyPostRule,
+        executeOn: [PostRuleExecuteOn.CreatingPost],
+        params: [
+          toKeyValueInput(
+            "lens.param.collectAction",
+            "address",
+            CONTRACTS.simpleCollectAction
+          ),
+          toKeyValueInput("lens.param.repliesRestricted", "bool", true),
+          toKeyValueInput("lens.param.repostsRestricted", "bool", false),
+          toKeyValueInput("lens.param.quotesRestricted", "bool", false)
+        ]
       }
     });
   }

@@ -119,9 +119,11 @@ const NewPublication = ({
     followersOnly,
     followingOnly,
     groupGate,
+    collectorsOnly,
     setFollowersOnly,
     setFollowingOnly,
-    setGroupGate
+    setGroupGate,
+    setCollectorsOnly
   } = usePostRulesStore();
   const { setContentWarning } = usePostContentWarningStore();
 
@@ -157,6 +159,7 @@ const NewPublication = ({
     setFollowersOnly(false);
     setFollowingOnly(false);
     setGroupGate(undefined);
+    setCollectorsOnly(false);
     setContentWarning(undefined);
     setShowPollEditor(false);
     resetPollConfig();
@@ -311,7 +314,12 @@ const NewPublication = ({
         actions.push({ ...pollActionParams(pollConfig) });
       }
 
-      const rules = postRuleParams({ followersOnly, followingOnly, groupGate });
+      const rules = postRuleParams({
+        collectorsOnly,
+        followersOnly,
+        followingOnly,
+        groupGate
+      });
 
       return await createPost({
         variables: {

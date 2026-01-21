@@ -2,6 +2,7 @@ import type { PostFragment } from "@palus/indexer";
 import { readContracts } from "@wagmi/core";
 import { useCallback, useEffect, useState } from "react";
 import { useConfig } from "wagmi";
+import { collectorOnlyPostRuleAbi } from "@/data/abis/colletorOnlyPostRuleAbi";
 import { followingOnlyPostRuleAbi } from "@/data/abis/followingOnlyPostRuleAbi";
 import { CONTRACTS } from "@/data/contracts";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
@@ -13,6 +14,11 @@ interface PostRuleValidationProps {
 const followingOnlyPostRuleContract = {
   abi: followingOnlyPostRuleAbi,
   address: CONTRACTS.followingOnlyPostRule
+};
+
+const collectorOnlyPostRuleContract = {
+  abi: collectorOnlyPostRuleAbi,
+  address: CONTRACTS.collectorOnlyPostRule
 };
 
 const useCanShare = ({ post }: PostRuleValidationProps) => {
@@ -55,7 +61,10 @@ const useCanShare = ({ post }: PostRuleValidationProps) => {
       const isFollowingOnlyRule = canRepostOperation.extraChecksRequired.find(
         (rule) => rule.address === CONTRACTS.followingOnlyPostRule
       );
-      if (!isFollowingOnlyRule || isLoading) {
+      const isCollectorOnlyRule = canRepostOperation.extraChecksRequired.find(
+        (rule) => rule.address === CONTRACTS.collectorOnlyPostRule
+      );
+      if ((!isFollowingOnlyRule && !isCollectorOnlyRule) || isLoading) {
         setCanRepost(false);
         setCanQuote(false);
         return;
@@ -63,22 +72,48 @@ const useCanShare = ({ post }: PostRuleValidationProps) => {
 
       setIsLoading(true);
       try {
-        const res = await readContracts(config, {
-          contracts: [
-            {
-              ...followingOnlyPostRuleContract,
-              args: [post.feed.address, post.id, currentAccount.address],
-              functionName: "validateCanRepost"
-            },
-            {
-              ...followingOnlyPostRuleContract,
-              args: [post.feed.address, post.id, currentAccount.address],
-              functionName: "validateCanQuote"
-            }
-          ]
-        });
-        setCanRepost(res[0].result ?? false);
-        setCanQuote(res[1].result ?? false);
+        let result: { canRepost: boolean; canQuote: boolean };
+        if (isCollectorOnlyRule) {
+          const res = await readContracts(config, {
+            contracts: [
+              {
+                ...collectorOnlyPostRuleContract,
+                args: [post.feed.address, post.id, currentAccount.address],
+                functionName: "validateCanRepost"
+              },
+              {
+                ...collectorOnlyPostRuleContract,
+                args: [post.feed.address, post.id, currentAccount.address],
+                functionName: "validateCanQuote"
+              }
+            ]
+          });
+          result = {
+            canQuote: res[1].result ?? false,
+            canRepost: res[0].result ?? false
+          };
+        } else {
+          const res = await readContracts(config, {
+            contracts: [
+              {
+                ...followingOnlyPostRuleContract,
+                args: [post.feed.address, post.id, currentAccount.address],
+                functionName: "validateCanRepost"
+              },
+              {
+                ...followingOnlyPostRuleContract,
+                args: [post.feed.address, post.id, currentAccount.address],
+                functionName: "validateCanQuote"
+              }
+            ]
+          });
+          result = {
+            canQuote: res[1].result ?? false,
+            canRepost: res[0].result ?? false
+          };
+        }
+        setCanRepost(result.canRepost);
+        setCanQuote(result.canQuote);
       } catch {
         setCanRepost(false);
         setCanQuote(false);

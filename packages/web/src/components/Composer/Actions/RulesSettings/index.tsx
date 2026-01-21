@@ -12,8 +12,10 @@ interface RulesSettingsProps {
 
 const RulesSettings = ({ group }: RulesSettingsProps) => {
   const [showModal, setShowModal] = useState(false);
-  const { followersOnly, followingOnly, groupGate } = usePostRulesStore();
-  const hasRules = followersOnly || followingOnly || groupGate;
+  const { collectorsOnly, followersOnly, followingOnly, groupGate } =
+    usePostRulesStore();
+  const hasRules =
+    followersOnly || followingOnly || groupGate || collectorsOnly;
 
   return (
     <>

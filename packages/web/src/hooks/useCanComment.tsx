@@ -2,6 +2,7 @@ import type { PostFragment } from "@palus/indexer";
 import { readContract } from "@wagmi/core";
 import { useCallback, useEffect, useState } from "react";
 import { useConfig } from "wagmi";
+import { collectorOnlyPostRuleAbi } from "@/data/abis/colletorOnlyPostRuleAbi";
 import { followingOnlyPostRuleAbi } from "@/data/abis/followingOnlyPostRuleAbi";
 import { groupGatedPostRuleAbi } from "@/data/abis/groupGatedPostRuleAbi";
 import { CONTRACTS } from "@/data/contracts";
@@ -19,6 +20,11 @@ const followingOnlyPostRuleContract = {
 const groupGatedPostRuleContract = {
   abi: groupGatedPostRuleAbi,
   address: CONTRACTS.groupGatedPostRule
+};
+
+const collectorOnlyPostRuleContract = {
+  abi: collectorOnlyPostRuleAbi,
+  address: CONTRACTS.collectorOnlyPostRule
 };
 
 const useCanComment = ({ post }: PostRuleValidationProps) => {
@@ -57,7 +63,13 @@ const useCanComment = ({ post }: PostRuleValidationProps) => {
       const isGroupGatedRule = canCommentOperation.extraChecksRequired.find(
         (rule) => rule.address === CONTRACTS.groupGatedPostRule
       );
-      if ((!isFollowingOnlyRule && !isGroupGatedRule) || isLoading) {
+      const isCollectorOnlyRule = canCommentOperation.extraChecksRequired.find(
+        (rule) => rule.address === CONTRACTS.collectorOnlyPostRule
+      );
+      if (
+        (!isFollowingOnlyRule && !isGroupGatedRule && !isCollectorOnlyRule) ||
+        isLoading
+      ) {
         setCanComment(false);
         setReason(null);
         return;
@@ -69,6 +81,12 @@ const useCanComment = ({ post }: PostRuleValidationProps) => {
         if (isGroupGatedRule) {
           canComment = await readContract(config, {
             ...groupGatedPostRuleContract,
+            args: [post.feed.address, post.id, currentAccount.address],
+            functionName: "validateCanReply"
+          });
+        } else if (isCollectorOnlyRule) {
+          canComment = await readContract(config, {
+            ...collectorOnlyPostRuleContract,
             args: [post.feed.address, post.id, currentAccount.address],
             functionName: "validateCanReply"
           });
@@ -85,7 +103,9 @@ const useCanComment = ({ post }: PostRuleValidationProps) => {
             ? null
             : isGroupGatedRule
               ? "You must be a member of the Group to comment"
-              : "You must be followed by the author of the root post to comment."
+              : isCollectorOnlyRule
+                ? "You must collect the root Post to comment"
+                : "You must be followed by the author of the root post to comment."
         );
       } catch {
         setCanComment(false);
