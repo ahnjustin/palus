@@ -1,6 +1,9 @@
-import type { Dispatch, SetStateAction } from "react";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import { useGroupQuery } from "@palus/indexer";
+import { type Dispatch, type SetStateAction, useEffect } from "react";
 import ToggleWithHelper from "@/components/Shared/ToggleWithHelper";
-import { Button } from "@/components/Shared/UI";
+import { Button, Tooltip } from "@/components/Shared/UI";
+import { CONTRACTS } from "@/data/contracts";
 import { usePostRulesStore } from "@/store/non-persisted/post/usePostRulesStore";
 
 interface RulesProps {
@@ -17,6 +20,32 @@ const Rules = ({ setShowModal, groupAddress }: RulesProps) => {
     setFollowingOnly,
     setGroupGate
   } = usePostRulesStore();
+
+  const { data, loading: groupLoading } = useGroupQuery({
+    skip: !groupAddress,
+    variables: {
+      request: {
+        group: groupAddress
+      }
+    }
+  });
+
+  const groupGatedFeedConfig = data?.group?.feed?.rules?.required
+    ?.find((feedRule) => feedRule.address === CONTRACTS.groupGatedFeedRule)
+    ?.config.find(
+      (keyValue) =>
+        keyValue.__typename === "BooleanKeyValue" &&
+        keyValue.key === "groupRepliesRestricted"
+    );
+  const isGroupGatedFeed =
+    groupGatedFeedConfig?.__typename === "BooleanKeyValue" &&
+    groupGatedFeedConfig.boolean;
+
+  useEffect(() => {
+    if (isGroupGatedFeed) {
+      setGroupGate(undefined);
+    }
+  }, [isGroupGatedFeed]);
 
   return (
     <>
@@ -44,13 +73,25 @@ const Rules = ({ setShowModal, groupAddress }: RulesProps) => {
         {groupAddress ? (
           <ToggleWithHelper
             description="Only members of the group can reply"
+            disabled={isGroupGatedFeed || groupLoading}
             heading={
               <span className="font-semibold">
                 Restrict to <span className="font-bold">group members</span>
               </span>
             }
-            on={!!groupGate}
-            setOn={() => setGroupGate(groupGate ? undefined : groupAddress)}
+            icon={
+              isGroupGatedFeed ? (
+                <Tooltip content="This group only allows members to reply">
+                  <InformationCircleIcon className="h-5 w-5 text-gray-400" />
+                </Tooltip>
+              ) : null
+            }
+            on={!!groupGate || !!isGroupGatedFeed}
+            setOn={() =>
+              setGroupGate(
+                groupGate || isGroupGatedFeed ? undefined : groupAddress
+              )
+            }
           />
         ) : null}
       </div>

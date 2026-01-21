@@ -1,3 +1,9 @@
 fragment FeedRule on FeedRule {
   address
+  config {
+    ... on BooleanKeyValue {
+      key
+      boolean
+    }
+  }
 }

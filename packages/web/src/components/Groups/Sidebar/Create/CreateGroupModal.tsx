@@ -5,6 +5,7 @@ import { z } from "zod";
 import AvatarUpload from "@/components/Shared/AvatarUpload";
 import {
   Button,
+  Checkbox,
   Form,
   Input,
   TextArea,
@@ -26,7 +27,8 @@ const ValidationSchema = z.object({
     .max(100, { message: "Name should not exceed 100 characters" })
     .regex(Regex.accountNameValidator, {
       message: "Account name must not contain restricted symbols"
-    })
+    }),
+  repliesRestricted: z.boolean()
 });
 
 const CreateGroupModal = () => {
@@ -76,7 +78,14 @@ const CreateGroupModal = () => {
       })
     );
 
-    return await createGroup({ variables: { request: { metadataUri } } });
+    return await createGroup({
+      variables: {
+        request: {
+          feed: { repliesRestricted: data.repliesRestricted },
+          metadataUri
+        }
+      }
+    });
   };
 
   return (
@@ -86,6 +95,10 @@ const CreateGroupModal = () => {
         label="Description"
         placeholder="Please provide additional details"
         {...form.register("description")}
+      />
+      <Checkbox
+        label="Restrict replies to group members"
+        {...form.register("repliesRestricted")}
       />
       <AvatarUpload
         isSmall
