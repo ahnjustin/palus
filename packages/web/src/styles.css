@@ -105,7 +105,13 @@
   }
 
   .divider {
-    @apply border-b border-gray-200 dark:border-gray-800;
+    @apply border-b border-border;
+  }
+
+  [role="dialog"][aria-modal="true"] {
+    .divider {
+      @apply border-gray-200 dark:border-gray-700;
+    }
   }
 
   .ProseMirror {

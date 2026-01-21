@@ -1,3 +1,4 @@
+import { UserPlusIcon } from "@heroicons/react/24/outline";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import {
   ManagedAccountsVisibility,
@@ -12,6 +13,7 @@ import { ERRORS } from "@/data/errors";
 import cn from "@/helpers/cn";
 import errorToast from "@/helpers/errorToast";
 import reloadAllTabs from "@/helpers/reloadAllTabs";
+import { useAuthModalStore } from "@/store/non-persisted/modal/useAuthModalStore";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
 import { signIn } from "@/store/persisted/useAuthStore";
 import SmallSingleAccount from "./SmallSingleAccount";
@@ -23,6 +25,7 @@ const SwitchAccounts = () => {
     null
   );
   const { address } = useAccount();
+  const { setShowAuthModal } = useAuthModalStore();
 
   const onError = useCallback((error?: unknown) => {
     setIsSubmitting(false);
@@ -118,6 +121,15 @@ const SwitchAccounts = () => {
           ) : null}
         </button>
       ))}
+      <div className="divider mt-2" />
+      <button
+        className="mt-2 mt-2 flex w-full cursor-pointer items-center gap-x-2 rounded-lg px-4 py-2 text-start text-gray-700 text-sm hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+        onClick={() => setShowAuthModal(true, "signup")}
+        type={"button"}
+      >
+        <UserPlusIcon className="size-5" />
+        New Account
+      </button>
     </div>
   );
 };
