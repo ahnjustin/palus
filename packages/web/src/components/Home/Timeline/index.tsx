@@ -10,17 +10,19 @@ import PostFeed from "@/components/Shared/Post/PostFeed";
 import PostLink from "@/components/Shared/Post/PostLink";
 import cn from "@/helpers/cn";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
+import { usePreferencesStore } from "@/store/persisted/usePreferencesStore";
 
 interface TimelineProps {
-  followingOnly: boolean;
   onScroll?: (scrollOffset: number) => void;
 }
 
-const Timeline = ({ followingOnly, onScroll }: TimelineProps) => {
+const Timeline = ({ onScroll }: TimelineProps) => {
   const { currentAccount } = useAccountStore();
+  const { includeCommentsInTimeline } = usePreferencesStore();
+
   const request: TimelineRequest = {
     account: currentAccount?.address,
-    ...(followingOnly && {
+    ...(!includeCommentsInTimeline && {
       filter: {
         eventType: [
           TimelineEventItemType.Post,

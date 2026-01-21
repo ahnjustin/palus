@@ -1,15 +1,22 @@
 import { AdjustmentsHorizontalIcon } from "@heroicons/react/24/outline";
 import type { FC } from "react";
 import { useState } from "react";
-import LowSignalNotificationToggle from "@/components/Shared/Settings/LowSignalNotificationToggle";
+import IncludeCommentsTimelineToggle from "@/components/Shared/Settings/IncludeCommentsTimelineToggle";
 import { Modal, Tooltip } from "@/components/Shared/UI";
+import { HomeFeedType } from "@/data/enums";
+import { useHomeTabStore } from "@/store/persisted/useHomeTabStore";
 
 const Settings: FC = () => {
+  const { feedType } = useHomeTabStore();
   const [showNotificationSettings, setShowNotificationSettings] =
     useState(false);
 
   const handleOpenSettings = () => setShowNotificationSettings(true);
   const handleCloseSettings = () => setShowNotificationSettings(false);
+
+  if (feedType !== HomeFeedType.TIMELINE) {
+    return null;
+  }
 
   return (
     <>
@@ -18,7 +25,7 @@ const Settings: FC = () => {
         onClick={handleOpenSettings}
         type="button"
       >
-        <Tooltip content="Notification settings" placement="top">
+        <Tooltip content="Timeline settings" placement="top">
           <AdjustmentsHorizontalIcon className="ld-text-gray-500 size-5" />
         </Tooltip>
       </button>
@@ -26,10 +33,10 @@ const Settings: FC = () => {
         onClose={handleCloseSettings}
         show={showNotificationSettings}
         size="xs"
-        title="Notification settings"
+        title="Timeline settings"
       >
         <div className="p-5">
-          <LowSignalNotificationToggle />
+          <IncludeCommentsTimelineToggle />
         </div>
       </Modal>
     </>

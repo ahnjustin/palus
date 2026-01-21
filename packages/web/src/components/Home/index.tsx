@@ -29,9 +29,7 @@ const Home = () => {
           <FeedType />
           <NewPost />
           {feedType === HomeFeedType.TIMELINE ? (
-            <Timeline followingOnly={false} onScroll={setScrollOffset} />
-          ) : feedType === HomeFeedType.FOLLOWING ? (
-            <Timeline followingOnly={true} onScroll={setScrollOffset} />
+            <Timeline onScroll={setScrollOffset} />
           ) : feedType === HomeFeedType.TOP_ACCOUNTS ? (
             <TopAccounts onScroll={setScrollOffset} />
           ) : feedType === HomeFeedType.FORYOU ? (

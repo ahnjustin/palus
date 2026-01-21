@@ -1,8 +1,9 @@
-import New from "@/components/Shared/Badges/New";
+import { useEffect } from "react";
 import { Tabs } from "@/components/Shared/UI";
 import { HomeFeedType } from "@/data/enums";
 import useUmami from "@/hooks/useUmami";
 import { useHomeTabStore } from "@/store/persisted/useHomeTabStore";
+import Settings from "./Settings";
 
 const FeedType = () => {
   const { feedType, setFeedType } = useHomeTabStore();
@@ -10,22 +11,30 @@ const FeedType = () => {
 
   const tabs = [
     { name: "Timeline", type: HomeFeedType.TIMELINE },
-    { name: "Following", type: HomeFeedType.FOLLOWING },
     { name: "For You", type: HomeFeedType.FORYOU },
-    { name: "Top Accounts", suffix: <New />, type: HomeFeedType.TOP_ACCOUNTS }
+    { name: "Top Accounts", type: HomeFeedType.TOP_ACCOUNTS }
   ];
 
+  useEffect(() => {
+    if (feedType === HomeFeedType.FOLLOWING) {
+      setFeedType(HomeFeedType.TIMELINE);
+    }
+  }, [feedType]);
+
   return (
-    <Tabs
-      active={feedType}
-      layoutId="home_tab"
-      setActive={(type) => {
-        const nextType = type as HomeFeedType;
-        setFeedType(nextType);
-        track("Home Feed", { type: nextType.toLowerCase() });
-      }}
-      tabs={tabs}
-    />
+    <div className="flex items-center justify-between">
+      <Tabs
+        active={feedType}
+        layoutId="home_tab"
+        setActive={(type) => {
+          const nextType = type as HomeFeedType;
+          setFeedType(nextType);
+          track("Home Feed", { type: nextType.toLowerCase() });
+        }}
+        tabs={tabs}
+      />
+      <Settings />
+    </div>
   );
 };
 
