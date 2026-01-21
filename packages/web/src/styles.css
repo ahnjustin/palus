@@ -170,13 +170,7 @@
 
   .markup ul,
   .full-page-post-markup ul {
-    @apply list-none pl-0;
-  }
-
-  .markup li:before,
-  .full-page-post-markup li:before {
-    padding-right: 0.5rem;
-    content: "•";
+    @apply list-disc pl-5;
   }
 
   .markup > hr {
