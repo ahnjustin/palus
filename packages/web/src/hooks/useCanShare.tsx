@@ -123,8 +123,8 @@ const useCanShare = ({ post }: PostRuleValidationProps) => {
       return;
     }
 
-    setCanRepost(false);
-    setCanQuote(false);
+    setCanRepost(true);
+    setCanQuote(true);
   }, [post]);
 
   useEffect(() => {
