@@ -23,13 +23,13 @@ const cache = new InMemoryCache({
         postBookmarks: createCursorFieldPolicy(["request", ["filter", "pageSize"]]),
         groups: createCursorFieldPolicy(["request", ["filter", "pageSize"]]),
         accounts: createCursorFieldPolicy(["request", ["filter", "orderBy"]]),
-        accountsBlocked: createCursorFieldPolicy(["request", ["filter", "pageSize"]]),
-        accountManagers: createCursorFieldPolicy(["request", ["filter", "pageSize"]]),
-        authenticatedSessions: createCursorFieldPolicy(["request", ["filter", "pageSize"]]),
+        accountsBlocked: createCursorFieldPolicy(["request", ["pageSize"]]),
+        accountManagers: createCursorFieldPolicy(["request", ["pageSize"]]),
+        authenticatedSessions: createCursorFieldPolicy(["request", ["pageSize"]]),
         usernames: createCursorFieldPolicy(["request", ["filter", "pageSize"]]),
         notifications: createCursorFieldPolicy(["request", ["filter", "pageSize"]]),
         mlPostsExplore: createCursorFieldPolicy(["request", ["filter", "pageSize"]]),
-        mlPostsForYou: createCursorFieldPolicy(["request", ["filter", "pageSize"]]),
+        mlPostsForYou: createCursorFieldPolicy(["request", ["pageSize"]]),
       }
     }
   }
