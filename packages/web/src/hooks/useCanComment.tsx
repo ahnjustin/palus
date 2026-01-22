@@ -66,6 +66,7 @@ const useCanComment = ({ post }: PostRuleValidationProps) => {
       const isCollectorOnlyRule = canCommentOperation.extraChecksRequired.find(
         (rule) => rule.address === CONTRACTS.collectorOnlyPostRule
       );
+
       if (
         (!isFollowingOnlyRule && !isGroupGatedRule && !isCollectorOnlyRule) ||
         isLoading
@@ -75,38 +76,43 @@ const useCanComment = ({ post }: PostRuleValidationProps) => {
         return;
       }
 
+      setReason(null);
       setIsLoading(true);
       try {
-        let canComment: boolean;
+        let canComment = true;
         if (isGroupGatedRule) {
           canComment = await readContract(config, {
             ...groupGatedPostRuleContract,
             args: [post.feed.address, post.id, currentAccount.address],
             functionName: "validateCanReply"
           });
-        } else if (isCollectorOnlyRule) {
+          if (!canComment) {
+            setReason("You must be a member of the Group to comment");
+          }
+        }
+        if (canComment && isCollectorOnlyRule) {
           canComment = await readContract(config, {
             ...collectorOnlyPostRuleContract,
             args: [post.feed.address, post.id, currentAccount.address],
             functionName: "validateCanReply"
           });
-        } else {
+          if (!canComment) {
+            setReason("You must collect the root Post to comment");
+          }
+        }
+        if (canComment && isFollowingOnlyRule) {
           canComment = await readContract(config, {
             ...followingOnlyPostRuleContract,
             args: [post.feed.address, post.id, currentAccount.address],
             functionName: "validateCanReply"
           });
+          if (!canComment) {
+            setReason(
+              "You must be followed by the author of the root post to comment"
+            );
+          }
         }
         setCanComment(canComment);
-        setReason(
-          canComment
-            ? null
-            : isGroupGatedRule
-              ? "You must be a member of the Group to comment"
-              : isCollectorOnlyRule
-                ? "You must collect the root Post to comment"
-                : "You must be followed by the author of the root post to comment."
-        );
       } catch {
         setCanComment(false);
         setReason(null);
