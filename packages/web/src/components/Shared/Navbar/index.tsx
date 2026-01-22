@@ -176,7 +176,7 @@ const Navbar = () => {
   };
 
   return (
-    <aside className="sticky top-0 hidden h-screen w-10 shrink-0 flex-col items-center gap-y-5 py-5 md:flex">
+    <aside className="sticky top-0 hidden h-screen w-10 shrink-0 flex-col items-center gap-y-8 overflow-y-auto py-5 md:flex">
       <Link onClick={handleLogoClick} to="/">
         <Image
           alt="Logo"
@@ -188,7 +188,7 @@ const Navbar = () => {
       </Link>
       <NavItems isLoggedIn={!!currentAccount} />
       {currentAccount ? (
-        <div className="flex flex-1 flex-col items-center justify-between">
+        <div className="flex flex-1 flex-col items-center justify-between gap-y-8">
           <button
             className="center flex size-10 rounded-full bg-brand-500 text-white active:bg-brand-600 dark:bg-brand-700 dark:active:bg-brand-600"
             onClick={handleNewPostClick}
