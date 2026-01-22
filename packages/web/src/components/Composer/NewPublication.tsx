@@ -430,7 +430,9 @@ const NewPublication = ({
             </>
           )}
           <div className="flex w-full items-center justify-end gap-x-4">
-            {editingPost ? null : <RulesSettings group={selectedGroup} />}
+            {editingPost || isComment ? null : (
+              <RulesSettings group={selectedGroup} />
+            )}
             <Button
               className="flex-none"
               disabled={
