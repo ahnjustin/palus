@@ -31,105 +31,130 @@ const useCanShare = ({ post }: PostRuleValidationProps) => {
 
   const validateCanReference = useCallback(async () => {
     if (!currentAccount || !post || !post.operations) {
+      setIsLoading(false);
       setCanRepost(false);
       setCanQuote(false);
       return;
     }
 
     const canRepostOperation = post.operations.canRepost;
-    if (canRepostOperation.__typename === "PostOperationValidationFailed") {
-      setCanRepost(false);
-    } else if (
-      canRepostOperation?.__typename === "PostOperationValidationPassed"
-    ) {
-      setCanRepost(true);
-    }
-
     const canQuoteOperation = post.operations.canQuote;
-    if (canQuoteOperation.__typename === "PostOperationValidationFailed") {
-      setCanQuote(false);
-    } else if (
-      canQuoteOperation?.__typename === "PostOperationValidationPassed"
-    ) {
-      setCanQuote(true);
-    }
 
-    if (
-      canRepostOperation.__typename === "PostOperationValidationUnknown" &&
-      canQuoteOperation.__typename === "PostOperationValidationUnknown"
-    ) {
-      const isFollowingOnlyRule = canRepostOperation.extraChecksRequired.find(
-        (rule) => rule.address === CONTRACTS.followingOnlyPostRule
-      );
-      const isCollectorOnlyRule = canRepostOperation.extraChecksRequired.find(
-        (rule) => rule.address === CONTRACTS.collectorOnlyPostRule
-      );
-      if ((!isFollowingOnlyRule && !isCollectorOnlyRule) || isLoading) {
-        setCanRepost(false);
-        setCanQuote(false);
-        return;
-      }
+    const repostPassed =
+      canRepostOperation.__typename === "PostOperationValidationPassed";
+    const repostFailed =
+      canRepostOperation.__typename === "PostOperationValidationFailed";
+    const quotePassed =
+      canQuoteOperation.__typename === "PostOperationValidationPassed";
+    const quoteFailed =
+      canQuoteOperation.__typename === "PostOperationValidationFailed";
 
-      setIsLoading(true);
-      try {
-        let result: { canRepost: boolean; canQuote: boolean };
-        if (isCollectorOnlyRule) {
-          const res = await readContracts(config, {
-            contracts: [
-              {
-                ...collectorOnlyPostRuleContract,
-                args: [post.feed.address, post.id, currentAccount.address],
-                functionName: "validateCanRepost"
-              },
-              {
-                ...collectorOnlyPostRuleContract,
-                args: [post.feed.address, post.id, currentAccount.address],
-                functionName: "validateCanQuote"
-              }
-            ]
-          });
-          result = {
-            canQuote: res[1].result ?? false,
-            canRepost: res[0].result ?? false
-          };
-        } else {
-          const res = await readContracts(config, {
-            contracts: [
-              {
-                ...followingOnlyPostRuleContract,
-                args: [post.feed.address, post.id, currentAccount.address],
-                functionName: "validateCanRepost"
-              },
-              {
-                ...followingOnlyPostRuleContract,
-                args: [post.feed.address, post.id, currentAccount.address],
-                functionName: "validateCanQuote"
-              }
-            ]
-          });
-          result = {
-            canQuote: res[1].result ?? false,
-            canRepost: res[0].result ?? false
-          };
-        }
-        setCanRepost(result.canRepost);
-        setCanQuote(result.canQuote);
-      } catch {
-        setCanRepost(false);
-        setCanQuote(false);
-      } finally {
-        setIsLoading(false);
-      }
+    if ((repostPassed || repostFailed) && (quotePassed || quoteFailed)) {
+      setIsLoading(false);
+      setCanRepost(repostPassed);
+      setCanQuote(quotePassed);
       return;
     }
 
-    setCanRepost(true);
-    setCanQuote(true);
-  }, [post]);
+    const repostUnknown =
+      canRepostOperation.__typename === "PostOperationValidationUnknown";
+    const quoteUnknown =
+      canQuoteOperation.__typename === "PostOperationValidationUnknown";
+
+    if (!repostUnknown && !quoteUnknown) {
+      setIsLoading(false);
+      setCanRepost(repostPassed);
+      setCanQuote(quotePassed);
+      return;
+    }
+
+    const isFollowingOnlyRule =
+      repostUnknown &&
+      canRepostOperation.extraChecksRequired.find(
+        (rule) => rule.address === CONTRACTS.followingOnlyPostRule
+      );
+    const isCollectorOnlyRule =
+      repostUnknown &&
+      canRepostOperation.extraChecksRequired.find(
+        (rule) => rule.address === CONTRACTS.collectorOnlyPostRule
+      );
+
+    if (!isFollowingOnlyRule && !isCollectorOnlyRule) {
+      setIsLoading(false);
+      setCanRepost(false);
+      setCanQuote(false);
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const contracts = [];
+      const args = [
+        post.feed.address,
+        post.id,
+        currentAccount.address
+      ] as const;
+
+      if (isFollowingOnlyRule) {
+        contracts.push(
+          {
+            ...followingOnlyPostRuleContract,
+            args,
+            functionName: "validateCanRepost"
+          } as const,
+          {
+            ...followingOnlyPostRuleContract,
+            args,
+            functionName: "validateCanQuote"
+          } as const
+        );
+      }
+
+      if (isCollectorOnlyRule) {
+        contracts.push(
+          {
+            ...collectorOnlyPostRuleContract,
+            args,
+            functionName: "validateCanRepost"
+          } as const,
+          {
+            ...collectorOnlyPostRuleContract,
+            args,
+            functionName: "validateCanQuote"
+          } as const
+        );
+      }
+
+      const res = await readContracts(config, { contracts });
+
+      let canRepostResult: boolean;
+      let canQuoteResult: boolean;
+
+      if (isFollowingOnlyRule && isCollectorOnlyRule) {
+        // Indices: 0,1 = following (repost, quote), 2,3 = collector (repost, quote)
+        canRepostResult = Boolean(res[0].result) && Boolean(res[2].result);
+        canQuoteResult = Boolean(res[1].result) && Boolean(res[3].result);
+      } else if (isFollowingOnlyRule) {
+        canRepostResult = Boolean(res[0].result);
+        canQuoteResult = Boolean(res[1].result);
+      } else {
+        canRepostResult = Boolean(res[0].result);
+        canQuoteResult = Boolean(res[1].result);
+      }
+
+      setCanRepost(canRepostResult);
+      setCanQuote(canQuoteResult);
+    } catch {
+      setCanRepost(false);
+      setCanQuote(false);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [post, config, currentAccount]);
 
   useEffect(() => {
     validateCanReference();
-  }, [post]);
+  }, [validateCanReference]);
 
   return {
     canQuote,

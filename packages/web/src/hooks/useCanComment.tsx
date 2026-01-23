@@ -36,13 +36,17 @@ const useCanComment = ({ post }: PostRuleValidationProps) => {
   const { currentAccount } = useAccountStore();
 
   const validateCanComment = useCallback(async () => {
-    const canCommentOperation = post?.operations?.canComment;
-    if (!currentAccount || !post || !canCommentOperation) {
+    if (!currentAccount || !post || !post.operations) {
+      setIsLoading(false);
       setCanComment(false);
       setReason(null);
       return;
     }
+
+    const canCommentOperation = post.operations.canComment;
+
     if (canCommentOperation.__typename === "PostOperationValidationFailed") {
+      setIsLoading(false);
       setCanComment(false);
       setReason(
         canCommentOperation.unsatisfiedRules?.required?.[0].message ?? null
@@ -51,6 +55,7 @@ const useCanComment = ({ post }: PostRuleValidationProps) => {
     }
 
     if (canCommentOperation.__typename === "PostOperationValidationPassed") {
+      setIsLoading(false);
       setCanComment(true);
       setReason(null);
       return;
@@ -67,10 +72,8 @@ const useCanComment = ({ post }: PostRuleValidationProps) => {
         (rule) => rule.address === CONTRACTS.collectorOnlyPostRule
       );
 
-      if (
-        (!isFollowingOnlyRule && !isGroupGatedRule && !isCollectorOnlyRule) ||
-        isLoading
-      ) {
+      if (!isFollowingOnlyRule && !isGroupGatedRule && !isCollectorOnlyRule) {
+        setIsLoading(false);
         setCanComment(false);
         setReason(null);
         return;
@@ -79,40 +82,51 @@ const useCanComment = ({ post }: PostRuleValidationProps) => {
       setReason(null);
       setIsLoading(true);
       try {
-        let canComment = true;
-        if (isGroupGatedRule) {
-          canComment = await readContract(config, {
+        const args = [
+          post.feed.address,
+          post.id,
+          currentAccount.address
+        ] as const;
+        let canCommentResult = true;
+        let failureReason: string | null = null;
+
+        if (isGroupGatedRule && canCommentResult) {
+          canCommentResult = await readContract(config, {
             ...groupGatedPostRuleContract,
-            args: [post.feed.address, post.id, currentAccount.address],
+            args,
             functionName: "validateCanReply"
           });
-          if (!canComment) {
-            setReason("You must be a member of the Group to comment");
+          if (!canCommentResult) {
+            failureReason = "You must be a member of the Group to comment";
           }
         }
-        if (canComment && isCollectorOnlyRule) {
-          canComment = await readContract(config, {
+
+        if (isCollectorOnlyRule && canCommentResult) {
+          canCommentResult = await readContract(config, {
             ...collectorOnlyPostRuleContract,
-            args: [post.feed.address, post.id, currentAccount.address],
+            args,
             functionName: "validateCanReply"
           });
-          if (!canComment) {
-            setReason("You must collect the root Post to comment");
+          if (!canCommentResult) {
+            failureReason = "You must collect the root Post to comment";
           }
         }
-        if (canComment && isFollowingOnlyRule) {
-          canComment = await readContract(config, {
+
+        // Check following only rule
+        if (isFollowingOnlyRule && canCommentResult) {
+          canCommentResult = await readContract(config, {
             ...followingOnlyPostRuleContract,
-            args: [post.feed.address, post.id, currentAccount.address],
+            args,
             functionName: "validateCanReply"
           });
-          if (!canComment) {
-            setReason(
-              "You must be followed by the author of the root post to comment"
-            );
+          if (!canCommentResult) {
+            failureReason =
+              "You must be followed by the author of the root post to comment";
           }
         }
-        setCanComment(canComment);
+
+        setCanComment(canCommentResult);
+        setReason(failureReason);
       } catch {
         setCanComment(false);
         setReason(null);
@@ -122,12 +136,14 @@ const useCanComment = ({ post }: PostRuleValidationProps) => {
       return;
     }
 
+    setIsLoading(false);
     setCanComment(false);
-  }, [post]);
+    setReason(null);
+  }, [post, config, currentAccount]);
 
   useEffect(() => {
     validateCanComment();
-  }, [post]);
+  }, [validateCanComment]);
 
   return {
     data: canComment,
