@@ -24,7 +24,7 @@ const PollAction = ({ post }: PollActionProps) => {
     return null;
   }
 
-  return <Choices onVoteSuccess={updatePollCache} poll={poll} />;
+  return <Choices onVoteSuccess={updatePollCache} poll={poll} post={post} />;
 };
 
 export default PollAction;

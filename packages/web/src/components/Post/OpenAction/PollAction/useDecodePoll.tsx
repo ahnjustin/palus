@@ -11,6 +11,11 @@ import type { Poll } from "@/types/palus";
 const OPTIONS_KEY = keccak256(stringToBytes("lens.param.options"));
 const END_TS_KEY = keccak256(stringToBytes("lens.param.endTimestamp"));
 
+const contract = {
+  abi: pollVoteActionAbi,
+  address: CONTRACTS.pollVoteAction
+} as const;
+
 const useDecodePoll = (
   post: PostFragment,
   account: AccountFragment | undefined
@@ -18,15 +23,6 @@ const useDecodePoll = (
   const chainId = useChainId();
   const config = useConfig();
   const queryClient = useQueryClient();
-
-  const contract = useMemo(
-    () =>
-      ({
-        abi: pollVoteActionAbi,
-        address: CONTRACTS.pollVoteAction
-      }) as const,
-    []
-  );
 
   const pollAction = useMemo(() => {
     if (post.__typename !== "Post") return null;

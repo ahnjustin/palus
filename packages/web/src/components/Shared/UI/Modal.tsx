@@ -12,7 +12,7 @@ import { Fragment, memo, type ReactNode } from "react";
 import stopEventPropagation from "@/helpers/stopEventPropagation";
 
 const modalVariants = cva(
-  "w-full scale-100 bg-white text-left shadow-xl dark:bg-gray-800",
+  "w-full scale-100 bg-white text-left shadow-xl dark:bg-gray-900 dark:border dark:border-border",
   {
     defaultVariants: { size: "sm" },
     variants: {

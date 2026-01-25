@@ -3,13 +3,15 @@ import {
   Bars3BottomLeftIcon,
   CheckCircleIcon
 } from "@heroicons/react/24/solid";
-import { useExecutePostActionMutation } from "@palus/indexer";
+import {
+  type PostFragment,
+  useExecutePostActionMutation
+} from "@palus/indexer";
 import dayjs from "dayjs";
 import plur from "plur";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { encodeAbiParameters, keccak256, stringToBytes } from "viem";
-import PostExecutors from "@/components/Shared/Modal/PostExecutors";
 import { Card, Modal, Spinner, Tooltip } from "@/components/Shared/UI";
 import { ScrollArea } from "@/components/Shared/UI/ScrollArea";
 import { CONTRACTS } from "@/data/contracts";
@@ -21,13 +23,15 @@ import stopEventPropagation from "@/helpers/stopEventPropagation";
 import useTransactionLifecycle from "@/hooks/useTransactionLifecycle";
 import type { ApolloClientError } from "@/types/errors";
 import type { Poll } from "@/types/palus";
+import Voters from "./Voters";
 
 interface ChoicesProps {
   poll: Poll;
+  post: PostFragment;
   onVoteSuccess?: (choiceIndex: number) => void;
 }
 
-const Choices = ({ poll, onVoteSuccess }: ChoicesProps) => {
+const Choices = ({ poll, post, onVoteSuccess }: ChoicesProps) => {
   const { endsAt, options } = poll;
   const [showPostExecutorsModal, setShowPostExecutorsModal] = useState(false);
 
@@ -192,10 +196,7 @@ const Choices = ({ poll, onVoteSuccess }: ChoicesProps) => {
         show={showPostExecutorsModal}
         title="Voters"
       >
-        <PostExecutors
-          filter={{ address: CONTRACTS.pollVoteAction }}
-          postId={poll.id}
-        />
+        <Voters poll={poll} post={post} />
       </Modal>
     </>
   );
