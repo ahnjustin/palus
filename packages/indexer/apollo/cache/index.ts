@@ -20,6 +20,7 @@ const cache = new InMemoryCache({
         ]),
         postReactions: createCursorFieldPolicy(["request", ["post"]]),
         whoReferencedPost: createCursorFieldPolicy(["request", ["post", "referenceTypes"]]),
+        whoExecutedActionOnPost: createCursorFieldPolicy(["request", ["post", "filter", "orderBy"]]),
         postBookmarks: createCursorFieldPolicy(["request", ["filter", "pageSize"]]),
         groups: createCursorFieldPolicy(["request", ["filter", "pageSize"]]),
         accounts: createCursorFieldPolicy(["request", ["filter", "orderBy"]]),

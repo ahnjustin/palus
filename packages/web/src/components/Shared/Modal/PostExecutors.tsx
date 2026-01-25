@@ -6,7 +6,7 @@ import {
   type WhoExecutedActionOnPostRequest
 } from "@palus/indexer";
 import { motion } from "motion/react";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { Virtualizer } from "virtua";
 import SingleAccount from "@/components/Shared/Account/SingleAccount";
 import { TipIcon } from "@/components/Shared/Icons/TipIcon";
@@ -25,11 +25,14 @@ interface PostExecutorsProps {
 const PostExecutors = ({ postId, filter }: PostExecutorsProps) => {
   const { currentAccount } = useAccountStore();
 
-  const request: WhoExecutedActionOnPostRequest = {
-    filter: { anyOf: [filter] },
-    orderBy: WhoExecutedActionOnPostOrderBy.AccountScore,
-    post: postId
-  };
+  const request: WhoExecutedActionOnPostRequest = useMemo(
+    () => ({
+      filter: { anyOf: [filter] },
+      orderBy: WhoExecutedActionOnPostOrderBy.AccountScore,
+      post: postId
+    }),
+    [filter, postId]
+  );
 
   const { data, error, fetchMore, loading } = useWhoExecutedActionOnPostQuery({
     skip: !postId,
