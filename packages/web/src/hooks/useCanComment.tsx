@@ -62,71 +62,80 @@ const useCanComment = ({ post }: PostRuleValidationProps) => {
     }
 
     if (canCommentOperation.__typename === "PostOperationValidationUnknown") {
-      const isFollowingOnlyRule = canCommentOperation.extraChecksRequired.find(
+      const hasFollowingOnlyRule = canCommentOperation.extraChecksRequired.find(
         (rule) => rule.address === CONTRACTS.followingOnlyPostRule
       );
-      const isGroupGatedRule = canCommentOperation.extraChecksRequired.find(
+      const hasGroupGatedRule = canCommentOperation.extraChecksRequired.find(
         (rule) => rule.address === CONTRACTS.groupGatedPostRule
       );
-      const isCollectorOnlyRule = canCommentOperation.extraChecksRequired.find(
+      const hasCollectorOnlyRule = canCommentOperation.extraChecksRequired.find(
         (rule) => rule.address === CONTRACTS.collectorOnlyPostRule
       );
 
-      if (!isFollowingOnlyRule && !isGroupGatedRule && !isCollectorOnlyRule) {
+      if (
+        !hasFollowingOnlyRule &&
+        !hasGroupGatedRule &&
+        !hasCollectorOnlyRule
+      ) {
+        // The rules are actually unknown so we cannot validate
         setIsLoading(false);
         setCanComment(false);
         setReason(null);
         return;
       }
 
-      setReason(null);
       setIsLoading(true);
+
       try {
         const args = [
           post.feed.address,
           post.id,
           currentAccount.address
         ] as const;
-        let canCommentResult = true;
-        let failureReason: string | null = null;
 
-        if (isGroupGatedRule && canCommentResult) {
-          canCommentResult = await readContract(config, {
-            ...groupGatedPostRuleContract,
-            args,
-            functionName: "validateCanReply"
-          });
-          if (!canCommentResult) {
-            failureReason = "You must be a member of the Group to comment";
-          }
-        }
-
-        if (isCollectorOnlyRule && canCommentResult) {
-          canCommentResult = await readContract(config, {
-            ...collectorOnlyPostRuleContract,
-            args,
-            functionName: "validateCanReply"
-          });
-          if (!canCommentResult) {
-            failureReason = "You must collect the root Post to comment";
-          }
-        }
-
-        // Check following only rule
-        if (isFollowingOnlyRule && canCommentResult) {
-          canCommentResult = await readContract(config, {
+        if (hasFollowingOnlyRule && !post.author.operations?.isFollowingMe) {
+          const res = await readContract(config, {
             ...followingOnlyPostRuleContract,
             args,
             functionName: "validateCanReply"
           });
-          if (!canCommentResult) {
-            failureReason =
-              "You must be followed by the author of the root post to comment";
+          if (!res) {
+            setCanComment(false);
+            setReason(
+              "You must be followed by the author of the root post to comment"
+            );
+            return;
           }
         }
 
-        setCanComment(canCommentResult);
-        setReason(failureReason);
+        if (hasGroupGatedRule) {
+          const res = await readContract(config, {
+            ...groupGatedPostRuleContract,
+            args,
+            functionName: "validateCanReply"
+          });
+          if (!res) {
+            setCanComment(false);
+            setReason("You must be a member of the Group to comment");
+            return;
+          }
+        }
+
+        if (hasCollectorOnlyRule && !post.operations.hasSimpleCollected) {
+          const res = await readContract(config, {
+            ...collectorOnlyPostRuleContract,
+            args,
+            functionName: "validateCanReply"
+          });
+          if (!res) {
+            setCanComment(false);
+            setReason("You must collect the root Post to comment");
+            return;
+          }
+        }
+
+        setCanComment(true);
+        setReason(null);
       } catch {
         setCanComment(false);
         setReason(null);

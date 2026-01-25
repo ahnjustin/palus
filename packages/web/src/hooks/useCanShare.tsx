@@ -68,18 +68,19 @@ const useCanShare = ({ post }: PostRuleValidationProps) => {
       return;
     }
 
-    const isFollowingOnlyRule =
+    const hasFollowingOnlyRule =
       repostUnknown &&
       canRepostOperation.extraChecksRequired.find(
         (rule) => rule.address === CONTRACTS.followingOnlyPostRule
       );
-    const isCollectorOnlyRule =
+    const hasCollectorOnlyRule =
       repostUnknown &&
       canRepostOperation.extraChecksRequired.find(
         (rule) => rule.address === CONTRACTS.collectorOnlyPostRule
       );
 
-    if (!isFollowingOnlyRule && !isCollectorOnlyRule) {
+    if (!hasFollowingOnlyRule && !hasCollectorOnlyRule) {
+      // The rules are actually unknown so we cannot validate
       setIsLoading(false);
       setCanRepost(false);
       setCanQuote(false);
@@ -95,7 +96,7 @@ const useCanShare = ({ post }: PostRuleValidationProps) => {
         currentAccount.address
       ] as const;
 
-      if (isFollowingOnlyRule) {
+      if (hasFollowingOnlyRule && !post.author.operations?.isFollowingMe) {
         contracts.push(
           {
             ...followingOnlyPostRuleContract,
@@ -110,7 +111,7 @@ const useCanShare = ({ post }: PostRuleValidationProps) => {
         );
       }
 
-      if (isCollectorOnlyRule) {
+      if (hasCollectorOnlyRule && !post.operations.hasSimpleCollected) {
         contracts.push(
           {
             ...collectorOnlyPostRuleContract,
@@ -123,6 +124,13 @@ const useCanShare = ({ post }: PostRuleValidationProps) => {
             functionName: "validateCanQuote"
           } as const
         );
+      }
+
+      if (contracts.length === 0) {
+        setIsLoading(false);
+        setCanRepost(true);
+        setCanQuote(true);
+        return;
       }
 
       const res = await readContracts(config, { contracts });
@@ -130,11 +138,11 @@ const useCanShare = ({ post }: PostRuleValidationProps) => {
       let canRepostResult: boolean;
       let canQuoteResult: boolean;
 
-      if (isFollowingOnlyRule && isCollectorOnlyRule) {
+      if (hasFollowingOnlyRule && hasCollectorOnlyRule) {
         // Indices: 0,1 = following (repost, quote), 2,3 = collector (repost, quote)
         canRepostResult = Boolean(res[0].result) && Boolean(res[2].result);
         canQuoteResult = Boolean(res[1].result) && Boolean(res[3].result);
-      } else if (isFollowingOnlyRule) {
+      } else if (hasFollowingOnlyRule) {
         canRepostResult = Boolean(res[0].result);
         canQuoteResult = Boolean(res[1].result);
       } else {
