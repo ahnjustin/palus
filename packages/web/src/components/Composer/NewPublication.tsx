@@ -40,6 +40,7 @@ import useCanComment from "@/hooks/useCanComment";
 import useCreatePost from "@/hooks/useCreatePost";
 import useEditPost from "@/hooks/useEditPost";
 import usePostMetadata from "@/hooks/usePostMetadata";
+import useUmami from "@/hooks/useUmami";
 import { useNewPostModalStore } from "@/store/non-persisted/modal/useNewPostModalStore";
 import { useCollectActionStore } from "@/store/non-persisted/post/useCollectActionStore";
 import { usePostAttachmentStore } from "@/store/non-persisted/post/usePostAttachmentStore";
@@ -137,6 +138,8 @@ const NewPublication = ({
   const editor = useEditorContext();
   const getMetadata = usePostMetadata();
 
+  const { track } = useUmami();
+
   const isComment = Boolean(post);
   const isQuote = Boolean(quotedPost);
   const hasAudio = attachments[0]?.type === "Audio";
@@ -178,6 +181,7 @@ const NewPublication = ({
   const onError = useCallback((error?: unknown) => {
     setIsSubmitting(false);
     errorToast(error);
+    track("Create Post Error", { error });
   }, []);
 
   const { createPost } = useCreatePost({
@@ -298,6 +302,9 @@ const NewPublication = ({
       };
 
       const metadata = getMetadata({ baseMetadata });
+      if (!metadata) {
+        throw new Error("Failed to generate metadata");
+      }
       const contentUri = await uploadMetadata(metadata);
 
       if (editingPost) {
@@ -319,6 +326,24 @@ const NewPublication = ({
         followersOnly,
         followingOnly,
         groupGate
+      });
+
+      track("Create Post", {
+        attachments: attachments.length,
+        collectible: collectAction.enabled,
+        comment: isComment,
+        contentWarning: "contentWarning" in metadata && metadata.contentWarning,
+        group: Boolean(group || selectedGroup),
+        modal: isModal,
+        poll: showPollEditor,
+        quote: isQuote,
+        rules: {
+          collectorsOnly,
+          followersOnly,
+          followingOnly,
+          groupGate: Boolean(groupGate)
+        },
+        type: metadata.lens.mainContentFocus
       });
 
       return await createPost({
