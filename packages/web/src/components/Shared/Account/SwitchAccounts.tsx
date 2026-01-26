@@ -60,6 +60,29 @@ const SwitchAccounts = () => {
   }
 
   const accountsAvailable = data?.accountsAvailable.items || [];
+  const sortedAccounts = [...accountsAvailable].sort((a, b) => {
+    const authAddress = currentAccount?.address.toLowerCase();
+    const aAddress = a.account.address.toLowerCase();
+    const bAddress = b.account.address.toLowerCase();
+
+    if (aAddress === authAddress) return -1;
+    if (bAddress === authAddress) return 1;
+
+    if (a.account.metadata?.name) {
+      if (b.account.metadata?.name) {
+        return a.account.metadata.name.localeCompare(b.account.metadata.name);
+      }
+      return a.account.metadata.name.localeCompare(
+        b.account.username?.localName || ""
+      );
+    }
+    if (a.account.username?.localName) {
+      return a.account.username.localName.localeCompare(
+        b.account.username?.localName || ""
+      );
+    }
+    return a.account.address.localeCompare(b.account.address);
+  });
 
   const handleSwitchAccount = async (account: string) => {
     try {
@@ -92,7 +115,7 @@ const SwitchAccounts = () => {
         error={error}
         title="Failed to load accounts"
       />
-      {accountsAvailable.map((accountAvailable, index) => (
+      {sortedAccounts.map((accountAvailable, index) => (
         <button
           className="flex w-full cursor-pointer items-center justify-between space-x-2 rounded-lg py-3 pr-4 pl-3 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
           disabled={
@@ -100,7 +123,7 @@ const SwitchAccounts = () => {
           }
           key={accountAvailable?.account.address}
           onClick={async () => {
-            const selectedAccount = accountsAvailable[index].account;
+            const selectedAccount = sortedAccounts[index].account;
             await handleSwitchAccount(selectedAccount.address);
           }}
           type="button"
