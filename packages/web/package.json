@@ -73,9 +73,9 @@
   "devDependencies": {
     "@palus/config": "workspace:*",
     "@tailwindcss/aspect-ratio": "^0.4.2",
-    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/forms": "^0.5.11",
     "@types/hast": "^3.0.4",
-    "@types/node": "^24.9.1",
+    "@types/node": "^24.10.9",
     "@types/react": "^19.2.9",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.2",
