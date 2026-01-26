@@ -173,6 +173,16 @@
     @apply list-disc pl-5;
   }
 
+  .markup ol,
+  .full-page-post-markup ol {
+    @apply list-decimal mb-3;
+  }
+
+  .markup li,
+  .full-page-post-markup li {
+    @apply mb-1;
+  }
+
   .markup > hr {
     @apply border-gray-200 dark:border-gray-800;
     @apply mb-3;
