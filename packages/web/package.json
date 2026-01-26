@@ -68,7 +68,7 @@
     "virtua": "^0.48.5",
     "wagmi": "^2.19.5",
     "zod": "4.3.6",
-    "zustand": "^5.0.8"
+    "zustand": "^5.0.10"
   },
   "devDependencies": {
     "@palus/config": "workspace:*",
