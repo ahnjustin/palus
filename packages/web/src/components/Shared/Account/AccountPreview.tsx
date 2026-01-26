@@ -89,8 +89,8 @@ const AccountPreview = ({
 
     const UserName = () => (
       <div>
-        <div className="flex max-w-sm items-center gap-1 truncate">
-          <div>{getAccount(account).name}</div>
+        <div className="flex min-w-0 max-w-sm items-center gap-1">
+          <div className="truncate">{getAccount(account).name}</div>
           {account.score < 9000 ? null : <TopAccount />}
         </div>
         <span>
