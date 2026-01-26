@@ -210,7 +210,7 @@ importers:
         specifier: ^3.4.0
         version: 3.4.0
       tailwindcss:
-        specifier: ^4.1.15
+        specifier: ^4.1.18
         version: 4.1.18
       unified:
         specifier: ^11.0.5
