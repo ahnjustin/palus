@@ -162,7 +162,8 @@
 
   /* Markup styles */
   .markup > p,
-  .markup > ul {
+  .markup > ul,
+  .markup > ol {
     word-break: break-word;
     @apply leading-[26px];
     @apply [&:not(:last-child)]:mb-3;
@@ -175,7 +176,7 @@
 
   .markup ol,
   .full-page-post-markup ol {
-    @apply list-decimal mb-3;
+    @apply list-decimal pl-4;
   }
 
   .markup li,
@@ -189,7 +190,8 @@
   }
 
   .full-page-post-markup > p,
-  .full-page-post-markup ul {
+  .full-page-post-markup ul,
+  .full-page-post-markup ol {
     @apply text-[15px] sm:text-[17px];
     @apply !leading-7 sm:leading-[26px];
     @apply [&:not(:last-child)]:mb-3 sm:[&:not(:last-child)]:mb-4;
