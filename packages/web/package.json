@@ -37,7 +37,7 @@
     "family": "^0.1.4",
     "mdast-util-to-markdown": "^2.1.2",
     "motion": "^12.29.2",
-    "plur": "^5.1.0",
+    "plur": "^6.0.0",
     "plyr-react": "^5.3.0",
     "prosekit": "^0.17.1",
     "react": "^19.2.4",
