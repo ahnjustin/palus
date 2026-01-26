@@ -19,7 +19,7 @@ const modalVariants = cva(
       size: {
         full: "h-full flex flex-col",
         lg: "inline-block rounded-xl sm:max-w-5xl sm:my-8 sm:align-middle",
-        md: "inline-block rounded-xl sm:max-w-3xl sm:my-8 sm:align-middle",
+        md: "inline-block rounded-xl sm:max-w-xl sm:my-8 sm:align-middle",
         sm: "inline-block rounded-xl sm:max-w-lg sm:my-8 sm:align-middle",
         xs: "inline-block rounded-xl sm:max-w-sm sm:my-8 sm:align-middle"
       }

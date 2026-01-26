@@ -107,7 +107,7 @@ const GlobalModals = () => {
         onClose={() => setShowNewPostModal(false)}
         preventClose={true}
         show={showNewPostModal}
-        size={isSmallDevice ? "full" : "sm"}
+        size={isSmallDevice ? "full" : "md"}
         title={
           editingPost
             ? "Edit post"
