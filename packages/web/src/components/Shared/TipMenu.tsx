@@ -19,6 +19,7 @@ import cn from "@/helpers/cn";
 import errorToast from "@/helpers/errorToast";
 import usePreventScrollOnNumberInput from "@/hooks/usePreventScrollOnNumberInput";
 import useTransactionLifecycle from "@/hooks/useTransactionLifecycle";
+import useUmami from "@/hooks/useUmami";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
 import type { ApolloClientError } from "@/types/errors";
 
@@ -39,6 +40,7 @@ const TipMenu = ({ closePopover, post, account }: TipMenuProps) => {
   const { cache } = useApolloClient();
   const inputRef = useRef<HTMLInputElement>(null);
   usePreventScrollOnNumberInput(inputRef as RefObject<HTMLInputElement>);
+  const { track } = useUmami();
 
   const { data: balance, loading: balanceLoading } = useBalancesBulkQuery({
     fetchPolicy: "no-cache",
@@ -138,12 +140,14 @@ const TipMenu = ({ closePopover, post, account }: TipMenuProps) => {
     };
 
     if (post) {
+      track("Tip", { amount, type: "Post" });
       return executePostAction({
         variables: { request: { action: { tipping }, post: post.id } }
       });
     }
 
     if (account) {
+      track("Tip", { amount, type: "Account" });
       return executeAccountAction({
         variables: {
           request: { account: account.address, action: { tipping } }
