@@ -28,7 +28,7 @@ const FollowUnfollowButton = ({
   }
 
   return (
-    <div className="contents" onClick={stopEventPropagation}>
+    <div className="contents flex-none" onClick={stopEventPropagation}>
       {!hideFollowButton &&
         (account.operations?.isFollowedByMe ? null : (
           <FollowWithRulesCheck
