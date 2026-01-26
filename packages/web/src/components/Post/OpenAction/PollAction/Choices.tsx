@@ -54,7 +54,7 @@ const Choices = ({ poll, post, onVoteSuccess }: ChoicesProps) => {
   const onCompleted = () => {
     setHasVoted(true);
     setIsSubmitting(false);
-    if (selectedOption) {
+    if (selectedOption !== null) {
       onVoteSuccess?.(selectedOption);
     }
     toast.success("Voted successfully!");
