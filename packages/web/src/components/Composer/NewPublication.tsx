@@ -330,11 +330,11 @@ const NewPublication = ({
 
       track("Create Post", {
         attachments: attachments.length,
-        collectible: collectAction.enabled,
+        collectible: Boolean(collectAction.enabled),
         comment: isComment,
         contentWarning: "contentWarning" in metadata && metadata.contentWarning,
         group: Boolean(group || selectedGroup),
-        modal: isModal,
+        modal: Boolean(isModal),
         poll: showPollEditor,
         quote: isQuote,
         rules: {
