@@ -6,16 +6,19 @@ import {
   HomeIcon as HomeOutline,
   PencilSquareIcon,
   UserCircleIcon,
-  UserGroupIcon as UserGroupOutline
+  UserGroupIcon as UserGroupOutline,
+  WalletIcon as WalletOutline
 } from "@heroicons/react/24/outline";
 import {
   BellIcon as BellSolid,
   BookmarkIcon as BookmarkSolid,
   GlobeAltIcon as GlobeSolid,
   HomeIcon as HomeSolid,
-  UserGroupIcon as UserGroupSolid
+  UserGroupIcon as UserGroupSolid,
+  WalletIcon as WalletSolid
 } from "@heroicons/react/24/solid";
 import {
+  BalancesBulkDocument,
   GroupsDocument,
   NotificationIndicatorDocument,
   NotificationsDocument,
@@ -70,6 +73,12 @@ const navigationItems = {
     refreshDocs: [NotificationsDocument, NotificationIndicatorDocument],
     solid: <BellSolid className="size-6" />,
     title: "Notifications"
+  },
+  "/wallet": {
+    outline: <WalletOutline className="size-6" />,
+    refreshDocs: [BalancesBulkDocument],
+    solid: <WalletSolid className="size-6" />,
+    title: "Wallet"
   }
 };
 
@@ -95,7 +104,9 @@ const NavItems = memo(({ isLoggedIn }: { isLoggedIn: boolean }) => {
   const routes = [
     "/",
     "/explore",
-    ...(isLoggedIn ? ["/notifications", "/groups", "/bookmarks"] : [])
+    ...(isLoggedIn
+      ? ["/notifications", "/wallet", "/groups", "/bookmarks"]
+      : [])
   ];
 
   return (

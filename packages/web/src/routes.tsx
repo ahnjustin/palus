@@ -30,6 +30,7 @@ import PreferencesSettings from "@/components/Settings/Preferences";
 import SessionsSettings from "@/components/Settings/Sessions";
 import UsernameSettings from "@/components/Settings/Username";
 import Custom404 from "@/components/Shared/404";
+import Wallet from "@/components/Wallet";
 import RewardsSettings from "./components/Settings/Rewards";
 
 const Routes = () => {
@@ -66,6 +67,7 @@ const Routes = () => {
           <Route element={<Notification />} path="notifications" />
           <Route element={<ViewAccount />} path="account/:address" />
           <Route element={<ViewAccount />} path="u/:username" />
+          <Route element={<Wallet />} path="wallet" />
           <Route path="g/:address">
             <Route element={<ViewGroup />} index />
             <Route path="settings">
