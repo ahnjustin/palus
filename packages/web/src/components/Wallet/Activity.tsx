@@ -1,7 +1,7 @@
 import { ArrowsRightLeftIcon, CpuChipIcon } from "@heroicons/react/24/outline";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { Link } from "react-router";
 import { formatEther, type Hex } from "viem";
 import { Virtualizer } from "virtua";
@@ -35,9 +35,9 @@ interface Transaction {
   to: string;
   value: string;
   isError: string;
-  input: string;
-  confirmations: string;
-  functionName: string;
+  type: string;
+  input?: string;
+  confirmations?: string;
 }
 
 interface TransactionsResponse {
@@ -51,31 +51,74 @@ interface ActivityProps {
 }
 
 const Activity = ({ account }: ActivityProps) => {
-  const getTransactions = async (
-    page: number
-  ): Promise<{ transactions: Transaction[]; nextPage: number | null }> => {
+  const seenRegularTxHashes = useRef(new Set<string>());
+
+  const fetchTransactionList = async (
+    page: number,
+    action: "txlist" | "txlistinternal"
+  ): Promise<Transaction[]> => {
     try {
       const response = await fetch(
-        `${BLOCK_EXPLORER_API_URL}?module=account&action=txlist&page=${page}&offset=${PAGE_SIZE}&address=${account}`
+        `${BLOCK_EXPLORER_API_URL}?module=account&action=${action}&page=${page}&offset=${PAGE_SIZE}&address=${account}`
       );
 
       if (!response.ok) {
-        return { nextPage: null, transactions: [] };
+        return [];
       }
 
       const data: TransactionsResponse = await response.json();
 
       if (data.status !== "1" || !Array.isArray(data.result)) {
-        return { nextPage: null, transactions: [] };
+        return [];
       }
 
-      return {
-        nextPage: data.result.length === PAGE_SIZE ? page + 1 : null,
-        transactions: data.result
-      };
+      return data.result;
     } catch {
-      return { nextPage: null, transactions: [] };
+      return [];
     }
+  };
+
+  const getTransactions = async (
+    page: number
+  ): Promise<{ transactions: Transaction[]; nextPage: number | null }> => {
+    // Reset seen hashes when fetching the first page
+    if (page === 1) {
+      seenRegularTxHashes.current.clear();
+    }
+
+    const [regularTxs, internalTxs] = await Promise.all([
+      fetchTransactionList(page, "txlist"),
+      fetchTransactionList(page, "txlistinternal")
+    ]);
+
+    // Filter out duplicate transactions
+    const uniqueTxs = regularTxs.filter(
+      (tx) => !seenRegularTxHashes.current.has(tx.hash)
+    );
+
+    // Add all regular transaction hashes to the seen set
+    for (const tx of uniqueTxs) {
+      seenRegularTxHashes.current.add(tx.hash);
+    }
+
+    // Filter out internal transactions that share a hash with any regular transaction
+    const uniqueInternalTxs = internalTxs.filter(
+      (tx) => !seenRegularTxHashes.current.has(tx.hash)
+    );
+
+    // Merge and sort by timestamp descending
+    const allTransactions = [...uniqueTxs, ...uniqueInternalTxs].sort(
+      (a, b) => Number(b.timeStamp) - Number(a.timeStamp)
+    );
+
+    // Determine if there are more pages - if either list returned a full page
+    const hasMorePages =
+      regularTxs.length === PAGE_SIZE || internalTxs.length === PAGE_SIZE;
+
+    return {
+      nextPage: hasMorePages ? page + 1 : null,
+      transactions: allTransactions
+    };
   };
 
   const { data, error, fetchNextPage, hasNextPage, isFetching, isLoading } =
@@ -108,17 +151,24 @@ const Activity = ({ account }: ActivityProps) => {
   };
 
   const getTransactionLabel = (
-    decodedTx: DecodedTransaction,
-    isReceived: boolean
+    decodedTx: DecodedTransaction | null,
+    isReceived: boolean,
+    isInternalTx: boolean
   ): { label: string; detail?: string } => {
-    const value = BigInt(decodedTx.value ?? 0);
+    if (isInternalTx) {
+      return isReceived
+        ? { label: `Received ${NATIVE_TOKEN_SYMBOL}` }
+        : { label: `Sent ${NATIVE_TOKEN_SYMBOL}` };
+    }
+
+    const value = BigInt(decodedTx?.value ?? 0);
     if (value > 0n) {
       return isReceived
         ? { label: `Received ${NATIVE_TOKEN_SYMBOL}` }
         : { label: `Sent ${NATIVE_TOKEN_SYMBOL}` };
     }
 
-    const firstAction = decodedTx.decodedActions[0];
+    const firstAction = decodedTx?.decodedActions[0];
     const contractType = firstAction?.contractType;
 
     let action = firstAction?.action;
@@ -133,17 +183,22 @@ const Activity = ({ account }: ActivityProps) => {
       }
     }
 
-    return firstAction && contractType
+    return firstAction && contractType && action
       ? { detail: contractType, label: camelToCapitalized(action) }
-      : { label: "Contract interaction" };
+      : {
+          label: isInternalTx ? "Internal transaction" : "Contract interaction"
+        };
   };
 
   const getTransactionStatus = (tx: Transaction) => {
-    return Number(tx.confirmations) > 0 ? "Confirmed" : "Pending";
+    const isInternalTx = !tx.input || tx.type === "call";
+    return (isInternalTx && tx.isError === "0") || Number(tx.confirmations) > 0
+      ? "Confirmed"
+      : "Pending";
   };
 
-  const getTransactionValue = (tx: DecodedTransaction, isReceived: boolean) => {
-    const value = BigInt(tx.value ?? 0);
+  const getTransactionValueDisplay = (txValue: string, isReceived: boolean) => {
+    const value = BigInt(txValue);
     if (value === 0n) {
       return "$0.00";
     }
@@ -186,14 +241,23 @@ const Activity = ({ account }: ActivityProps) => {
     <div className="h-full overflow-y-auto">
       <Virtualizer>
         {transactions.map((tx) => {
-          const decodedTx = decodeDelegatedTransaction(tx.input as Hex);
-          const firstAction = decodedTx.decodedActions[0];
-          const isReceived =
-            firstAction?.target?.toLowerCase() === account.toLowerCase();
+          const isInternalTx = !tx.input || tx.type === "call";
+          const decodedTx = isInternalTx
+            ? null
+            : decodeDelegatedTransaction(tx.input as Hex);
+          const firstAction = decodedTx?.decodedActions[0];
+          const isReceived = isInternalTx
+            ? tx.to.toLowerCase() === account.toLowerCase()
+            : firstAction?.target?.toLowerCase() === account.toLowerCase();
 
-          const label = getTransactionLabel(decodedTx, isReceived);
+          const txValue = isInternalTx ? tx.value : (decodedTx?.value ?? "0");
+          const label = getTransactionLabel(
+            decodedTx,
+            isReceived,
+            isInternalTx
+          );
           const status = getTransactionStatus(tx);
-          const value = getTransactionValue(decodedTx, isReceived);
+          const value = getTransactionValueDisplay(txValue, isReceived);
           const date = dayjs(Number(tx.timeStamp) * 1000);
 
           return (
@@ -201,13 +265,13 @@ const Activity = ({ account }: ActivityProps) => {
               className={
                 "mb-1 flex items-center justify-between rounded-lg px-3 py-2 hover:bg-gray-300/20"
               }
-              key={tx.hash}
+              key={`${tx.hash}-${tx.to}`}
               rel="noreferrer noopener"
               target="_blank"
               to={`${BLOCK_EXPLORER_URL}/tx/${tx.hash}`}
             >
               <div className="flex min-w-0 items-center gap-x-2">
-                {BigInt(decodedTx.value ?? 0) > 0n ? (
+                {BigInt(txValue) > 0n ? (
                   <ArrowsRightLeftIcon className="size-7 rounded-full bg-gray-200 p-1 text-gray-600 dark:bg-gray-700 dark:text-gray-400" />
                 ) : label.detail ? (
                   <svg
@@ -267,15 +331,11 @@ const Activity = ({ account }: ActivityProps) => {
                     </div>
                   </Tooltip>
                 </span>
-                <Tooltip
-                  content={formatEther(
-                    BigInt(decodedTx.value ?? "0")
-                  ).toString()}
-                >
+                <Tooltip content={formatEther(BigInt(txValue)).toString()}>
                   <span
                     className={cn(
                       "font-medium",
-                      BigInt(decodedTx.value ?? 0) === 0n
+                      BigInt(txValue) === 0n
                         ? "text-on-surface"
                         : isReceived
                           ? "text-green-600"
