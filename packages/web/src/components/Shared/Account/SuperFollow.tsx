@@ -10,7 +10,7 @@ import LoginButton from "@/components/Shared/LoginButton";
 import Slug from "@/components/Shared/Slug";
 import { H3, H5 } from "@/components/Shared/UI";
 import { CONTRACTS } from "@/data/contracts";
-import { tokens } from "@/data/tokens";
+import { TOKENS } from "@/data/tokens";
 import getAccount from "@/helpers/getAccount";
 import getTokenImage from "@/helpers/getTokenImage";
 import { getSimplePaymentDetails } from "@/helpers/rules";
@@ -25,7 +25,7 @@ const SuperFollow = () => {
   const { assetAddress, assetSymbol, amount } = getSimplePaymentDetails(
     superFollowingAccount?.rules as AccountFollowRules
   );
-  const enabledTokens = tokens.map((t) => t.symbol);
+  const enabledTokens = TOKENS.map((t) => t.symbol);
   const isTokenEnabled = enabledTokens?.includes(assetSymbol || "");
 
   const { data: balances, loading: balanceLoading } = useBalancesBulkQuery({

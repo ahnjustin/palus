@@ -127,7 +127,7 @@ const GlobalModals = () => {
       <Modal
         onClose={() => setShowFundModal({ showFundModal: false })}
         show={showFundModal}
-        title="Top-up your account"
+        title="Deposit"
       >
         <TopUp />
       </Modal>

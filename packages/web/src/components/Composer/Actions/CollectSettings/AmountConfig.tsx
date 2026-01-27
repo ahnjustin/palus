@@ -4,7 +4,7 @@ import ToggleWithHelper from "@/components/Shared/ToggleWithHelper";
 import { Input, Select } from "@/components/Shared/UI";
 import { STATIC_IMAGES_URL } from "@/data/constants";
 import { CONTRACTS } from "@/data/contracts";
-import { tokens } from "@/data/tokens";
+import { TOKENS } from "@/data/tokens";
 import { EXPANSION_EASE } from "@/helpers/variants";
 import { useCollectActionStore } from "@/store/non-persisted/post/useCollectActionStore";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
@@ -85,11 +85,11 @@ const AmountConfig = ({ setCollectType }: AmountConfigProps) => {
                 }}
                 options={[
                   {
-                    icon: `${STATIC_IMAGES_URL}/${tokens[0].symbol.toLowerCase()}.svg`,
-                    label: tokens[0].name,
+                    icon: `${STATIC_IMAGES_URL}/${TOKENS[0].symbol.toLowerCase()}.svg`,
+                    label: TOKENS[0].name,
                     selected:
-                      tokens[0].contractAddress === CONTRACTS.nativeToken,
-                    value: tokens[0].contractAddress
+                      TOKENS[0].contractAddress === CONTRACTS.nativeToken,
+                    value: TOKENS[0].contractAddress
                   }
                 ]}
               />

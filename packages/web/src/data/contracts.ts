@@ -1,3 +1,5 @@
+import { lensDeployments } from "lens-modules/deployments";
+
 export const IS_TESTNET = import.meta.env.VITE_USE_TESTNET === "true";
 
 export const CONTRACTS = {
@@ -11,21 +13,24 @@ export const CONTRACTS = {
     ? "0x8d3f8e9cCB82c6B4903fc7E5f2dE1F5985E4F356"
     : "0x873A3Ea97181D1617B4bF80998E9D0fad26fB333",
   groupGatedFeedRule: IS_TESTNET
-    ? "0xbDE71d01eC6d6c49b2bcc9067EcA352a17D25A91"
-    : "0x40a2a352583b266097234f1260b5aafb7b129047",
+    ? lensDeployments.testnet.GroupGatedFeedRule.address
+    : lensDeployments.mainnet.GroupGatedFeedRule.address,
   groupGatedPostRule: IS_TESTNET
     ? "0x83F5E3bb7209111002eB6C98A89a9869cD63a0e1"
     : "0x4450451C88DdfE41880D2b702c3Cf8D4d394432F",
   lensGlobalGraph: IS_TESTNET
-    ? "0x4d97287FF1A0e030cA4604EcDa9be355dd8A8BaC"
-    : "0x433025d9718302E7B2e1853D712d96F00764513F",
+    ? lensDeployments.testnet.LensGlobalGraph.address
+    : lensDeployments.mainnet.LensGlobalGraph.address,
   nativeToken: "0x000000000000000000000000000000000000800A",
   pollVoteAction: IS_TESTNET
     ? "0x58C03173a0A71fb0e1AF00625E21f84CC799FC56"
     : "0x0B9507487800F0c385A240199fDf1d79131E8e25",
   simpleCollectAction: IS_TESTNET
-    ? "0x17d5B3917Eab14Ab4923DEc597B39EF64863C830"
-    : "0x1cee1cd464c4e44e80acdb0b0e33f88849070f6e",
+    ? lensDeployments.testnet.SimpleCollectAction.address
+    : lensDeployments.mainnet.SimpleCollectAction.address,
+  tippingPostAction: IS_TESTNET
+    ? lensDeployments.testnet.TippingPostAction.address
+    : lensDeployments.mainnet.TippingPostAction.address,
   wrappedNativeToken: IS_TESTNET
     ? "0xeee5a340Cdc9c179Db25dea45AcfD5FE8d4d3eB8"
     : "0x6bDc36E20D267Ff0dd6097799f82e78907105e2F"

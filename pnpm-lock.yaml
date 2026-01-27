@@ -131,6 +131,9 @@ importers:
       family:
         specifier: ^0.1.4
         version: 0.1.6(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(viem@2.45.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.3.6))(wagmi@2.19.5(@tanstack/query-core@5.90.20)(@tanstack/react-query@5.90.20(react@19.2.4))(@types/react@19.2.9)(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(immer@10.2.0)(react@19.2.4)(typescript@5.9.3)(utf-8-validate@5.0.10)(viem@2.45.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.3.6))(ws@8.18.3(bufferutil@4.1.0)(utf-8-validate@5.0.10))(zod@4.3.6))
+      lens-modules:
+        specifier: ^3.1.6
+        version: 3.1.6
       mdast-util-to-markdown:
         specifier: ^2.1.2
         version: 2.1.2
@@ -4188,6 +4191,9 @@ packages:
 
   keyvaluestorage-interface@1.0.0:
     resolution: {integrity: sha512-8t6Q3TclQ4uZynJY9IGr2+SsIGwK9JHcO6ootkHCGA0CrQCRy+VkouYNO2xicET6b9al7QKzpebNow+gkpCL8g==}
+
+  lens-modules@3.1.6:
+    resolution: {integrity: sha512-L4KaXjqO0Pa9Iu8u9t1X5MM8nlCbpzG51ryPTJcD8PDS5ykmsJ3TgySEzs75weR12WC3w6pJuUcK4pogdKZwzA==}
 
   lightningcss-android-arm64@1.30.2:
     resolution: {integrity: sha512-BH9sEdOCahSgmkVhBLeU7Hc9DWeZ1Eb6wNS6Da8igvUwAe0sqROHddIlvU06q3WyXVEOYDZ6ykBZQnjTbmo4+A==}
@@ -11700,6 +11706,8 @@ snapshots:
       readable-stream: 3.6.2
 
   keyvaluestorage-interface@1.0.0: {}
+
+  lens-modules@3.1.6: {}
 
   lightningcss-android-arm64@1.30.2:
     optional: true

@@ -22,7 +22,6 @@ import Search from "@/components/Search";
 import AccountSettings from "@/components/Settings";
 import BlockedSettings from "@/components/Settings/Blocked";
 import DeveloperSettings from "@/components/Settings/Developer";
-import FundsSettings from "@/components/Settings/Funds";
 import ManagerSettings from "@/components/Settings/Manager";
 import { default as AccountMonetizeSettings } from "@/components/Settings/Monetize";
 import { default as AccountPersonalizeSettings } from "@/components/Settings/Personalize";
@@ -95,7 +94,6 @@ const Routes = () => {
             <Route element={<RewardsSettings />} path="rewards" />
             <Route element={<BlockedSettings />} path="blocked" />
             <Route element={<DeveloperSettings />} path="developer" />
-            <Route element={<FundsSettings />} path="funds" />
             <Route element={<ManagerSettings />} path="manager" />
             <Route element={<SessionsSettings />} path="sessions" />
             <Route element={<UsernameSettings />} path="username" />

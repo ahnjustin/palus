@@ -2,7 +2,7 @@ import { CONTRACTS } from "./contracts";
 
 export const IS_TESTNET = import.meta.env.VITE_USE_TESTNET === "true";
 
-export const tokens = [
+export const TOKENS = [
   {
     contractAddress: CONTRACTS.nativeToken,
     decimals: 18,

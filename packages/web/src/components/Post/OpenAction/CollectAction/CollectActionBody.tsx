@@ -29,7 +29,7 @@ import {
   WarningMessage
 } from "@/components/Shared/UI";
 import { BLOCK_EXPLORER_URL } from "@/data/constants";
-import { tokens } from "@/data/tokens";
+import { TOKENS } from "@/data/tokens";
 import formatAddress from "@/helpers/formatAddress";
 import getAccount from "@/helpers/getAccount";
 import getTokenImage from "@/helpers/getTokenImage";
@@ -58,7 +58,7 @@ const CollectActionBody = ({
 
   // Memoize expensive calculations to prevent unnecessary re-renders
   const enabledTokens = useMemo(() => {
-    return tokens.map((t) => t.contractAddress);
+    return TOKENS.map((t) => t.contractAddress);
   }, []);
 
   // Extract data safely with optional chaining

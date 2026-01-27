@@ -3,7 +3,6 @@ import {
   ArrowRightIcon,
   AtSymbolIcon,
   CodeBracketIcon,
-  CreditCardIcon,
   CurrencyDollarIcon,
   FingerPrintIcon,
   GiftIcon,
@@ -47,11 +46,6 @@ const AccountSettings = () => {
       icon: <GiftIcon className="size-5" />,
       title: "Rewards",
       url: "/settings/rewards"
-    },
-    {
-      icon: <CreditCardIcon className="size-5" />,
-      title: "Funds",
-      url: "/settings/funds"
     },
     {
       icon: <AtSymbolIcon className="size-5" />,

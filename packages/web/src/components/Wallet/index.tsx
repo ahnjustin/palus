@@ -2,22 +2,20 @@ import {
   EllipsisVerticalIcon,
   Square2StackIcon
 } from "@heroicons/react/24/outline";
-import {
-  ArrowDownIcon,
-  ArrowRightIcon,
-  ArrowUpIcon
-} from "@heroicons/react/24/solid";
 import { type AnyBalance, useBalancesBulkQuery } from "@palus/indexer";
 import { useState } from "react";
 import NotLoggedIn from "@/components/Shared/NotLoggedIn";
 import PageLayout from "@/components/Shared/PageLayout";
-import { Button, Card, CardHeader, Tabs } from "@/components/Shared/UI";
-import Activity from "@/components/Wallet/Activity";
-import TokenBalances from "@/components/Wallet/TokenBalances";
+import { Card, CardHeader, Tabs, Tooltip } from "@/components/Shared/UI";
 import { CONTRACTS } from "@/data/contracts";
 import formatAddress from "@/helpers/formatAddress";
 import useCopyToClipboard from "@/hooks/useCopyToClipboard";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
+import Activity from "./Activity";
+import Deposit from "./Deposit";
+import Send from "./Send";
+import TokenBalances from "./TokenBalances";
+import Withdraw from "./Withdraw";
 
 enum WalletTab {
   Tokens = "Tokens",
@@ -68,7 +66,7 @@ const Wallet = () => {
   }
 
   return (
-    <PageLayout>
+    <PageLayout zeroTopMargin>
       <Card>
         <CardHeader title="Account Wallet" />
         <div className="flex items-center justify-between px-5 pt-4">
@@ -87,27 +85,23 @@ const Wallet = () => {
             <EllipsisVerticalIcon className="size-5 text-on-surface" />
           </button>
         </div>
-        <div className="center flex p-2 font-semibold text-4xl">
-          ${totalBalance.toFixed(2)}
+        <div className="center flex p-3 font-semibold text-5xl">
+          <Tooltip content={totalBalance} placement="top">
+            ${totalBalance.toFixed(2)}
+          </Tooltip>
         </div>
         <div className="flex justify-center gap-x-4 px-5 py-2">
-          <Button outline size="lg">
-            <ArrowDownIcon className="size-4" />
-            Deposit
-          </Button>
-          <Button outline size="lg">
-            <ArrowRightIcon className="size-4" />
-            Send
-          </Button>
-          <Button outline size="lg">
-            <ArrowUpIcon className="size-4" />
-            Withdraw
-          </Button>
+          <Deposit />
+          <Send balances={data?.balancesBulk as AnyBalance[]} />
+          <Withdraw
+            balances={data?.balancesBulk as AnyBalance[]}
+            refetch={refetch}
+          />
         </div>
-        <div className="flex flex-col gap-y-4 p-5">
+        <div className="flex flex-col gap-y-2 pt-4 sm:p-5">
           <Tabs
             active={activeTab}
-            className="p-0"
+            className="border-border border-y py-2 sm:px-0"
             layoutId="wallet-tabs"
             setActive={setActiveTab}
             tabs={tabs}
@@ -118,7 +112,9 @@ const Wallet = () => {
               refetch={refetch}
             />
           )}
-          {activeTab === WalletTab.Activity && <Activity />}
+          {activeTab === WalletTab.Activity && (
+            <Activity account={currentAccount.address} />
+          )}
         </div>
       </Card>
     </PageLayout>

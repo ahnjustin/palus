@@ -6,7 +6,7 @@ import { Spinner } from "@/components/Shared/UI";
 import cn from "@/helpers/cn";
 
 const buttonVariants = cva(
-  "rounded-full font-bold inline-flex items-center justify-center relative overflow-hidden",
+  "rounded-full font-bold inline-flex items-center justify-center relative overflow-hidden disabled:opacity-50",
   {
     compoundVariants: [
       // Non-outline Primary

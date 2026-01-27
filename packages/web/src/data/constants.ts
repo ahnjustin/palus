@@ -7,7 +7,7 @@ export const CHAIN = IS_TESTNET ? chains.testnet : chains.mainnet;
 export const PALUS_TREASURY = IS_TESTNET
   ? "0xdaA5EBe0d75cD16558baE6145644EDdFcbA1e868"
   : "0x8589d6dd8acc2c41b7ac8b247458fda18d4c20ae";
-export const ADDRESS_PLACEHOLDER = "0x03Ba3...7EF";
+export const ADDRESS_PLACEHOLDER = "0x03B...a7EF";
 
 // Application
 export const BRAND_COLOR = "#0170a3";
