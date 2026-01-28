@@ -33,7 +33,12 @@ const TokenBalance = ({
         <span className="font-bold">{symbol}</span>
       </div>
       <div className="flex items-center gap-x-3">
-        <Button onClick={onClick} outline size="sm">
+        <Button
+          disabled={Number(value) === 0}
+          onClick={onClick}
+          outline
+          size="sm"
+        >
           {buttonLabel}
         </Button>
         <Tooltip content={value}>

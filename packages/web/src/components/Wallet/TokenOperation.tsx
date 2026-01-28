@@ -128,7 +128,7 @@ const TokenOperation = ({
             }))}
           />
         )}
-        <div className="mb-5 flex items-center gap-2">
+        <div className="flex items-center gap-2">
           <Input
             autoFocus
             inputMode="decimal"
@@ -142,9 +142,15 @@ const TokenOperation = ({
             Max
           </Button>
         </div>
+        <div>Balance: {maxValue ? Number(maxValue).toFixed(4) : "0"}</div>
         <Button
           className="w-full"
-          disabled={isSubmitting || !inputValue || Number(inputValue) <= 0}
+          disabled={
+            isSubmitting ||
+            !inputValue ||
+            Number(inputValue) <= 0 ||
+            Number(inputValue) > Number(maxValue)
+          }
           loading={isSubmitting}
           onClick={handleSubmit}
           size="lg"
