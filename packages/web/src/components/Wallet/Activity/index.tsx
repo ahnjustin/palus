@@ -11,6 +11,7 @@ import {
   Spinner,
   Tooltip
 } from "@/components/Shared/UI";
+import ActivityShimmer from "@/components/Wallet/Activity/Shimmer";
 import {
   BLOCK_EXPLORER_API_URL,
   BLOCK_EXPLORER_URL,
@@ -208,11 +209,7 @@ const Activity = ({ account }: ActivityProps) => {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center p-5">
-        <Spinner />
-      </div>
-    );
+    return <ActivityShimmer />;
   }
 
   if (error) {
@@ -263,7 +260,7 @@ const Activity = ({ account }: ActivityProps) => {
           return (
             <Link
               className={
-                "mb-1 flex items-center justify-between rounded-lg px-3 py-2 hover:bg-gray-300/20"
+                "mb-1 flex items-center justify-between rounded-lg p-2 hover:bg-gray-300/20"
               }
               key={`${tx.hash}-${tx.to}`}
               rel="noreferrer noopener"

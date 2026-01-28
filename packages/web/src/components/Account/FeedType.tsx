@@ -21,7 +21,10 @@ const FeedType = ({ feedType, setFeedType }: FeedTypeProps) => {
   const tab = searchParams.get("tab");
 
   useEffect(() => {
-    if (!tab) return;
+    if (!tab) {
+      setFeedType(AccountFeedType.Feed);
+      return;
+    }
     setFeedType(tab.toUpperCase() as AccountFeedType);
   }, [tab]);
 
@@ -33,9 +36,7 @@ const FeedType = ({ feedType, setFeedType }: FeedTypeProps) => {
       setActive={(type) => {
         setFeedType(type as AccountFeedType);
         setSearchParams(
-          type !== AccountFeedType.Feed
-            ? `tab=${type.toLowerCase()}`
-            : undefined
+          type !== AccountFeedType.Feed ? { tab: type.toLowerCase() } : {}
         );
       }}
       tabs={tabs}

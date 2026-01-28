@@ -7,15 +7,21 @@ import TokenOperation from "./TokenOperation";
 interface WithdrawProps {
   balances: AnyBalance[];
   refetch: () => void;
+  disabled: boolean;
 }
 
-const Withdraw = ({ balances, refetch }: WithdrawProps) => {
+const Withdraw = ({ balances, refetch, disabled }: WithdrawProps) => {
   const [showModal, setShowModal] = useState(false);
   return (
     <>
-      <Button onClick={() => setShowModal(true)} outline size="lg">
+      <Button
+        disabled={disabled}
+        onClick={() => setShowModal(true)}
+        outline
+        size="lg"
+      >
         <ArrowUpIcon
-          className="size-6 rounded-full border border-border p-1"
+          className="size-6 rounded-full border border-border bg-gray-50 p-1 dark:bg-gray-700"
           stroke="currentColor"
           strokeWidth={2}
         />

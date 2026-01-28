@@ -1,9 +1,9 @@
 import { type AnyBalance, useWrapTokensMutation } from "@palus/indexer";
 import { useState } from "react";
 import { Button, Image, Tooltip } from "@/components/Shared/UI";
-import { NATIVE_TOKEN_SYMBOL } from "@/data/constants";
+import { IS_TESTNET, NATIVE_TOKEN_SYMBOL } from "@/data/constants";
 import getTokenImage from "@/helpers/getTokenImage";
-import TokenOperation from "./TokenOperation";
+import TokenOperation from "../TokenOperation";
 
 interface TokenBalanceProps {
   value: string;
@@ -24,7 +24,7 @@ const TokenBalance = ({
         <Image
           alt={symbol}
           className="size-7 rounded-full"
-          src={getTokenImage(symbol)}
+          src={getTokenImage(IS_TESTNET ? undefined : symbol)}
         />
         <span className="font-bold">{symbol}</span>
       </div>
@@ -42,12 +42,12 @@ const TokenBalance = ({
   );
 };
 
-interface TokenBalancesProps {
+interface TokenProps {
   balances: AnyBalance[] | undefined;
   refetch: () => void;
 }
 
-const TokenBalances = ({ balances, refetch }: TokenBalancesProps) => {
+const Tokens = ({ balances, refetch }: TokenProps) => {
   const [showWrapModal, setShowWrapModal] = useState(false);
   const [showUnwrapModal, setShowUnwrapModal] = useState(false);
 
@@ -111,4 +111,4 @@ const TokenBalances = ({ balances, refetch }: TokenBalancesProps) => {
   );
 };
 
-export default TokenBalances;
+export default Tokens;

@@ -1,34 +1,50 @@
 import {
   EllipsisVerticalIcon,
+  ExclamationTriangleIcon,
   Square2StackIcon
 } from "@heroicons/react/24/outline";
 import { type AnyBalance, useBalancesBulkQuery } from "@palus/indexer";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router";
 import NotLoggedIn from "@/components/Shared/NotLoggedIn";
 import PageLayout from "@/components/Shared/PageLayout";
+import Skeleton from "@/components/Shared/Skeleton";
 import { Card, CardHeader, Tabs, Tooltip } from "@/components/Shared/UI";
+import ActivityShimmer from "@/components/Wallet/Activity/Shimmer";
+import TokensShimmer from "@/components/Wallet/Tokens/Shimmer";
 import { CONTRACTS } from "@/data/contracts";
+import type { AccountFeedType } from "@/data/enums";
 import formatAddress from "@/helpers/formatAddress";
 import useCopyToClipboard from "@/hooks/useCopyToClipboard";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
 import Activity from "./Activity";
 import Deposit from "./Deposit";
 import Send from "./Send";
-import TokenBalances from "./TokenBalances";
+import Tokens from "./Tokens";
 import Withdraw from "./Withdraw";
 
 enum WalletTab {
-  Tokens = "Tokens",
-  Activity = "Activity"
+  Tokens = "TOKENS",
+  Activity = "ACTIVITY"
 }
 
 const Wallet = () => {
   const [activeTab, setActiveTab] = useState<string>(WalletTab.Tokens);
 
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tab = searchParams.get("tab");
+
   const { currentAccount } = useAccountStore();
 
-  // TODO loading and error states
-  const { data, refetch } = useBalancesBulkQuery({
+  useEffect(() => {
+    if (!tab) {
+      setActiveTab(WalletTab.Tokens);
+      return;
+    }
+    setActiveTab(tab.toUpperCase() as AccountFeedType);
+  }, [tab]);
+
+  const { data, refetch, loading, error } = useBalancesBulkQuery({
     pollInterval: 10000,
     skip: !currentAccount?.address,
     variables: {
@@ -85,16 +101,31 @@ const Wallet = () => {
             <EllipsisVerticalIcon className="size-5 text-on-surface" />
           </button>
         </div>
-        <div className="center flex p-3 font-semibold text-5xl">
-          <Tooltip content={totalBalance} placement="top">
-            ${totalBalance.toFixed(2)}
-          </Tooltip>
-        </div>
+        {loading ? (
+          <div className="center flex p-3">
+            <Skeleton className="h-12 w-48 rounded-lg" />
+          </div>
+        ) : error ? (
+          <div className="center flex flex-col p-3">
+            <ExclamationTriangleIcon className="size-8" />
+            Error loading balance
+          </div>
+        ) : (
+          <div className="center flex p-3 font-semibold text-5xl">
+            <Tooltip content={totalBalance} placement="top">
+              ${totalBalance.toFixed(2)}
+            </Tooltip>
+          </div>
+        )}
         <div className="flex justify-center gap-x-4 px-5 py-2">
-          <Deposit />
-          <Send balances={data?.balancesBulk as AnyBalance[]} />
+          <Deposit disabled={loading || !!error} />
+          <Send
+            balances={data?.balancesBulk as AnyBalance[]}
+            disabled={loading || !!error}
+          />
           <Withdraw
             balances={data?.balancesBulk as AnyBalance[]}
+            disabled={loading || !!error}
             refetch={refetch}
           />
         </div>
@@ -103,18 +134,33 @@ const Wallet = () => {
             active={activeTab}
             className="border-border border-y py-2 sm:px-0"
             layoutId="wallet-tabs"
-            setActive={setActiveTab}
+            setActive={(type) => {
+              setActiveTab(type);
+              setSearchParams(
+                type !== WalletTab.Tokens ? { tab: type.toLowerCase() } : {}
+              );
+            }}
             tabs={tabs}
           />
-          {activeTab === WalletTab.Tokens && (
-            <TokenBalances
-              balances={data?.balancesBulk as AnyBalance[]}
-              refetch={refetch}
-            />
-          )}
-          {activeTab === WalletTab.Activity && (
-            <Activity account={currentAccount.address} />
-          )}
+          {activeTab === WalletTab.Tokens ? (
+            loading ? (
+              <TokensShimmer />
+            ) : error ? (
+              <div className="p-5">Error loading tokens.</div>
+            ) : (
+              <Tokens
+                balances={data?.balancesBulk as AnyBalance[]}
+                refetch={refetch}
+              />
+            )
+          ) : null}
+          {activeTab === WalletTab.Activity ? (
+            loading ? (
+              <ActivityShimmer />
+            ) : (
+              <Activity account={currentAccount.address} />
+            )
+          ) : null}
         </div>
       </Card>
     </PageLayout>

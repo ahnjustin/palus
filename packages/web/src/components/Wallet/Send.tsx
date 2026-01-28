@@ -13,9 +13,10 @@ import { useAccountStore } from "@/store/persisted/useAccountStore";
 
 interface SendProps {
   balances: AnyBalance[];
+  disabled: boolean;
 }
 
-const Send = ({ balances }: SendProps) => {
+const Send = ({ balances, disabled }: SendProps) => {
   const [showModal, setShowModal] = useState(false);
   const [inputValue, setInputValue] = useState<string>("");
   const [recipient, setRecipient] = useState<string>("");
@@ -62,9 +63,14 @@ const Send = ({ balances }: SendProps) => {
 
   return (
     <>
-      <Button onClick={() => setShowModal(true)} outline size="lg">
+      <Button
+        disabled={disabled}
+        onClick={() => setShowModal(true)}
+        outline
+        size="lg"
+      >
         <ArrowRightIcon
-          className="size-6 rounded-full border border-border p-1"
+          className="size-6 rounded-full border border-border bg-gray-50 p-1 dark:bg-gray-700"
           stroke="currentColor"
           strokeWidth={2}
         />
