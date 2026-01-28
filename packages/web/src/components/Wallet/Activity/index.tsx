@@ -27,7 +27,7 @@ import {
 import useLoadMoreOnIntersect from "@/hooks/useLoadMoreOnIntersect";
 
 const GET_TRANSACTIONS_QUERY_KEY = "getTransactions";
-const PAGE_SIZE = 20;
+const ONE_WEEK_SECONDS = 7 * 24 * 60 * 60;
 
 interface Transaction {
   timeStamp: string;
@@ -37,6 +37,7 @@ interface Transaction {
   value: string;
   isError: string;
   type: string;
+  blockNumber: string;
   input?: string;
   confirmations?: string;
 }
@@ -51,16 +52,47 @@ interface ActivityProps {
   account: string;
 }
 
+interface BlockRange {
+  endBlock: number;
+  startBlock: number;
+  startBlockTimestamp: number;
+}
+
 const Activity = ({ account }: ActivityProps) => {
   const seenRegularTxHashes = useRef(new Set<string>());
 
+  const getBlockNumberByTimestamp = async (
+    timestamp: number
+  ): Promise<number | null> => {
+    try {
+      const response = await fetch(
+        `${BLOCK_EXPLORER_API_URL}?module=block&action=getblocknobytime&closest=before&timestamp=${timestamp}`
+      );
+
+      if (!response.ok) {
+        return null;
+      }
+
+      const data = await response.json();
+
+      if (data.status !== "1" || !data.result) {
+        return null;
+      }
+
+      return Number(data.result);
+    } catch {
+      return null;
+    }
+  };
+
   const fetchTransactionList = async (
-    page: number,
+    startBlock: number,
+    endBlock: number,
     action: "txlist" | "txlistinternal"
   ): Promise<Transaction[]> => {
     try {
       const response = await fetch(
-        `${BLOCK_EXPLORER_API_URL}?module=account&action=${action}&page=${page}&offset=${PAGE_SIZE}&address=${account}`
+        `${BLOCK_EXPLORER_API_URL}?module=account&action=${action}&startblock=${startBlock}&endblock=${endBlock}&sort=desc&address=${account}`
       );
 
       if (!response.ok) {
@@ -80,16 +112,56 @@ const Activity = ({ account }: ActivityProps) => {
   };
 
   const getTransactions = async (
-    page: number
-  ): Promise<{ transactions: Transaction[]; nextPage: number | null }> => {
-    // Reset seen hashes when fetching the first page
-    if (page === 1) {
+    blockRange: BlockRange | null
+  ): Promise<{
+    transactions: Transaction[];
+    nextBlockRange: BlockRange | null;
+  }> => {
+    let startBlock: number;
+    let endBlock: number;
+    let startBlockTimestamp: number;
+
+    if (blockRange) {
+      // Subsequent pages: use the previous startBlock - 1 as new endBlock
+      // to avoid duplicates, and go back another week for startBlock
+      endBlock = blockRange.startBlock - 1;
+
+      if (endBlock <= 0) {
+        return { nextBlockRange: null, transactions: [] };
+      }
+
+      // Calculate timestamp that's 1 week before the endBlock's timestamp
+      // We approximate by subtracting ONE_WEEK_SECONDS from the previous range's start timestamp
+      startBlockTimestamp = blockRange.startBlockTimestamp - ONE_WEEK_SECONDS;
+
+      const weekBeforeBlock =
+        await getBlockNumberByTimestamp(startBlockTimestamp);
+
+      // If we can't get the block, use block 0 as the start
+      startBlock = weekBeforeBlock ?? 0;
+    } else {
+      // First page: get block numbers for now and 1 week ago
       seenRegularTxHashes.current.clear();
+
+      const now = Math.floor(Date.now() / 1000);
+      startBlockTimestamp = now - ONE_WEEK_SECONDS;
+
+      const [currentBlock, weekAgoBlock] = await Promise.all([
+        getBlockNumberByTimestamp(now),
+        getBlockNumberByTimestamp(startBlockTimestamp)
+      ]);
+
+      if (currentBlock === null || weekAgoBlock === null) {
+        return { nextBlockRange: null, transactions: [] };
+      }
+
+      startBlock = weekAgoBlock;
+      endBlock = currentBlock;
     }
 
     const [regularTxs, internalTxs] = await Promise.all([
-      fetchTransactionList(page, "txlist"),
-      fetchTransactionList(page, "txlistinternal")
+      fetchTransactionList(startBlock, endBlock, "txlist"),
+      fetchTransactionList(startBlock, endBlock, "txlistinternal")
     ]);
 
     // Filter out duplicate transactions
@@ -112,25 +184,31 @@ const Activity = ({ account }: ActivityProps) => {
       (a, b) => Number(b.timeStamp) - Number(a.timeStamp)
     );
 
-    // Determine if there are more pages - if either list returned a full page
-    const hasMorePages =
-      regularTxs.length === PAGE_SIZE || internalTxs.length === PAGE_SIZE;
+    // We can continue if either list had transactions and startBlock > 0
+    const hasMore =
+      (regularTxs.length > 0 || internalTxs.length > 0) && startBlock > 0;
 
     return {
-      nextPage: hasMorePages ? page + 1 : null,
+      nextBlockRange: hasMore
+        ? { endBlock, startBlock, startBlockTimestamp }
+        : null,
       transactions: allTransactions
     };
   };
 
   const { data, error, fetchNextPage, hasNextPage, isFetching, isLoading } =
     useInfiniteQuery<
-      { transactions: Transaction[]; nextPage: number | null },
+      {
+        transactions: Transaction[];
+        nextBlockRange: BlockRange | null;
+      },
       Error
     >({
       enabled: Boolean(account),
-      getNextPageParam: (lastPage) => lastPage.nextPage,
-      initialPageParam: 1,
-      queryFn: ({ pageParam }) => getTransactions(pageParam as number),
+      getNextPageParam: (lastPage) => lastPage.nextBlockRange,
+      initialPageParam: null as BlockRange | null,
+      queryFn: ({ pageParam }) =>
+        getTransactions(pageParam as BlockRange | null),
       queryKey: [GET_TRANSACTIONS_QUERY_KEY, account]
     });
 
