@@ -18,7 +18,6 @@ import ActivityShimmer from "@/components/Wallet/Activity/Shimmer";
 import TokensShimmer from "@/components/Wallet/Tokens/Shimmer";
 import { BLOCK_EXPLORER_URL } from "@/data/constants";
 import { CONTRACTS } from "@/data/contracts";
-import type { AccountFeedType } from "@/data/enums";
 import cn from "@/helpers/cn";
 import formatAddress from "@/helpers/formatAddress";
 import useCopyToClipboard from "@/hooks/useCopyToClipboard";
@@ -49,7 +48,7 @@ const Wallet = () => {
       setActiveTab(WalletTab.Tokens);
       return;
     }
-    setActiveTab(tab.toUpperCase() as AccountFeedType);
+    setActiveTab(tab.toUpperCase());
   }, [tab]);
 
   const { data, refetch, loading, error } = useBalancesBulkQuery({

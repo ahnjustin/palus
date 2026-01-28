@@ -9,6 +9,7 @@ import SearchAccounts from "@/components/Shared/Account/SearchAccounts";
 import { Button, Input, Modal, Select } from "@/components/Shared/UI";
 import { ADDRESS_PLACEHOLDER } from "@/data/constants";
 import { TOKENS } from "@/data/tokens";
+import useUmami from "@/hooks/useUmami";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
 
 interface SendProps {
@@ -25,6 +26,7 @@ const Send = ({ balances, disabled }: SendProps) => {
   );
 
   const { currentAccount } = useAccountStore();
+  const { track } = useUmami();
 
   const { writeContractAsync, isPending } = useWriteContract();
 
@@ -59,6 +61,12 @@ const Send = ({ balances, disabled }: SendProps) => {
     setShowModal(false);
     setInputValue("");
     setRecipient("");
+    track("Token operation", {
+      sendTokens: TOKENS.find(
+        (token) =>
+          token.contractAddress.toLowerCase() === selectedToken.toLowerCase()
+      )?.symbol
+    });
   };
 
   return (

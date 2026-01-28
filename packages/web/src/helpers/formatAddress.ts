@@ -5,15 +5,13 @@ const formatAddress = (address: string | null, sliceSize = 4): string => {
     return "";
   }
 
-  const formattedAddress = address.toLowerCase();
-
-  if (isAddress(formattedAddress)) {
-    const start = formattedAddress.slice(0, sliceSize);
-    const end = formattedAddress.slice(formattedAddress.length - sliceSize);
+  if (isAddress(address)) {
+    const start = address.slice(0, sliceSize);
+    const end = address.slice(address.length - sliceSize);
     return `${start}…${end}`;
   }
 
-  return formattedAddress;
+  return address;
 };
 
 export default formatAddress;

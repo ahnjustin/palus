@@ -6,6 +6,7 @@ import { CONTRACTS } from "@/data/contracts";
 import { TOKENS } from "@/data/tokens";
 import errorToast from "@/helpers/errorToast";
 import useTransactionLifecycle from "@/hooks/useTransactionLifecycle";
+import useUmami from "@/hooks/useUmami";
 import type { ApolloClientError } from "@/types/errors";
 
 interface TokenOperationProps {
@@ -37,6 +38,8 @@ const TokenOperation = ({
   const [inputValue, setInputValue] = useState<string>("");
   const handleTransactionLifecycle = useTransactionLifecycle();
 
+  const { track } = useUmami();
+
   useEffect(() => {
     const balance = balances?.find(
       (balance) =>
@@ -54,6 +57,12 @@ const TokenOperation = ({
     setIsSubmitting(false);
     refetch();
     toast.success(successMessage);
+    track("Token operation", {
+      [resultKey]: TOKENS.find(
+        (token) =>
+          token.contractAddress.toLowerCase() === selectedToken.toLowerCase()
+      )?.symbol
+    });
   };
 
   const onError = useCallback((error: ApolloClientError) => {

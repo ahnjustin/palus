@@ -17,6 +17,7 @@ import { NATIVE_TOKEN_SYMBOL } from "@/data/constants";
 import errorToast from "@/helpers/errorToast";
 import usePreventScrollOnNumberInput from "@/hooks/usePreventScrollOnNumberInput";
 import useTransactionLifecycle from "@/hooks/useTransactionLifecycle";
+import useUmami from "@/hooks/useUmami";
 import {
   type FundingToken,
   useFundModalStore
@@ -29,14 +30,20 @@ interface TransferProps {
 
 const Transfer = ({ token }: TransferProps) => {
   const { setShowFundModal, amountToTopUp } = useFundModalStore();
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [txHash, setTxHash] = useState<Hex | null>(null);
   const [amount, setAmount] = useState(amountToTopUp ?? 1);
   const [other, setOther] = useState(!!amountToTopUp);
+
   const inputRef = useRef<HTMLInputElement>(null);
   usePreventScrollOnNumberInput(inputRef as RefObject<HTMLInputElement>);
+
   const { address } = useAccount();
   const handleTransactionLifecycle = useTransactionLifecycle();
+
+  const { track } = useUmami();
+
   const symbol = token?.symbol ?? NATIVE_TOKEN_SYMBOL;
 
   const { data: balance, loading: balanceLoading } = useBalancesBulkQuery({
@@ -59,7 +66,8 @@ const Transfer = ({ token }: TransferProps) => {
     setIsSubmitting(false);
     setTxHash(null);
     setShowFundModal({ showFundModal: false });
-    toast.success("Transferred successfully");
+    toast.success("Deposit successful");
+    track("Token operation", { deposit: symbol });
   };
 
   const onError = useCallback((error: ApolloClientError) => {
