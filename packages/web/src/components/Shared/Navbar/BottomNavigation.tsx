@@ -2,12 +2,14 @@ import {
   BellIcon,
   GlobeAltIcon as GlobeOutline,
   HomeIcon,
-  MagnifyingGlassIcon
+  MagnifyingGlassIcon,
+  WalletIcon as WalletOutline
 } from "@heroicons/react/24/outline";
 import {
   BellIcon as BellIconSolid,
   GlobeAltIcon as GlobeSolid,
-  HomeIcon as HomeIconSolid
+  HomeIcon as HomeIconSolid,
+  WalletIcon as WalletSolid
 } from "@heroicons/react/24/solid";
 import type { MouseEvent, ReactNode } from "react";
 import { Link, useLocation } from "react-router";
@@ -90,6 +92,12 @@ const BottomNavigation = () => {
       outline: <BellIcon className="size-6" />,
       path: "/notifications",
       solid: <BellIconSolid className="size-6" />
+    },
+    {
+      label: "Wallet",
+      outline: <WalletOutline className="size-6" />,
+      path: "/wallet",
+      solid: <WalletSolid className="size-6" />
     }
   ];
 

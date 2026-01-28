@@ -260,7 +260,7 @@ const Activity = ({ account }: ActivityProps) => {
           return (
             <Link
               className={
-                "mb-1 flex items-center justify-between rounded-lg p-2 hover:bg-gray-300/20"
+                "mb-1 flex items-center justify-between rounded-lg px-3 py-2 hover:bg-gray-300/20 sm:p-2"
               }
               key={`${tx.hash}-${tx.to}`}
               rel="noreferrer noopener"
