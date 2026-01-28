@@ -1,19 +1,25 @@
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import {
+  ArrowTopRightOnSquareIcon,
   EllipsisVerticalIcon,
   ExclamationTriangleIcon,
+  FingerPrintIcon,
   Square2StackIcon
 } from "@heroicons/react/24/outline";
 import { type AnyBalance, useBalancesBulkQuery } from "@palus/indexer";
-import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router";
+import { Fragment, useEffect, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router";
+import MenuTransition from "@/components/Shared/MenuTransition";
 import NotLoggedIn from "@/components/Shared/NotLoggedIn";
 import PageLayout from "@/components/Shared/PageLayout";
 import Skeleton from "@/components/Shared/Skeleton";
 import { Card, CardHeader, Tabs, Tooltip } from "@/components/Shared/UI";
 import ActivityShimmer from "@/components/Wallet/Activity/Shimmer";
 import TokensShimmer from "@/components/Wallet/Tokens/Shimmer";
+import { BLOCK_EXPLORER_URL } from "@/data/constants";
 import { CONTRACTS } from "@/data/contracts";
 import type { AccountFeedType } from "@/data/enums";
+import cn from "@/helpers/cn";
 import formatAddress from "@/helpers/formatAddress";
 import useCopyToClipboard from "@/hooks/useCopyToClipboard";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
@@ -35,6 +41,8 @@ const Wallet = () => {
   const tab = searchParams.get("tab");
 
   const { currentAccount } = useAccountStore();
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!tab) {
@@ -93,13 +101,57 @@ const Wallet = () => {
               onClick={copyAddress}
             />
           </div>
-          <button
-            aria-label="More"
-            className="rounded-full p-1.5 hover:bg-gray-300/20"
-            type="button"
-          >
-            <EllipsisVerticalIcon className="size-5 text-on-surface" />
-          </button>
+          <Menu as="div" className="relative">
+            <MenuButton as={Fragment}>
+              <button
+                aria-label="More"
+                className="rounded-full p-1.5 hover:bg-gray-300/20"
+                type="button"
+              >
+                <EllipsisVerticalIcon className="size-5 text-on-surface" />
+              </button>
+            </MenuButton>
+            <MenuTransition>
+              <MenuItems
+                anchor="bottom end"
+                className="mt-2 w-48 origin-top-right rounded-xl border border-gray-200 bg-white shadow-xs focus:outline-hidden dark:border-gray-800 dark:bg-gray-900"
+                static
+              >
+                <MenuItem
+                  as="div"
+                  className={({ focus }) =>
+                    cn(
+                      { "dropdown-active": focus },
+                      "m-2 block flex cursor-pointer items-center gap-x-2 rounded-lg px-2 py-1.5 text-sm"
+                    )
+                  }
+                  onClick={() => navigate("/settings/manager")}
+                >
+                  <FingerPrintIcon className="size-5" />
+                  <div>Manager settings</div>
+                </MenuItem>
+                <MenuItem
+                  as="div"
+                  className={({ focus }) =>
+                    cn(
+                      { "dropdown-active": focus },
+                      "m-2 block rounded-lg px-2 py-1.5 text-sm"
+                    )
+                  }
+                >
+                  <Link
+                    className="flex items-center gap-x-2"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    to={`${BLOCK_EXPLORER_URL}/address/${currentAccount.address}`}
+                  >
+                    <ArrowTopRightOnSquareIcon className="size-5" />
+                    <div>View on explorer</div>
+                  </Link>
+                </MenuItem>
+              </MenuItems>
+            </MenuTransition>
+          </Menu>
         </div>
         {loading ? (
           <div className="center flex p-3">
