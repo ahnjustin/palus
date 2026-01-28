@@ -75,7 +75,7 @@ const AccountSettings = () => {
   ];
 
   return (
-    <PageLayout title="Settings">
+    <PageLayout title="Settings" zeroTopMargin>
       <Card>
         <CardHeader icon={<BackButton path="/" />} title="Settings" />
         <div className="p-5">
