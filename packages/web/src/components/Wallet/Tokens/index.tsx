@@ -1,4 +1,8 @@
-import { type AnyBalance, useWrapTokensMutation } from "@palus/indexer";
+import {
+  type AnyBalance,
+  useUnwrapTokensMutation,
+  useWrapTokensMutation
+} from "@palus/indexer";
 import { useState } from "react";
 import { Button, Image, Tooltip } from "@/components/Shared/UI";
 import { IS_TESTNET, NATIVE_TOKEN_SYMBOL } from "@/data/constants";
@@ -105,7 +109,7 @@ const Tokens = ({ balances, refetch }: TokenProps) => {
         showModal={showUnwrapModal}
         successMessage="Unwrap Successful"
         title="Unwrap"
-        useMutationHook={useWrapTokensMutation}
+        useMutationHook={useUnwrapTokensMutation}
       />
     </>
   );

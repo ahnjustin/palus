@@ -9,7 +9,7 @@ import { ADDRESS_PLACEHOLDER } from "@/data/constants";
 import { ERRORS } from "@/data/errors";
 import errorToast from "@/helpers/errorToast";
 import useTransactionLifecycle from "@/hooks/useTransactionLifecycle";
-import useWaitForTransactionToComplete from "@/hooks/useWaitForTransactionToComplete";
+import useWaitForTransactionToBeIndexed from "@/hooks/useWaitForTransactionToBeIndexed";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
 import type { ApolloClientError } from "@/types/errors";
 
@@ -24,7 +24,7 @@ const AddAccountManager = ({
   const [manager, setManager] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const handleTransactionLifecycle = useTransactionLifecycle();
-  const waitForTransactionToComplete = useWaitForTransactionToComplete();
+  const waitForTransactionToComplete = useWaitForTransactionToBeIndexed();
 
   const onCompleted = async (hash: string) => {
     setIsSubmitting(false);

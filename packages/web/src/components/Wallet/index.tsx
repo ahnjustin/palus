@@ -53,7 +53,7 @@ const Wallet = () => {
   }, [tab]);
 
   const { data, refetch, loading, error } = useBalancesBulkQuery({
-    pollInterval: 10000,
+    pollInterval: 5000,
     skip: !currentAccount?.address,
     variables: {
       request: {

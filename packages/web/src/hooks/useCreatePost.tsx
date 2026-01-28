@@ -10,7 +10,7 @@ import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import type { ApolloClientError } from "@/types/errors";
 import useTransactionLifecycle from "./useTransactionLifecycle";
-import useWaitForTransactionToComplete from "./useWaitForTransactionToComplete";
+import useWaitForTransactionToBeIndexed from "./useWaitForTransactionToBeIndexed";
 
 interface CreatePostProps {
   commentOn?: PostFragment;
@@ -25,7 +25,7 @@ const useCreatePost = ({
 }: CreatePostProps) => {
   const navigate = useNavigate();
   const handleTransactionLifecycle = useTransactionLifecycle();
-  const waitForTransactionToComplete = useWaitForTransactionToComplete();
+  const waitForTransactionToComplete = useWaitForTransactionToBeIndexed();
   const [getPost] = usePostLazyQuery();
   const { cache } = useApolloClient();
   const isComment = Boolean(commentOn);

@@ -29,7 +29,7 @@ import errorToast from "@/helpers/errorToast";
 import { getSimplePaymentDetails } from "@/helpers/rules";
 import usePreventScrollOnNumberInput from "@/hooks/usePreventScrollOnNumberInput";
 import useTransactionLifecycle from "@/hooks/useTransactionLifecycle";
-import useWaitForTransactionToComplete from "@/hooks/useWaitForTransactionToComplete";
+import useWaitForTransactionToBeIndexed from "@/hooks/useWaitForTransactionToBeIndexed";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
 import type { ApolloClientError } from "@/types/errors";
 
@@ -38,7 +38,7 @@ const SuperFollow = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [amount, setAmount] = useState(0);
   const handleTransactionLifecycle = useTransactionLifecycle();
-  const waitForTransactionToComplete = useWaitForTransactionToComplete();
+  const waitForTransactionToComplete = useWaitForTransactionToBeIndexed();
   const inputRef = useRef<HTMLInputElement>(null);
   usePreventScrollOnNumberInput(inputRef as RefObject<HTMLInputElement>);
   const [getCurrentAccountDetails] = useMeLazyQuery({

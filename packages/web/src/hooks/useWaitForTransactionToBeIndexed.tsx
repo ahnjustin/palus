@@ -5,7 +5,7 @@ const INITIAL_DELAY = 1000;
 const MAX_DELAY = 10000;
 const MAX_TIMEOUT = 60000;
 
-const useWaitForTransactionToComplete = () => {
+const useWaitForTransactionToBeIndexed = () => {
   const [getTransactionStatus] = useTransactionStatusLazyQuery({
     fetchPolicy: "no-cache"
   });
@@ -36,4 +36,4 @@ const useWaitForTransactionToComplete = () => {
   return waitForTransactionToComplete;
 };
 
-export default useWaitForTransactionToComplete;
+export default useWaitForTransactionToBeIndexed;

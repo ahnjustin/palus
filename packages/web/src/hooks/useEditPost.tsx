@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { usePostStore } from "@/store/non-persisted/post/usePostStore";
 import type { ApolloClientError } from "@/types/errors";
 import useTransactionLifecycle from "./useTransactionLifecycle";
-import useWaitForTransactionToComplete from "./useWaitForTransactionToComplete";
+import useWaitForTransactionToBeIndexed from "./useWaitForTransactionToBeIndexed";
 
 interface EditPostProps {
   onCompleted: () => void;
@@ -15,7 +15,7 @@ interface EditPostProps {
 const useEditPost = ({ onCompleted, onError }: EditPostProps) => {
   const handleTransactionLifecycle = useTransactionLifecycle();
   const { editingPost, setEditingPost } = usePostStore();
-  const waitForTransactionToComplete = useWaitForTransactionToComplete();
+  const waitForTransactionToComplete = useWaitForTransactionToBeIndexed();
   const [getPost] = usePostLazyQuery();
   const { cache } = useApolloClient();
 

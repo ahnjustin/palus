@@ -22,7 +22,7 @@ import getAccountAttribute from "@/helpers/getAccountAttribute";
 import prepareAccountMetadata from "@/helpers/prepareAccountMetadata";
 import uploadMetadata from "@/helpers/uploadMetadata";
 import useTransactionLifecycle from "@/hooks/useTransactionLifecycle";
-import useWaitForTransactionToComplete from "@/hooks/useWaitForTransactionToComplete";
+import useWaitForTransactionToBeIndexed from "@/hooks/useWaitForTransactionToBeIndexed";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
 import type { ApolloClientError } from "@/types/errors";
 
@@ -54,7 +54,7 @@ const PersonalizeSettingsForm = () => {
     currentAccount?.metadata?.coverPicture
   );
   const handleTransactionLifecycle = useTransactionLifecycle();
-  const waitForTransactionToComplete = useWaitForTransactionToComplete();
+  const waitForTransactionToComplete = useWaitForTransactionToBeIndexed();
   const [getCurrentAccountDetails] = useMeLazyQuery({
     fetchPolicy: "no-cache"
   });

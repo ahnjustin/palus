@@ -6,7 +6,6 @@ import { CONTRACTS } from "@/data/contracts";
 import { TOKENS } from "@/data/tokens";
 import errorToast from "@/helpers/errorToast";
 import useTransactionLifecycle from "@/hooks/useTransactionLifecycle";
-import useWaitForTransactionToComplete from "@/hooks/useWaitForTransactionToComplete";
 import type { ApolloClientError } from "@/types/errors";
 
 interface TokenOperationProps {
@@ -37,7 +36,6 @@ const TokenOperation = ({
   const [maxValue, setMaxValue] = useState<string>("0");
   const [inputValue, setInputValue] = useState<string>("");
   const handleTransactionLifecycle = useTransactionLifecycle();
-  const waitForTransactionToComplete = useWaitForTransactionToComplete();
 
   useEffect(() => {
     const balance = balances?.find(
@@ -51,9 +49,8 @@ const TokenOperation = ({
     setMaxValue(value || "0");
   }, [selectedToken, balances]);
 
-  const onCompleted = async (hash: string) => {
+  const onCompleted = () => {
     setShowModal(false);
-    await waitForTransactionToComplete(hash);
     setIsSubmitting(false);
     refetch();
     toast.success(successMessage);
