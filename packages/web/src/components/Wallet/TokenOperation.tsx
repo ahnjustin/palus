@@ -31,7 +31,9 @@ const TokenOperation = ({
   setShowModal
 }: TokenOperationProps) => {
   const [selectedToken, setSelectedToken] = useState<string>(
-    TOKENS[0].contractAddress
+    resultKey === "unwrapTokens"
+      ? CONTRACTS.wrappedNativeToken
+      : CONTRACTS.nativeToken
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [maxValue, setMaxValue] = useState<string>("0");
