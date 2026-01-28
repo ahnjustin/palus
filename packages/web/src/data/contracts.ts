@@ -3,6 +3,9 @@ import { lensDeployments } from "lens-modules/deployments";
 export const IS_TESTNET = import.meta.env.VITE_USE_TESTNET === "true";
 
 export const CONTRACTS = {
+  actionHub: IS_TESTNET
+    ? lensDeployments.testnet.ActionHub.address
+    : lensDeployments.mainnet.ActionHub.address,
   app: IS_TESTNET
     ? "0xC75A89145d765c396fd75CbD16380Eb184Bd2ca7"
     : "0xCa01Da446811d76aa7aD885e5fa39DF2031096cB",
@@ -28,6 +31,9 @@ export const CONTRACTS = {
   simpleCollectAction: IS_TESTNET
     ? lensDeployments.testnet.SimpleCollectAction.address
     : lensDeployments.mainnet.SimpleCollectAction.address,
+  tippingAccountAction: IS_TESTNET
+    ? lensDeployments.testnet.TippingAccountAction.address
+    : lensDeployments.mainnet.TippingAccountAction.address,
   tippingPostAction: IS_TESTNET
     ? lensDeployments.testnet.TippingPostAction.address
     : lensDeployments.mainnet.TippingPostAction.address,

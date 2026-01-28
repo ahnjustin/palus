@@ -231,20 +231,27 @@ const Activity = ({ account }: ActivityProps) => {
 
   const getTransactionLabel = (
     decodedTx: DecodedTransaction | null,
+    tx: Transaction,
     isReceived: boolean,
-    isInternalTx: boolean
+    value: bigint
   ): { label: string; detail?: string } => {
-    if (isInternalTx) {
+    if (!decodedTx && value) {
+      let action: string | undefined;
+      if (tx.from === CONTRACTS.simpleCollectAction) {
+        action = "Post collected";
+      } else if (tx.from === CONTRACTS.tippingPostAction) {
+        action = "Post tip";
+      } else if (tx.to === CONTRACTS.actionHub) {
+        action = "Acted on a post";
+      }
+      if (!action) {
+        return isReceived
+          ? { label: `Received ${NATIVE_TOKEN_SYMBOL}` }
+          : { label: `Sent ${NATIVE_TOKEN_SYMBOL}` };
+      }
       return isReceived
-        ? { label: `Received ${NATIVE_TOKEN_SYMBOL}` }
-        : { label: `Sent ${NATIVE_TOKEN_SYMBOL}` };
-    }
-
-    const value = BigInt(decodedTx?.value ?? 0);
-    if (value > 0n) {
-      return isReceived
-        ? { label: `Received ${NATIVE_TOKEN_SYMBOL}` }
-        : { label: `Sent ${NATIVE_TOKEN_SYMBOL}` };
+        ? { detail: `Received ${NATIVE_TOKEN_SYMBOL}`, label: action }
+        : { detail: `Sent ${NATIVE_TOKEN_SYMBOL}`, label: action };
     }
 
     const firstAction = decodedTx?.decodedActions[0];
@@ -259,13 +266,21 @@ const Activity = ({ account }: ActivityProps) => {
         action = "Collected a post";
       } else if (postActionContract === CONTRACTS.tippingPostAction) {
         action = "Tipped a post";
+      } else if (postActionContract === CONTRACTS.tippingAccountAction) {
+        action = "Tipped an account";
       }
+    }
+
+    if (value > 0n && !action) {
+      return isReceived
+        ? { label: `Received ${NATIVE_TOKEN_SYMBOL}` }
+        : { label: `Sent ${NATIVE_TOKEN_SYMBOL}` };
     }
 
     return firstAction && contractType && action
       ? { detail: contractType, label: camelToCapitalized(action) }
       : {
-          label: isInternalTx ? "Internal transaction" : "Contract interaction"
+          label: decodedTx ? "Contract interaction" : "Internal transaction"
         };
   };
 
@@ -320,16 +335,24 @@ const Activity = ({ account }: ActivityProps) => {
           const decodedTx = isInternalTx
             ? null
             : decodeDelegatedTransaction(tx.input as Hex);
+          if (isInternalTx) {
+            console.log("internalTx", tx);
+          } else {
+            console.log("decodedTx", decodedTx);
+          }
           const firstAction = decodedTx?.decodedActions[0];
           const isReceived = isInternalTx
             ? tx.to.toLowerCase() === account.toLowerCase()
             : firstAction?.target?.toLowerCase() === account.toLowerCase();
 
-          const txValue = isInternalTx ? tx.value : (decodedTx?.value ?? "0");
+          const txValue = isInternalTx
+            ? tx.value
+            : (decodedTx?.value ?? decodedTx?.transactions?.[0].value ?? "0");
           const label = getTransactionLabel(
             decodedTx,
+            tx,
             isReceived,
-            isInternalTx
+            BigInt(txValue)
           );
           const status = getTransactionStatus(tx);
           const value = getTransactionValueDisplay(txValue, isReceived);
