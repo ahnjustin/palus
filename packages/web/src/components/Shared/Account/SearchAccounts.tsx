@@ -5,7 +5,13 @@ import {
   PageSize,
   useAccountsLazyQuery
 } from "@palus/indexer";
-import { type ChangeEvent, type KeyboardEvent, useState } from "react";
+import { useDebounce } from "@uidotdev/usehooks";
+import {
+  type ChangeEvent,
+  type KeyboardEvent,
+  useEffect,
+  useState
+} from "react";
 import Loader from "@/components/Shared/Loader";
 import { Card, Input } from "@/components/Shared/UI";
 import cn from "@/helpers/cn";
@@ -30,20 +36,24 @@ const SearchAccounts = ({
 }: SearchAccountsProps) => {
   const [searchAccounts, { data, loading }] = useAccountsLazyQuery();
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const debouncedValue = useDebounce<string>(value, 500);
 
   const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
     onChange(event);
     setSelectedIndex(-1);
-
-    const keyword = event.target.value;
-    const request: AccountsRequest = {
-      filter: { searchBy: { localNameQuery: keyword } },
-      orderBy: AccountsOrderBy.AccountScore,
-      pageSize: PageSize.Fifty
-    };
-
-    searchAccounts({ variables: { request } });
   };
+
+  useEffect(() => {
+    if (debouncedValue) {
+      const request: AccountsRequest = {
+        filter: { searchBy: { localNameQuery: debouncedValue } },
+        orderBy: AccountsOrderBy.AccountScore,
+        pageSize: PageSize.Fifty
+      };
+
+      searchAccounts({ variables: { request } });
+    }
+  }, [debouncedValue, searchAccounts]);
 
   const accounts = data?.accounts?.items;
   const displayedAccounts = accounts?.slice(0, 7);
