@@ -7,7 +7,7 @@ import {
   useAccountsLazyQuery
 } from "@palus/indexer";
 import { useClickAway, useDebounce } from "@uidotdev/usehooks";
-import type { MutableRefObject } from "react";
+import type { KeyboardEvent, RefObject } from "react";
 import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router";
 import { z } from "zod";
@@ -41,6 +41,7 @@ const Search = ({ placeholder = "Search…" }: SearchProps) => {
   const { addAccount } = useSearchStore();
   const [showDropdown, setShowDropdown] = useState(false);
   const [accounts, setAccounts] = useState<AccountFragment[]>([]);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
 
   const form = useZodForm({
     defaultValues: { query: "" },
@@ -53,12 +54,13 @@ const Search = ({ placeholder = "Search…" }: SearchProps) => {
   const handleReset = useCallback(() => {
     setShowDropdown(false);
     setAccounts([]);
+    setSelectedIndex(-1);
     form.reset();
   }, [form]);
 
   const dropdownRef = useClickAway(() => {
     handleReset();
-  }) as MutableRefObject<HTMLDivElement>;
+  }) as RefObject<HTMLDivElement>;
 
   const [searchAccounts, { loading }] = useAccountsLazyQuery();
 
@@ -79,6 +81,61 @@ const Search = ({ placeholder = "Search…" }: SearchProps) => {
     setShowDropdown(true);
   }, []);
 
+  const handleSelectAccount = useCallback(
+    (account: AccountFragment) => {
+      setCachedAccount(account);
+      addAccount(account.address);
+      navigate(getAccount(account).link);
+      handleReset();
+    },
+    [setCachedAccount, addAccount, navigate, handleReset]
+  );
+
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLInputElement>) => {
+      const hasResults =
+        pathname !== "/search" &&
+        showDropdown &&
+        !loading &&
+        accounts.length > 0;
+
+      if (!hasResults) {
+        return;
+      }
+
+      switch (event.key) {
+        case "ArrowDown":
+          event.preventDefault();
+          setSelectedIndex((prev) =>
+            prev < accounts.length - 1 ? prev + 1 : prev
+          );
+          break;
+        case "ArrowUp":
+          event.preventDefault();
+          setSelectedIndex((prev) => (prev > 0 ? prev - 1 : prev));
+          break;
+        case "Enter":
+          if (selectedIndex >= 0 && accounts[selectedIndex]) {
+            event.preventDefault();
+            handleSelectAccount(accounts[selectedIndex]);
+          }
+          break;
+        case "Escape":
+          setSelectedIndex(-1);
+          setShowDropdown(false);
+          break;
+      }
+    },
+    [
+      pathname,
+      showDropdown,
+      loading,
+      accounts,
+      selectedIndex,
+      handleSelectAccount
+    ]
+  );
+
   useEffect(() => {
     if (pathname !== "/search" && showDropdown && debouncedSearchText) {
       const request: AccountsRequest = {
@@ -90,6 +147,7 @@ const Search = ({ placeholder = "Search…" }: SearchProps) => {
       searchAccounts({ variables: { request } }).then((res) => {
         if (res.data?.accounts?.items) {
           setAccounts(res.data.accounts.items);
+          setSelectedIndex(-1);
         }
       });
     }
@@ -108,6 +166,7 @@ const Search = ({ placeholder = "Search…" }: SearchProps) => {
             />
           }
           onClick={handleShowDropdown}
+          onKeyDown={handleKeyDown}
           placeholder={placeholder}
           type="text"
           {...form.register("query")}
@@ -123,16 +182,14 @@ const Search = ({ placeholder = "Search…" }: SearchProps) => {
               <Loader className="my-3" message="Searching users" small />
             ) : (
               <>
-                {accounts.map((account) => (
+                {accounts.map((account, index) => (
                   <div
-                    className="cursor-pointer px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    className={cn(
+                      "cursor-pointer px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800",
+                      index === selectedIndex && "bg-gray-100 dark:bg-gray-800"
+                    )}
                     key={account.address}
-                    onClick={() => {
-                      setCachedAccount(account);
-                      addAccount(account.address);
-                      navigate(getAccount(account).link);
-                      handleReset();
-                    }}
+                    onClick={() => handleSelectAccount(account)}
                   >
                     <SingleAccount
                       account={account}
