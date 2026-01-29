@@ -5,9 +5,10 @@ import {
   PageSize,
   useAccountsLazyQuery
 } from "@palus/indexer";
-import type { ChangeEvent } from "react";
+import { type ChangeEvent, type KeyboardEvent, useState } from "react";
 import Loader from "@/components/Shared/Loader";
 import { Card, Input } from "@/components/Shared/UI";
+import cn from "@/helpers/cn";
 import SmallSingleAccount from "./SmallSingleAccount";
 
 interface SearchAccountsProps {
@@ -28,9 +29,11 @@ const SearchAccounts = ({
   value
 }: SearchAccountsProps) => {
   const [searchAccounts, { data, loading }] = useAccountsLazyQuery();
+  const [selectedIndex, setSelectedIndex] = useState(-1);
 
   const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
     onChange(event);
+    setSelectedIndex(-1);
 
     const keyword = event.target.value;
     const request: AccountsRequest = {
@@ -43,12 +46,49 @@ const SearchAccounts = ({
   };
 
   const accounts = data?.accounts?.items;
+  const displayedAccounts = accounts?.slice(0, 7);
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    const hasResults =
+      !hideDropdown &&
+      value.length > 0 &&
+      !loading &&
+      displayedAccounts &&
+      displayedAccounts.length > 0;
+
+    if (!hasResults) {
+      return;
+    }
+
+    switch (event.key) {
+      case "ArrowDown":
+        event.preventDefault();
+        setSelectedIndex((prev) =>
+          prev < displayedAccounts.length - 1 ? prev + 1 : prev
+        );
+        break;
+      case "ArrowUp":
+        event.preventDefault();
+        setSelectedIndex((prev) => (prev > 0 ? prev - 1 : prev));
+        break;
+      case "Enter":
+        if (selectedIndex >= 0 && displayedAccounts[selectedIndex]) {
+          event.preventDefault();
+          onAccountSelected(displayedAccounts[selectedIndex]);
+        }
+        break;
+      case "Escape":
+        setSelectedIndex(-1);
+        break;
+    }
+  };
 
   return (
     <div className="relative w-full">
       <Input
         error={error}
         onChange={handleSearch}
+        onKeyDown={handleKeyDown}
         placeholder={placeholder}
         type="text"
         value={value}
@@ -59,9 +99,12 @@ const SearchAccounts = ({
             {loading ? (
               <Loader className="my-3" message="Searching users" small />
             ) : accounts && accounts.length > 0 ? (
-              accounts.slice(0, 7).map((account) => (
+              displayedAccounts?.map((account, index) => (
                 <div
-                  className="cursor-pointer px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  className={cn(
+                    "cursor-pointer px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800",
+                    index === selectedIndex && "bg-gray-100 dark:bg-gray-800"
+                  )}
                   key={account.address}
                   onClick={() => onAccountSelected(account)}
                 >
