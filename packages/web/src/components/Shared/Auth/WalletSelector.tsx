@@ -6,6 +6,9 @@ import { useAccount, useConnect, useDisconnect } from "wagmi";
 import cn from "@/helpers/cn";
 import getWalletDetails from "@/helpers/getWalletDetails";
 
+const isMobileAndroid =
+  typeof navigator !== "undefined" && /android/i.test(navigator.userAgent);
+
 const WalletSelector: FC = () => {
   const { connectAsync, connectors, isPending } = useConnect();
   const { disconnect } = useDisconnect();
@@ -23,12 +26,16 @@ const WalletSelector: FC = () => {
       if (!allowedConnectors.includes(connector.id)) {
         return false;
       }
-      if (connector.id === "injected") {
-        return (
-          typeof window !== "undefined" && Boolean((window as any).ethereum)
-        );
+      switch (connector.id) {
+        case "metaMaskSDK":
+          return !isMobileAndroid; // MetaMask is broken on Android
+        case "injected":
+          return (
+            typeof window !== "undefined" && Boolean((window as any).ethereum)
+          );
+        default:
+          return true;
       }
-      return true;
     })
     .sort(
       (a: Connector, b: Connector) =>
