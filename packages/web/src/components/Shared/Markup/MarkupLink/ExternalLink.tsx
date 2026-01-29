@@ -42,6 +42,11 @@ const ExternalLink = ({ title }: MarkupLinkProps) => {
           case "lenster.xyz":
             localPath = pathname;
             break;
+          case "firefly.social":
+            if (pathname.startsWith("/post/lens/")) {
+              localPath = pathname.replace("/post/lens/", "/posts/");
+            }
+            break;
         }
 
         if (localPath) {
