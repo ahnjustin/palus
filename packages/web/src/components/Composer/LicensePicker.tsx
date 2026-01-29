@@ -1,5 +1,4 @@
 import { MetadataLicenseType } from "@palus/indexer";
-import { Link } from "react-router";
 import { Select, Tooltip } from "@/components/Shared/UI";
 import getAssetLicense from "@/helpers/getAssetLicense";
 import { usePostLicenseStore } from "@/store/non-persisted/post/usePostLicenseStore";
@@ -60,13 +59,6 @@ const LicensePicker = () => {
       <div className="linkify mt-2 text-gray-500 text-sm dark:text-gray-200">
         {getAssetLicense(license)?.helper ||
           "You are not granting a license to the collector and retain all rights."}
-        <Link
-          className="ml-1.5"
-          target="_blank"
-          to="https://yoginth.notion.site/60f9d82c5a274a88b8444611c7a8a94a"
-        >
-          Learn more.
-        </Link>
       </div>
     </div>
   );
