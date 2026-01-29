@@ -41,14 +41,16 @@ const NavigationItem = ({
 }: NavigationItemProps) => (
   <Link
     aria-label={label}
-    className="relative mx-auto my-3"
+    className="center my-3 flex flex-1"
     onClick={onClick}
     to={path}
   >
-    {isActive ? solid : outline}
-    {showIndicator && (
-      <span className="-right-1 -top-1 absolute size-2 rounded-full bg-brand-500" />
-    )}
+    <div className="relative">
+      {isActive ? solid : outline}
+      {showIndicator && (
+        <span className="-right-1 -top-1 absolute size-2 rounded-full bg-brand-500" />
+      )}
+    </div>
   </Link>
 );
 
@@ -120,7 +122,7 @@ const BottomNavigation = () => {
         {currentAccount && (
           <button
             aria-label="Your account"
-            className="m-auto h-fit"
+            className="center flex flex-1"
             onClick={handleAccountClick}
             type="button"
           >
