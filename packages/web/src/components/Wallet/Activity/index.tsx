@@ -14,6 +14,7 @@ import {
 } from "@/components/Shared/UI";
 import ActivityShimmer from "@/components/Wallet/Activity/Shimmer";
 import { BLOCK_EXPLORER_API_URL, BLOCK_EXPLORER_URL } from "@/data/constants";
+import { NATIVE_TOKEN_SYMBOL } from "@/data/tokens";
 import cn from "@/helpers/cn";
 import formatRelativeOrAbsolute from "@/helpers/datetime/formatRelativeOrAbsolute";
 import { decodeDelegatedTransaction } from "@/helpers/decodeTransaction";
@@ -240,24 +241,32 @@ const Activity = ({ account }: ActivityProps) => {
             const decodedTx = tx.input
               ? decodeDelegatedTransaction(tx.input as Hex)
               : null;
+
+            // For determining received value when withdrawing wrapped tokens
+            const actionWads =
+              decodedTx?.decodedActions?.reduce(
+                (acc, action) => acc + BigInt(action.parameters?.wad ?? "0"),
+                0n
+              ) ?? 0n;
+
             const isReceived = decodedTx
               ? decodedTx?.decodedActions?.[0]?.target?.toLowerCase() ===
-                account.toLowerCase()
+                  account.toLowerCase() || actionWads > 0n
               : tx.to.toLowerCase() === account.toLowerCase();
 
             const txValue =
-              decodedTx?.value ??
-              (decodedTx?.transactions
-                ? decodedTx.transactions
-                    .reduce((acc, t) => acc + BigInt(t?.value ?? "0"), 0n)
-                    .toString()
-                : undefined) ??
-              tx.value;
+              BigInt(decodedTx?.value ?? "0") ||
+              decodedTx?.transactions?.reduce(
+                (acc, t) => acc + BigInt(t?.value ?? "0"),
+                0n
+              ) ||
+              actionWads ||
+              BigInt(tx.value ?? "0");
             const label = getTransactionLabel(
               decodedTx,
               tx,
               isReceived,
-              BigInt(txValue)
+              txValue
             );
             const status = getTransactionStatus(tx);
             const value = getTransactionValueDisplay(txValue, isReceived);
@@ -274,7 +283,7 @@ const Activity = ({ account }: ActivityProps) => {
                 to={`${BLOCK_EXPLORER_URL}/tx/${tx.hash}`}
               >
                 <div className="flex min-w-0 items-center gap-x-2">
-                  {BigInt(txValue) > 0n ? (
+                  {txValue > 0n ? (
                     <ArrowsRightLeftIcon className="size-7 rounded-full bg-gray-200 p-1 text-gray-600 dark:bg-gray-700 dark:text-gray-400" />
                   ) : label.detail ? (
                     <svg
@@ -334,11 +343,14 @@ const Activity = ({ account }: ActivityProps) => {
                       </div>
                     </Tooltip>
                   </span>
-                  <Tooltip content={formatEther(BigInt(txValue)).toString()}>
+                  <Tooltip
+                    content={`${formatEther(txValue).toString()} ${NATIVE_TOKEN_SYMBOL}`}
+                    placement="left"
+                  >
                     <span
                       className={cn(
                         "font-medium",
-                        BigInt(txValue) === 0n
+                        txValue === 0n
                           ? "text-secondary"
                           : isReceived
                             ? "text-green-600"

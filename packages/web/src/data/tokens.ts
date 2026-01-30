@@ -16,3 +16,5 @@ export const TOKENS = [
     symbol: IS_TESTNET ? "WGRASS" : "WGHO"
   }
 ];
+
+export const NATIVE_TOKEN_SYMBOL = IS_TESTNET ? "GRASS" : "GHO";

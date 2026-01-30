@@ -81,10 +81,9 @@ export const getTransactionStatus = (
 };
 
 export const getTransactionValueDisplay = (
-  txValue: string,
+  value: bigint,
   isReceived: boolean
 ) => {
-  const value = BigInt(txValue);
   if (value === 0n) {
     return "$0.00";
   }
@@ -97,6 +96,7 @@ export const getTransactionValueDisplay = (
   if (fracNoTrailing.length <= 2) {
     return `${prefix}$${num.toFixed(2)}`;
   }
-  const decimals = Math.min(6, fracNoTrailing.length);
+  const decimals =
+    fracNoTrailing.length <= 6 ? Math.min(6, fracNoTrailing.length) : 2;
   return `${prefix}$${num.toFixed(decimals)}`;
 };

@@ -8,6 +8,8 @@ import {
   namespaceAbi
 } from "lens-modules/abis";
 import { decodeFunctionData, type Hex, parseAbi } from "viem";
+import { wrappedGhoAbi } from "@/data/abis/wrappedGhoAbi";
+import { NATIVE_TOKEN_SYMBOL } from "@/data/tokens";
 
 interface ABIItem {
   readonly type: string;
@@ -82,6 +84,7 @@ addFunctionsToMap([...groupAbi], "Group");
 addFunctionsToMap([...namespaceAbi], "Namespace");
 addFunctionsToMap([...appAbi], "App");
 addFunctionsToMap([...actionHubAbi], "ActionHub");
+addFunctionsToMap([...wrappedGhoAbi], NATIVE_TOKEN_SYMBOL);
 
 export function decodeDelegatedTransaction(calldata: Hex): DecodedTransaction {
   try {
@@ -178,6 +181,34 @@ function decodeInnerAction(target: string, data: Hex): DecodedAction {
 
     const selector = data.slice(0, 10);
 
+    // Check if selector matches any parameterless function
+    for (const [funcName, { abi, contractName }] of functionMap) {
+      const funcItem = abi[0];
+      if (
+        funcItem.type === "function" &&
+        (!funcItem.inputs || funcItem.inputs.length === 0)
+      ) {
+        try {
+          const decoded = decodeFunctionData({
+            abi,
+            data
+          }) as DecodedFunction;
+
+          if (decoded.functionName === funcName) {
+            return {
+              action: funcName,
+              contractType: contractName,
+              parameters: {},
+              rawData: data,
+              target
+            };
+          }
+        } catch {
+          // Continue
+        }
+      }
+    }
+
     const commonFunctions = [
       "createPost",
       "follow",
@@ -192,7 +223,9 @@ function decodeInnerAction(target: string, data: Hex): DecodedAction {
       "tip",
       "collect",
       "executeAccountAction",
-      "executePostAction"
+      "executePostAction",
+      "withdraw",
+      "deposit"
     ];
 
     for (const funcName of commonFunctions) {
@@ -229,7 +262,8 @@ function decodeInnerAction(target: string, data: Hex): DecodedAction {
       { abi: namespaceAbi, name: "Namespace" },
       { abi: appAbi, name: "App" },
       { abi: accountAbi, name: "Account" },
-      { abi: actionHubAbi, name: "ActionHub" }
+      { abi: actionHubAbi, name: "ActionHub" },
+      { abi: wrappedGhoAbi, name: NATIVE_TOKEN_SYMBOL }
     ];
 
     for (const { abi, name } of abiSets) {
