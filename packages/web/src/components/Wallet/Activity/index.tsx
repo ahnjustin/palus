@@ -309,20 +309,18 @@ const Activity = ({ account }: ActivityProps) => {
                         {label.label}
                       </span>
                     )}
-                    {tx.isError === "1" ? (
-                      <span className="text-red-600 text-sm">Failed</span>
-                    ) : (
-                      <span
-                        className={cn(
-                          "text-sm",
-                          status === "Confirmed"
-                            ? "text-green-600"
+                    <span
+                      className={cn(
+                        "text-sm",
+                        status === "Confirmed"
+                          ? "text-green-600"
+                          : status === "Failed"
+                            ? "text-red-600"
                             : "text-yellow-600"
-                        )}
-                      >
-                        {status}
-                      </span>
-                    )}
+                      )}
+                    >
+                      {status}
+                    </span>
                   </div>
                 </div>
                 <div className="ml-4 flex flex-none flex-col items-end">
@@ -341,7 +339,7 @@ const Activity = ({ account }: ActivityProps) => {
                       className={cn(
                         "font-medium",
                         BigInt(txValue) === 0n
-                          ? "text-on-surface"
+                          ? "text-secondary"
                           : isReceived
                             ? "text-green-600"
                             : "text-red-600"
