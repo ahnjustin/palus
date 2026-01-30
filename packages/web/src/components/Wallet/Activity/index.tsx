@@ -237,18 +237,22 @@ const Activity = ({ account }: ActivityProps) => {
       <div className="h-full overflow-y-auto bg-card">
         <Virtualizer>
           {transactions.map((tx) => {
-            const isInternalTx = !tx.input || tx.type === "call";
-            const decodedTx = isInternalTx
-              ? null
-              : decodeDelegatedTransaction(tx.input as Hex);
-            const isReceived = isInternalTx
-              ? tx.to.toLowerCase() === account.toLowerCase()
-              : decodedTx?.decodedActions?.[0]?.target?.toLowerCase() ===
-                account.toLowerCase();
+            const decodedTx = tx.input
+              ? decodeDelegatedTransaction(tx.input as Hex)
+              : null;
+            const isReceived = decodedTx
+              ? decodedTx?.decodedActions?.[0]?.target?.toLowerCase() ===
+                account.toLowerCase()
+              : tx.to.toLowerCase() === account.toLowerCase();
 
-            const txValue = isInternalTx
-              ? tx.value
-              : (decodedTx?.value ?? decodedTx?.transactions?.[0].value ?? "0");
+            const txValue =
+              decodedTx?.value ??
+              (decodedTx?.transactions
+                ? decodedTx.transactions
+                    .reduce((acc, t) => acc + BigInt(t?.value ?? "0"), 0n)
+                    .toString()
+                : undefined) ??
+              tx.value;
             const label = getTransactionLabel(
               decodedTx,
               tx,
