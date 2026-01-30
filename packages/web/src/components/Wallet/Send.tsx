@@ -44,13 +44,12 @@ const Send = ({ balances, disabled }: SendProps) => {
     if (!currentAccount || !isAddress(recipient)) return;
 
     try {
-      const res = await writeContractAsync({
+      await writeContractAsync({
         abi: accountAbi,
         address: currentAccount.address,
         args: [recipient as Hex, parseEther(inputValue), "0x"],
         functionName: "executeTransaction"
       });
-      console.log("handleSubmit: executeTransaction res=", res);
     } catch (e) {
       console.error("handleSubmit: executeTransaction error=", e);
       toast.error("Failed to send tokens.");

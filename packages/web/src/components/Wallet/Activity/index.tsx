@@ -241,15 +241,10 @@ const Activity = ({ account }: ActivityProps) => {
             const decodedTx = isInternalTx
               ? null
               : decodeDelegatedTransaction(tx.input as Hex);
-            if (isInternalTx) {
-              console.log("internalTx", tx);
-            } else {
-              console.log("decodedTx", decodedTx);
-            }
-            const firstAction = decodedTx?.decodedActions[0];
             const isReceived = isInternalTx
               ? tx.to.toLowerCase() === account.toLowerCase()
-              : firstAction?.target?.toLowerCase() === account.toLowerCase();
+              : decodedTx?.decodedActions?.[0]?.target?.toLowerCase() ===
+                account.toLowerCase();
 
             const txValue = isInternalTx
               ? tx.value
