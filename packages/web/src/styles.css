@@ -21,6 +21,7 @@
   --color-on-surface: #000000;
   --color-secondary: #6a7282;
   --color-border: #e5e7eb;
+  --color-card: #ffffff;
 }
 
 .dark {
@@ -35,6 +36,7 @@
   --color-on-surface: #f9fafb;
   --color-secondary: #d1d5dc;
   --color-border: #1e2939;
+  --color-card: #101828;
 }
 
 @keyframes shimmer {
