@@ -70,7 +70,7 @@ const Activity = ({ account }: ActivityProps) => {
   ): Promise<Transaction[]> => {
     try {
       const response = await fetch(
-        `${BLOCK_EXPLORER_API_URL}?module=account&action=${action}&startblock=${startBlock}&endblock=${endBlock}&sort=desc&address=${account}`
+        `${BLOCK_EXPLORER_API_URL}?module=account&action=${action}&startblock=${startBlock}&endblock=${endBlock}&sort=desc&address=${account}&offset=1000`
       );
 
       if (!response.ok) {
