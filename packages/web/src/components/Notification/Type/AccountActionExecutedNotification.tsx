@@ -30,7 +30,7 @@ const AccountActionExecutedNotification = ({
       ? firstAction.executedBy
       : undefined;
   const length = actions.length - 1;
-  const moreThanOneAccount = length > 1;
+  const moreThanOneAccount = length > 0;
   const type =
     firstAction.__typename === "TippingAccountActionExecuted"
       ? "tipped"

@@ -18,7 +18,7 @@ const FollowNotification = ({ notification }: FollowNotificationProps) => {
   const followers = notification.followers;
   const firstAccount = followers?.[0];
   const length = followers.length - 1;
-  const moreThanOneAccount = length > 1;
+  const moreThanOneAccount = length > 0;
 
   const text = moreThanOneAccount
     ? `and ${length} ${plur("other", length)} followed`

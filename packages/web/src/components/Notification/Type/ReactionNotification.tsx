@@ -22,7 +22,7 @@ const ReactionNotification = ({ notification }: ReactionNotificationProps) => {
   const reactions = notification.reactions;
   const firstAccount = reactions?.[0]?.account;
   const length = reactions.length - 1;
-  const moreThanOneAccount = length > 1;
+  const moreThanOneAccount = length > 0;
 
   const text = moreThanOneAccount
     ? `and ${length} ${plur("other", length)} liked your`

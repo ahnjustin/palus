@@ -41,7 +41,7 @@ const PostActionExecutedNotification = ({
   const firstAction = actions[0];
   const firstAccount = firstAction.executedBy;
   const length = actions.length - 1;
-  const moreThanOneAccount = length > 1;
+  const moreThanOneAccount = length > 0;
   const actionType =
     firstAction?.__typename === "SimpleCollectPostActionExecuted"
       ? "collected"

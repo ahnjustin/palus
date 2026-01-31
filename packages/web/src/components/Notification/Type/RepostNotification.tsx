@@ -22,7 +22,7 @@ const RepostNotification = ({ notification }: RepostNotificationProps) => {
   const reposts = notification.reposts;
   const firstAccount = reposts?.[0]?.account;
   const length = reposts.length - 1;
-  const moreThanOneAccount = length > 1;
+  const moreThanOneAccount = length > 0;
 
   const text = moreThanOneAccount
     ? `and ${length} ${plur("other", length)} reposted your`
