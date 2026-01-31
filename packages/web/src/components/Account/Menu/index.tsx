@@ -2,6 +2,7 @@ import { Menu, MenuButton, MenuItems } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import type { AccountFragment } from "@palus/indexer";
 import { Fragment } from "react";
+import OpenExplorer from "@/components/Account/Menu/OpenExplorer";
 import MenuTransition from "@/components/Shared/MenuTransition";
 import stopEventPropagation from "@/helpers/stopEventPropagation";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
@@ -38,6 +39,7 @@ const AccountMenu = ({ account }: AccountMenuProps) => {
         >
           <CopyLink account={account} />
           <CopyAddress account={account} />
+          <OpenExplorer account={account} />
           {currentAccount && currentAccount?.address !== account.address ? (
             <>
               <div className="divider" />

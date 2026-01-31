@@ -1,6 +1,7 @@
 import { familyAccountsConnector } from "family";
 import type { ReactNode } from "react";
 import { http } from "viem";
+import { mainnet } from "viem/chains";
 import { createConfig, WagmiProvider } from "wagmi";
 import { injected, metaMask, walletConnect } from "wagmi/connectors";
 import {
@@ -26,12 +27,13 @@ const connectors = [
 ];
 
 const config = createConfig({
-  chains: [CHAIN],
+  chains: [CHAIN, mainnet],
   connectors,
   transports: {
     [CHAIN.id]: IS_TESTNET
       ? http("https://rpc.testnet.lens.xyz")
-      : http("https://rpc.lens.xyz")
+      : http("https://rpc.lens.xyz"),
+    [mainnet.id]: http()
   }
 });
 

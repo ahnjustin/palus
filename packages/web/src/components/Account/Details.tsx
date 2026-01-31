@@ -5,6 +5,7 @@ import dayjs from "dayjs";
 import type { ReactNode } from "react";
 import { useCallback, useState } from "react";
 import { Link, useNavigate } from "react-router";
+import AccountOwner from "@/components/Account/AccountOwner";
 import FollowUnfollowButton from "@/components/Shared/Account/FollowUnfollowButton";
 import TipButton from "@/components/Shared/Account/TipButton";
 import TopAccount from "@/components/Shared/Badges/TopAccount";
@@ -139,6 +140,7 @@ const Details = ({
           />
         ) : null}
         <div className="flex flex-wrap gap-x-5 gap-y-2">
+          <AccountOwner ownerAddress={account.owner} />
           {!isBlockedByMe &&
             getAccountAttribute("location", account?.metadata?.attributes) && (
               <MetaDetails icon={<MapPinIcon className="size-4" />}>
