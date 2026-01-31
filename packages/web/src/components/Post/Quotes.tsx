@@ -66,7 +66,7 @@ const Quotes = ({ post }: QuotesProps) => {
             {quotes.map((quote) => (
               <SinglePost key={quote.id} post={quote} showType={false} />
             ))}
-            {hasMore && <span ref={loadMoreRef} />}
+            {hasMore && <div className="h-0.5" ref={loadMoreRef} />}
           </WindowVirtualizer>
         </div>
       ) : (

@@ -84,7 +84,7 @@ const List = ({ feedType }: ListProps) => {
             <SingleGroup group={group} isBig showDescription />
           </div>
         ))}
-        {hasMore && <span ref={loadMoreRef} />}
+        {hasMore && <div className="h-0.5" ref={loadMoreRef} />}
       </WindowVirtualizer>
     </div>
   );

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef } from "react";
 const useLoadMoreOnIntersect = (onLoadMore: () => void) => {
   const [ref, entry] = useIntersectionObserver({
     root: null,
-    rootMargin: "0px",
+    rootMargin: "200px",
     threshold: 0
   });
 

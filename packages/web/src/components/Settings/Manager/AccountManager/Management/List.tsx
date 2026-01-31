@@ -156,7 +156,7 @@ const List = ({ managed = false }: ListProps) => {
           )}
         </div>
       ))}
-      {hasMore && <span ref={loadMoreRef} />}
+      {hasMore && <div className="h-0.5" ref={loadMoreRef} />}
     </WindowVirtualizer>
   );
 };

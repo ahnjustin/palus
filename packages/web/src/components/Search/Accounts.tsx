@@ -74,7 +74,7 @@ const Accounts = ({ query }: AccountsProps) => {
           <SingleAccount account={account} isBig showBio />
         </Card>
       ))}
-      {hasMore && <span ref={loadMoreRef} />}
+      {hasMore && <div className="h-0.5" ref={loadMoreRef} />}
     </CachedWindowVirtualizer>
   );
 };

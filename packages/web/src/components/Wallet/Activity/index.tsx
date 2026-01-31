@@ -364,7 +364,7 @@ const Activity = ({ account }: ActivityProps) => {
               </Link>
             );
           })}
-          {hasNextPage && <span ref={loadMoreRef} />}
+          {hasNextPage && <div className="h-0.5" ref={loadMoreRef} />}
           {isFetching && !isLoading && (
             <div className="flex justify-center p-5">
               <Spinner size="sm" />

@@ -74,7 +74,7 @@ const Groups = ({ query }: GroupsProps) => {
           <SingleGroup group={group} isBig showDescription />
         </Card>
       ))}
-      {hasMore && <span ref={loadMoreRef} />}
+      {hasMore && <div className="h-0.5" ref={loadMoreRef} />}
     </CachedWindowVirtualizer>
   );
 };

@@ -61,7 +61,7 @@ const PostFeed = <T extends { id: string }>({
           ref={ref}
         >
           {items.map((item) => renderItem(item))}
-          {hasMore && <span ref={loadMoreRef} />}
+          {hasMore && <div className="h-0.5" ref={loadMoreRef} />}
         </CachedWindowVirtualizer>
       </Card>
     </PullToRefresh>

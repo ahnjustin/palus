@@ -102,7 +102,7 @@ const FollowersYouKnow = ({ username, address }: FollowersYouKnowProps) => {
             />
           </motion.div>
         ))}
-        {hasMore && <span ref={loadMoreRef} />}
+        {hasMore && <div className="h-0.5" ref={loadMoreRef} />}
       </Virtualizer>
     </div>
   );
