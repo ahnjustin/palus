@@ -97,7 +97,7 @@ const LightBox = ({
           )}
           <img
             alt={`${currentIndex + 1} of ${images.length}`}
-            className="max-h-[90vh] w-auto max-w-full cursor-zoom-in touch-manipulation select-none object-contain"
+            className="max-h-[80vh] w-auto max-w-full cursor-zoom-in touch-manipulation select-none object-contain"
             draggable={false}
             loading="lazy"
             onClick={() => window.open(currentImage, "_blank", "noopener")}
