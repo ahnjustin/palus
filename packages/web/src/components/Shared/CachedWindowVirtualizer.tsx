@@ -17,6 +17,7 @@ interface CachedWindowVirtualizerProps {
   cacheKey: string;
   children: ReactNode;
   onScroll?: (scrollOffset: number) => void;
+  alwaysRestore?: boolean;
 }
 
 // Track which keys have been "cleared" during this JS session to allow
@@ -26,11 +27,11 @@ const sessionHandledKeys = new Set<string>();
 const CachedWindowVirtualizer = forwardRef<
   WindowVirtualizerHandle,
   CachedWindowVirtualizerProps
->(({ cacheKey, children, onScroll }, ref) => {
+>(({ cacheKey, children, onScroll, alwaysRestore = false }, ref) => {
   const innerRef = useRef<WindowVirtualizerHandle>(null);
   const isRestored = useRef(false);
   const navType = useNavigationType();
-  const shouldRestore = navType === "POP";
+  const shouldRestore = alwaysRestore || navType === "POP";
 
   useImperativeHandle(ref, () => innerRef.current as WindowVirtualizerHandle);
 

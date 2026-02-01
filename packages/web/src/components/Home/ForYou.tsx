@@ -5,7 +5,7 @@ import {
   type PostsForYouRequest,
   usePostsForYouQuery
 } from "@palus/indexer";
-import { useCallback, useMemo } from "react";
+import { memo, useCallback, useMemo } from "react";
 import SinglePost from "@/components/Post/SinglePost";
 import PostFeed from "@/components/Shared/Post/PostFeed";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
@@ -17,11 +17,14 @@ interface ForYouProps {
 const ForYou = ({ onScroll }: ForYouProps) => {
   const { currentAccount } = useAccountStore();
 
-  const request: PostsForYouRequest = {
-    account: currentAccount?.address,
-    pageSize: PageSize.Fifty,
-    shuffle: true
-  };
+  const request: PostsForYouRequest = useMemo(
+    () => ({
+      account: currentAccount?.address,
+      pageSize: PageSize.Fifty,
+      shuffle: true
+    }),
+    [currentAccount?.address]
+  );
 
   const { data, error, fetchMore, loading, refetch } = usePostsForYouQuery({
     variables: { request }
@@ -53,6 +56,7 @@ const ForYou = ({ onScroll }: ForYouProps) => {
 
   return (
     <PostFeed
+      alwaysRestoreScroll={true}
       emptyIcon={<LightBulbIcon className="size-8" />}
       emptyMessage="No posts yet!"
       error={error}
@@ -69,4 +73,4 @@ const ForYou = ({ onScroll }: ForYouProps) => {
   );
 };
 
-export default ForYou;
+export default memo(ForYou);

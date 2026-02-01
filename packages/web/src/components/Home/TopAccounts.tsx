@@ -6,7 +6,7 @@ import {
   PostType,
   usePostsQuery
 } from "@palus/indexer";
-import { useCallback, useMemo } from "react";
+import { memo, useCallback, useMemo } from "react";
 import SinglePost from "@/components/Post/SinglePost";
 import PostFeed from "@/components/Shared/Post/PostFeed";
 
@@ -15,15 +15,18 @@ interface TopAccountsProps {
 }
 
 const TopAccounts = ({ onScroll }: TopAccountsProps) => {
-  const request: PostsRequest = {
-    filter: {
-      accountScore: {
-        atLeast: 9000
+  const request: PostsRequest = useMemo(
+    () => ({
+      filter: {
+        accountScore: {
+          atLeast: 9000
+        },
+        postTypes: [PostType.Root, PostType.Quote]
       },
-      postTypes: [PostType.Root, PostType.Quote]
-    },
-    pageSize: PageSize.Fifty
-  };
+      pageSize: PageSize.Fifty
+    }),
+    []
+  );
 
   const { data, error, fetchMore, loading, refetch } = usePostsQuery({
     variables: { request }
@@ -54,6 +57,7 @@ const TopAccounts = ({ onScroll }: TopAccountsProps) => {
 
   return (
     <PostFeed
+      alwaysRestoreScroll={true}
       emptyIcon={<LightBulbIcon className="size-8" />}
       emptyMessage="No posts found!"
       error={error}
@@ -72,4 +76,4 @@ const TopAccounts = ({ onScroll }: TopAccountsProps) => {
   );
 };
 
-export default TopAccounts;
+export default memo(TopAccounts);

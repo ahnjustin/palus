@@ -25,6 +25,7 @@ const Layout = () => {
   const { accessToken } = hydrateAuthTokens();
 
   useEffect(() => {
+    if (pathname === "/") return; // let CachedWindowVirtualizer handle scroll restoration on home page
     window.scrollTo(0, 0);
   }, [pathname]);
 

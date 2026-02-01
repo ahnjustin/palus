@@ -61,6 +61,7 @@ const Timeline = ({ onScroll }: TimelineProps) => {
 
   return (
     <PostFeed
+      alwaysRestoreScroll={true}
       emptyIcon={<UserGroupIcon className="size-8" />}
       emptyMessage="No posts yet!"
       error={error}

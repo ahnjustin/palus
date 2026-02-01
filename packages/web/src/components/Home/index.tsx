@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import NewPost from "@/components/Composer/NewPost";
 import ExploreFeed from "@/components/Explore/ExploreFeed";
-import TopAccounts from "@/components/Home/TopAccounts";
 import FloatingNewPostButton from "@/components/Post/FloatingNewPostButton";
 import PageLayout from "@/components/Shared/PageLayout";
 import { HomeFeedType } from "@/data/enums";
@@ -11,6 +10,7 @@ import FeedType from "./FeedType";
 import ForYou from "./ForYou";
 import Hero from "./Hero";
 import Timeline from "./Timeline";
+import TopAccounts from "./TopAccounts";
 
 const Home = () => {
   const { currentAccount } = useAccountStore();

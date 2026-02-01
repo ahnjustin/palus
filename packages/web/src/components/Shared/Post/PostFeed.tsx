@@ -19,6 +19,7 @@ interface PostFeedProps<T extends { id: string }> {
   renderItem: (item: T) => ReactNode;
   refetch: () => Promise<any>;
   onScroll?: (scrollOffset: number) => void;
+  alwaysRestoreScroll?: boolean;
 }
 
 const PostFeed = <T extends { id: string }>({
@@ -33,7 +34,8 @@ const PostFeed = <T extends { id: string }>({
   errorTitle,
   renderItem,
   refetch,
-  onScroll
+  onScroll,
+  alwaysRestoreScroll
 }: PostFeedProps<T>) => {
   const loadMoreRef = useLoadMoreOnIntersect(handleEndReached);
 
@@ -56,6 +58,7 @@ const PostFeed = <T extends { id: string }>({
     <PullToRefresh onRefresh={refetch}>
       <Card className="virtual-divider-list-window">
         <CachedWindowVirtualizer
+          alwaysRestore={alwaysRestoreScroll}
           cacheKey={cacheKey}
           onScroll={onScroll}
           ref={ref}
