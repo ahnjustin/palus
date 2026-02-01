@@ -1,5 +1,5 @@
 import { CalendarIcon } from "@heroicons/react/20/solid";
-import { MapPinIcon } from "@heroicons/react/24/outline";
+import { LinkIcon, MapPinIcon } from "@heroicons/react/24/outline";
 import type { AccountFragment } from "@palus/indexer";
 import dayjs from "dayjs";
 import type { ReactNode } from "react";
@@ -16,7 +16,6 @@ import { TRANSFORMS } from "@/data/constants";
 import getAccount from "@/helpers/getAccount";
 import getAccountAttribute from "@/helpers/getAccountAttribute";
 import getAvatar from "@/helpers/getAvatar";
-import getFavicon from "@/helpers/getFavicon";
 import getMentions from "@/helpers/getMentions";
 import { useTheme } from "@/hooks/useTheme";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
@@ -147,18 +146,7 @@ const Details = ({
                 {getAccountAttribute("location", account?.metadata?.attributes)}
               </MetaDetails>
             )}
-          {renderAccountAttribute(
-            "website",
-            <img
-              alt="Website"
-              className="size-4 rounded-full"
-              height={16}
-              src={getFavicon(
-                getAccountAttribute("website", account?.metadata?.attributes)
-              )}
-              width={16}
-            />
-          )}
+          {renderAccountAttribute("website", <LinkIcon className="size-4" />)}
           {renderAccountAttribute(
             "x",
             <svg
