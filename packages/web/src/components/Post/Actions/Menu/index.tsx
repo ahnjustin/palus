@@ -2,6 +2,7 @@ import { Menu, MenuButton, MenuItems } from "@headlessui/react";
 import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
 import type { PostFragment } from "@palus/indexer";
 import { Fragment } from "react";
+import ViewMetadata from "@/components/Post/Actions/Menu/ViewMetadata";
 import MenuTransition from "@/components/Shared/MenuTransition";
 import cn from "@/helpers/cn";
 import stopEventPropagation from "@/helpers/stopEventPropagation";
@@ -55,6 +56,7 @@ const PostMenu = ({ post }: PostMenuProps) => {
           ) : null}
           <Share post={post} />
           <CopyPostText post={post} />
+          <ViewMetadata post={post} />
           <div className="divider" />
           {currentAccount?.address === post?.author?.address ? (
             <>

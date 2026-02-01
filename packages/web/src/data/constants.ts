@@ -25,8 +25,8 @@ export const BLOCK_EXPLORER_API_URL = IS_TESTNET
   : "https://explorer-api.lens.xyz/api/";
 
 // Storage
-export const STORAGE_NODE_URL = "https://api.grove.storage";
-export const IPFS_GATEWAY = "https://gw.ipfs-lens.dev/ipfs";
+export const STORAGE_NODE_URL = "https://api.grove.storage/";
+export const IPFS_GATEWAY = "https://gw.ipfs-lens.dev/ipfs/";
 
 // Tokens / Keys
 export const WALLETCONNECT_PROJECT_ID = "3f7a1aceea44f6ca49f43842e86107a8";

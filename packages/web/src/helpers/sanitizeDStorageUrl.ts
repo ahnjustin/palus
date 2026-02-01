@@ -5,17 +5,15 @@ const sanitizeDStorageUrl = (url?: string): string => {
     return "";
   }
 
-  const ipfsGateway = `${IPFS_GATEWAY}/`;
-
   if (/^Qm[1-9A-Za-z]{44}/.test(url)) {
-    return `${ipfsGateway}${url}`;
+    return `${IPFS_GATEWAY}${url}`;
   }
 
   return url
-    .replace("https://ipfs.io/ipfs/", ipfsGateway)
-    .replace("ipfs://ipfs/", ipfsGateway)
-    .replace("ipfs://", ipfsGateway)
-    .replace("lens://", `${STORAGE_NODE_URL}/`)
+    .replace("https://ipfs.io/ipfs/", IPFS_GATEWAY)
+    .replace("ipfs://ipfs/", IPFS_GATEWAY)
+    .replace("ipfs://", IPFS_GATEWAY)
+    .replace("lens://", STORAGE_NODE_URL)
     .replace("ar://", "https://gateway.arweave.net/");
 };
 
