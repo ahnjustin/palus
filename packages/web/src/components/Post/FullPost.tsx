@@ -7,8 +7,10 @@ import { Tooltip } from "@/components/Shared/UI";
 import cn from "@/helpers/cn";
 import { getBlockedByMeMessage } from "@/helpers/getBlockedMessage";
 import { isRepost } from "@/helpers/postHelpers";
+import { useBannedAccountsStore } from "@/store/non-persisted/admin/useBannedAccountsStore";
 import { useHiddenCommentFeedStore } from ".";
 import PostActions from "./Actions";
+import BannedAuthorPost from "./BannedAuthorPost";
 import HiddenPost from "./HiddenPost";
 import PostAvatar from "./PostAvatar";
 import PostBody from "./PostBody";
@@ -24,6 +26,7 @@ interface FullPostProps {
 const FullPost = ({ hasHiddenComments, post }: FullPostProps) => {
   const { setShowHiddenComments, showHiddenComments } =
     useHiddenCommentFeedStore();
+  const { bannedAccounts } = useBannedAccountsStore();
 
   const headerRef = useRef<HTMLDivElement>(null);
   const [ignoreBlock, setIgnoreBlock] = useState(false);
@@ -57,6 +60,8 @@ const FullPost = ({ hasHiddenComments, post }: FullPostProps) => {
           <PostHeader post={targetPost} />
           {targetPost.isDeleted ? (
             <HiddenPost type={targetPost.__typename} />
+          ) : bannedAccounts.includes(post.author.address) ? (
+            <BannedAuthorPost />
           ) : (
             <>
               <PostBody

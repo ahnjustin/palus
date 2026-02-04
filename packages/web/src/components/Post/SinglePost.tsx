@@ -3,7 +3,9 @@ import { memo } from "react";
 import ActionType from "@/components/Home/Timeline/EventType";
 import PostWrapper from "@/components/Shared/Post/PostWrapper";
 import cn from "@/helpers/cn";
+import { useBannedAccountsStore } from "@/store/non-persisted/admin/useBannedAccountsStore";
 import PostActions from "./Actions";
+import BannedAuthorPost from "./BannedAuthorPost";
 import HiddenPost from "./HiddenPost";
 import PostAvatar from "./PostAvatar";
 import PostBody from "./PostBody";
@@ -27,6 +29,7 @@ const SinglePost = ({
 }: SinglePostProps) => {
   const rootPost = timelineItem ? timelineItem?.primary : post;
   const hasComments = Boolean(timelineItem?.comments?.length);
+  const { bannedAccounts } = useBannedAccountsStore();
 
   return (
     <PostWrapper
@@ -61,6 +64,8 @@ const SinglePost = ({
           />
           {post.isDeleted ? (
             <HiddenPost type={post.__typename} />
+          ) : bannedAccounts.includes(post.author.address) ? (
+            <BannedAuthorPost />
           ) : (
             <>
               <PostBody post={rootPost} showMore={showMore} />

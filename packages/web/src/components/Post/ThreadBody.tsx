@@ -2,7 +2,9 @@ import type { PostFragment } from "@palus/indexer";
 import { memo } from "react";
 import PostWrapper from "@/components/Shared/Post/PostWrapper";
 import cn from "@/helpers/cn";
+import { useBannedAccountsStore } from "@/store/non-persisted/admin/useBannedAccountsStore";
 import PostActions from "./Actions";
+import BannedAuthorPost from "./BannedAuthorPost";
 import HiddenPost from "./HiddenPost";
 import PostAvatar from "./PostAvatar";
 import PostBody from "./PostBody";
@@ -15,6 +17,8 @@ interface ThreadBodyProps {
 }
 
 const ThreadBody = ({ post, isRoot, embedded }: ThreadBodyProps) => {
+  const { bannedAccounts } = useBannedAccountsStore();
+
   return (
     <PostWrapper
       className="w-full cursor-pointer"
@@ -34,6 +38,8 @@ const ThreadBody = ({ post, isRoot, embedded }: ThreadBodyProps) => {
           <PostHeader embedded={embedded} post={post} />
           {post.isDeleted ? (
             <HiddenPost type={post.__typename} />
+          ) : bannedAccounts.includes(post.author.address) ? (
+            <BannedAuthorPost />
           ) : (
             <>
               <PostBody embedded={embedded} post={post} />
