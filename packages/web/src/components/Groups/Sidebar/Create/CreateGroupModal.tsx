@@ -24,9 +24,9 @@ const ValidationSchema = z.object({
   }),
   name: z
     .string()
-    .max(100, { message: "Name should not exceed 100 characters" })
-    .regex(Regex.accountNameValidator, {
-      message: "Account name must not contain restricted symbols"
+    .max(50, { message: "Name cannot exceed 50 characters" })
+    .regex(Regex.usernameValidator, {
+      message: "Name may contain only alphanumeric characters and hyphens"
     }),
   repliesRestricted: z.boolean()
 });
@@ -90,8 +90,14 @@ const CreateGroupModal = () => {
 
   return (
     <Form className="space-y-4 p-5" form={form} onSubmit={handleCreateGroup}>
-      <Input label="Name" placeholder="Name" {...form.register("name")} />
+      <Input
+        error={!!form.formState.errors.name}
+        label="Name"
+        placeholder="Name"
+        {...form.register("name")}
+      />
       <TextArea
+        error={!!form.formState.errors.description}
         label="Description"
         placeholder="Please provide additional details"
         {...form.register("description")}

@@ -23,7 +23,8 @@ export const Regex = {
   groupMention: /#(0x[a-fA-F0-9]{40})/g,
   // modified version of https://stackoverflow.com/a/6041965/961254 to support unicode international characters
   url: /\b(http|https):\/\/([\p{L}\p{N}_-]+(?:(?:\.[\p{L}\p{N}_-]+)+))([\p{L}\p{N}_.,@?^=%&:/~+#-]*[\p{L}\p{N}_@?^=%&/~+#-])/gu,
-  username: /^[\dA-Za-z]\w{1,25}$/g
+  username: /^[\dA-Za-z]\w{1,25}$/g,
+  usernameValidator: /^[a-zA-Z0-9-]{1,50}$/
 };
 
 export const EditorRegex = {
