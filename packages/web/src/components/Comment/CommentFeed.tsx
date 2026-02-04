@@ -12,6 +12,7 @@ import { useCallback } from "react";
 import { useHiddenCommentFeedStore } from "@/components/Post";
 import SinglePost from "@/components/Post/SinglePost";
 import PostFeed from "@/components/Shared/Post/PostFeed";
+import { useBannedAccountsStore } from "@/store/non-persisted/admin/useBannedAccountsStore";
 
 interface CommentFeedProps {
   postId: string;
@@ -19,6 +20,7 @@ interface CommentFeedProps {
 
 const CommentFeed = ({ postId }: CommentFeedProps) => {
   const { showHiddenComments } = useHiddenCommentFeedStore();
+  const { bannedAccounts } = useBannedAccountsStore();
 
   const request: PostReferencesRequest = {
     pageSize: PageSize.Fifty,
@@ -52,7 +54,8 @@ const CommentFeed = ({ postId }: CommentFeedProps) => {
     (comment) =>
       !comment.author.operations?.isBlockedByMe &&
       !comment.operations?.hasReported &&
-      !comment.isDeleted
+      !comment.isDeleted &&
+      !bannedAccounts.includes(comment.author.address)
   );
 
   return (

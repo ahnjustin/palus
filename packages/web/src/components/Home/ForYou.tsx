@@ -8,6 +8,7 @@ import {
 import { memo, useCallback, useMemo } from "react";
 import SinglePost from "@/components/Post/SinglePost";
 import PostFeed from "@/components/Shared/Post/PostFeed";
+import { useBannedAccountsStore } from "@/store/non-persisted/admin/useBannedAccountsStore";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
 
 interface ForYouProps {
@@ -16,6 +17,7 @@ interface ForYouProps {
 
 const ForYou = ({ onScroll }: ForYouProps) => {
   const { currentAccount } = useAccountStore();
+  const { bannedAccounts } = useBannedAccountsStore();
 
   const request: PostsForYouRequest = useMemo(
     () => ({
@@ -49,7 +51,8 @@ const ForYou = ({ onScroll }: ForYouProps) => {
         .filter(
           (post) =>
             !post.author.operations?.isBlockedByMe &&
-            !post.operations?.hasReported
+            !post.operations?.hasReported &&
+            !bannedAccounts.includes(post.author.address)
         ),
     [posts]
   );

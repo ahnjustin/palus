@@ -15,6 +15,7 @@ import PostFeed from "@/components/Shared/Post/PostFeed";
 import { Card, StackedAvatars } from "@/components/Shared/UI";
 import { TRANSFORMS } from "@/data/constants";
 import getAvatar from "@/helpers/getAvatar";
+import { useBannedAccountsStore } from "@/store/non-persisted/admin/useBannedAccountsStore";
 
 interface NoneRelevantFeedProps {
   postId: string;
@@ -22,6 +23,7 @@ interface NoneRelevantFeedProps {
 
 const NoneRelevantFeed = ({ postId }: NoneRelevantFeedProps) => {
   const { showHiddenComments } = useHiddenCommentFeedStore();
+  const { bannedAccounts } = useBannedAccountsStore();
   const [showMore, setShowMore] = useState(false);
 
   const request: PostReferencesRequest = {
@@ -61,7 +63,8 @@ const NoneRelevantFeed = ({ postId }: NoneRelevantFeedProps) => {
     (comment) =>
       !comment.author.operations?.isBlockedByMe &&
       !comment.operations?.hasReported &&
-      !comment.isDeleted
+      !comment.isDeleted &&
+      !bannedAccounts.includes(comment.author.address)
   );
 
   return (

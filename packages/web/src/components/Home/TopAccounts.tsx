@@ -9,12 +9,15 @@ import {
 import { memo, useCallback, useMemo } from "react";
 import SinglePost from "@/components/Post/SinglePost";
 import PostFeed from "@/components/Shared/Post/PostFeed";
+import { useBannedAccountsStore } from "@/store/non-persisted/admin/useBannedAccountsStore";
 
 interface TopAccountsProps {
   onScroll?: (scrollOffset: number) => void;
 }
 
 const TopAccounts = ({ onScroll }: TopAccountsProps) => {
+  const { bannedAccounts } = useBannedAccountsStore();
+
   const request: PostsRequest = useMemo(
     () => ({
       filter: {
@@ -50,7 +53,8 @@ const TopAccounts = ({ onScroll }: TopAccountsProps) => {
         (post) =>
           !post.author.operations?.isBlockedByMe &&
           post.__typename === "Post" &&
-          !post.operations?.hasReported
+          !post.operations?.hasReported &&
+          !bannedAccounts.includes(post.author.address)
       ),
     [posts]
   );

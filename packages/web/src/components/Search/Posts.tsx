@@ -1,14 +1,18 @@
 import { ChatBubbleBottomCenterIcon } from "@heroicons/react/24/outline";
 import { PageSize, type PostsRequest, usePostsQuery } from "@palus/indexer";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import SinglePost from "@/components/Post/SinglePost";
 import PostFeed from "@/components/Shared/Post/PostFeed";
+import { isRepost } from "@/helpers/postHelpers";
+import { useBannedAccountsStore } from "@/store/non-persisted/admin/useBannedAccountsStore";
 
 interface PostsProps {
   query: string;
 }
 
 const Posts = ({ query }: PostsProps) => {
+  const { bannedAccounts } = useBannedAccountsStore();
+
   const request: PostsRequest = {
     filter: { searchQuery: query },
     pageSize: PageSize.Fifty
@@ -21,6 +25,19 @@ const Posts = ({ query }: PostsProps) => {
   const posts = data?.posts?.items;
   const pageInfo = data?.posts?.pageInfo;
   const hasMore = pageInfo?.next;
+
+  const filteredPosts = useMemo(
+    () =>
+      (posts ?? []).filter((post) => {
+        const targetPost = isRepost(post) ? post.repostOf : post;
+        return (
+          !post.author.operations?.isBlockedByMe &&
+          !targetPost.operations?.hasReported &&
+          !bannedAccounts.includes(post.author.address)
+        );
+      }),
+    [posts]
+  );
 
   const handleEndReached = useCallback(async () => {
     if (hasMore) {
@@ -42,7 +59,7 @@ const Posts = ({ query }: PostsProps) => {
       errorTitle="Failed to load posts"
       handleEndReached={handleEndReached}
       hasMore={hasMore}
-      items={posts ?? []}
+      items={filteredPosts ?? []}
       kind="search"
       loading={loading}
       refetch={refetch}

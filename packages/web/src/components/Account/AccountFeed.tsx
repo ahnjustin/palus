@@ -11,6 +11,7 @@ import { useCallback, useMemo } from "react";
 import SinglePost from "@/components/Post/SinglePost";
 import PostFeed from "@/components/Shared/Post/PostFeed";
 import { AccountFeedType } from "@/data/enums";
+import { useBannedAccountsStore } from "@/store/non-persisted/admin/useBannedAccountsStore";
 
 interface AccountFeedProps {
   username: string;
@@ -30,6 +31,8 @@ const EMPTY_MESSAGES: Record<AccountFeedType, string> = {
 };
 
 const AccountFeed = ({ username, address, type }: AccountFeedProps) => {
+  const { bannedAccounts } = useBannedAccountsStore();
+
   const postTypes = useMemo(() => {
     switch (type) {
       case AccountFeedType.Feed:
@@ -84,7 +87,9 @@ const AccountFeed = ({ username, address, type }: AccountFeedProps) => {
   const posts = data?.posts?.items.filter((post) =>
     type === AccountFeedType.Feed && post.__typename === "Post"
       ? !post.commentOn
-      : true
+      : post.__typename === "Post" && post.commentOn
+        ? !bannedAccounts.includes(post.commentOn.author.address)
+        : !bannedAccounts.includes(post.author.address)
   );
   const pageInfo = data?.posts?.pageInfo;
   const hasMore = pageInfo?.next;

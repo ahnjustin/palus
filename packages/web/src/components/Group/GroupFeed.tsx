@@ -3,12 +3,16 @@ import { PageSize, type PostsRequest, usePostsQuery } from "@palus/indexer";
 import { useCallback, useMemo } from "react";
 import SinglePost from "@/components/Post/SinglePost";
 import PostFeed from "@/components/Shared/Post/PostFeed";
+import { isRepost } from "@/helpers/postHelpers";
+import { useBannedAccountsStore } from "@/store/non-persisted/admin/useBannedAccountsStore";
 
 interface GroupFeedProps {
   feed: string;
 }
 
 const GroupFeed = ({ feed }: GroupFeedProps) => {
+  const { bannedAccounts } = useBannedAccountsStore();
+
   const request: PostsRequest = {
     filter: { feeds: [{ feed }] },
     pageSize: PageSize.Fifty
@@ -33,7 +37,14 @@ const GroupFeed = ({ feed }: GroupFeedProps) => {
 
   const filteredPosts = useMemo(
     () =>
-      (posts ?? []).filter((post) => !post.author.operations?.isBlockedByMe),
+      (posts ?? []).filter((post) => {
+        const targetPost = isRepost(post) ? post.repostOf : post;
+        return (
+          !post.author.operations?.isBlockedByMe &&
+          !targetPost.operations?.hasReported &&
+          !bannedAccounts.includes(post.author.address)
+        );
+      }),
     [posts]
   );
 

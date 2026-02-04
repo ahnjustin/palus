@@ -11,12 +11,14 @@ import SingleAccount from "@/components/Shared/Account/SingleAccount";
 import SingleAccountShimmer from "@/components/Shared/Shimmer/SingleAccountShimmer";
 import Skeleton from "@/components/Shared/Skeleton";
 import { Card, ErrorMessage, H5, Modal } from "@/components/Shared/UI";
+import { useBannedAccountsStore } from "@/store/non-persisted/admin/useBannedAccountsStore";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
 
 const Title = memo(() => <H5>Who to Follow</H5>);
 
 const WhoToFollow = () => {
   const { currentAccount } = useAccountStore();
+  const { bannedAccounts } = useBannedAccountsStore();
   const [showMore, setShowMore] = useState(false);
 
   const { data, error, loading } = useAccountRecommendationsQuery({
@@ -58,7 +60,8 @@ const WhoToFollow = () => {
     (account) =>
       !account.operations?.isBlockedByMe &&
       !account.operations?.isFollowedByMe &&
-      !account.operations?.hasBlockedMe
+      !account.operations?.hasBlockedMe &&
+      !bannedAccounts.includes(account.address)
   ) as AccountFragment[];
 
   if (!recommendedAccounts?.length) {

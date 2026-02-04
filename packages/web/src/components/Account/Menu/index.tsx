@@ -6,6 +6,7 @@ import OpenExplorer from "@/components/Account/Menu/OpenExplorer";
 import MenuTransition from "@/components/Shared/MenuTransition";
 import stopEventPropagation from "@/helpers/stopEventPropagation";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
+import Ban from "./Ban";
 import Block from "./Block";
 import CopyAddress from "./CopyAddress";
 import CopyLink from "./CopyLink";
@@ -47,6 +48,7 @@ const AccountMenu = ({ account }: AccountMenuProps) => {
               <Mute account={account} />
               <div className="divider" />
               <Report account={account} />
+              <Ban account={account} />
             </>
           ) : null}
         </MenuItems>

@@ -9,6 +9,7 @@ import SinglePost from "@/components/Post/SinglePost";
 import PostFeed from "@/components/Shared/Post/PostFeed";
 import PostLink from "@/components/Shared/Post/PostLink";
 import cn from "@/helpers/cn";
+import { useBannedAccountsStore } from "@/store/non-persisted/admin/useBannedAccountsStore";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
 import { usePreferencesStore } from "@/store/persisted/usePreferencesStore";
 
@@ -19,6 +20,7 @@ interface TimelineProps {
 const Timeline = ({ onScroll }: TimelineProps) => {
   const { currentAccount } = useAccountStore();
   const { includeCommentsInTimeline } = usePreferencesStore();
+  const { bannedAccounts } = useBannedAccountsStore();
 
   const request: TimelineRequest = {
     account: currentAccount?.address,
@@ -54,7 +56,8 @@ const Timeline = ({ onScroll }: TimelineProps) => {
       (feed ?? []).filter(
         (timelineItem) =>
           !timelineItem.primary.author.operations?.isBlockedByMe &&
-          !timelineItem.primary.operations?.hasReported
+          !timelineItem.primary.operations?.hasReported &&
+          !bannedAccounts.includes(timelineItem.primary.author.address)
       ),
     [feed]
   );

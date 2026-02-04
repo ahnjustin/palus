@@ -1,5 +1,9 @@
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
-import { useMeQuery } from "@palus/indexer";
+import {
+  PageSize,
+  useGroupBannedAccountsQuery,
+  useMeQuery
+} from "@palus/indexer";
 import { useIsClient } from "@uidotdev/usehooks";
 import { memo, useCallback, useEffect } from "react";
 import { Outlet, useLocation } from "react-router";
@@ -10,8 +14,10 @@ import GlobalModals from "@/components/Shared/GlobalModals";
 import Navbar from "@/components/Shared/Navbar";
 import BottomNavigation from "@/components/Shared/Navbar/BottomNavigation";
 import { Spinner } from "@/components/Shared/UI";
+import { ADMIN_GROUP_ADDRESS } from "@/data/constants";
 import reloadAllTabs from "@/helpers/reloadAllTabs";
 import { useTheme } from "@/hooks/useTheme";
+import { useBannedAccountsStore } from "@/store/non-persisted/admin/useBannedAccountsStore";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
 import { hydrateAuthTokens, signOut } from "@/store/persisted/useAuthStore";
 import ReloadTabsWatcher from "./ReloadTabsWatcher";
@@ -23,6 +29,7 @@ const Layout = () => {
     useAccountStore();
   const isMounted = useIsClient();
   const { accessToken } = hydrateAuthTokens();
+  const { setBannedAccounts } = useBannedAccountsStore();
 
   useEffect(() => {
     if (pathname === "/") return; // let CachedWindowVirtualizer handle scroll restoration on home page
@@ -41,6 +48,21 @@ const Layout = () => {
     },
     onError,
     skip: !accessToken
+  });
+
+  useGroupBannedAccountsQuery({
+    fetchPolicy: "network-only",
+    onCompleted: ({ groupBannedAccounts }) => {
+      setBannedAccounts(
+        groupBannedAccounts.items.map((item) => item.account.address)
+      );
+    },
+    variables: {
+      request: {
+        group: ADMIN_GROUP_ADDRESS,
+        pageSize: PageSize.Fifty
+      }
+    }
   });
 
   const accountLoading = !currentAccount && loading;

@@ -13,6 +13,7 @@ import { AccountFeedType } from "@/data/enums";
 import getAccount from "@/helpers/getAccount";
 import { getBlockedByMeMessage } from "@/helpers/getBlockedMessage";
 import isAccountDeleted from "@/helpers/isAccountDeleted";
+import { useBannedAccountsStore } from "@/store/non-persisted/admin/useBannedAccountsStore";
 import { useAccountLinkStore } from "@/store/non-persisted/navigation/useAccountLinkStore";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
 import AccountFeed from "./AccountFeed";
@@ -32,6 +33,7 @@ const ViewAccount = () => {
 
   const { currentAccount } = useAccountStore();
   const { cachedAccount, setCachedAccount } = useAccountLinkStore();
+  const { bannedAccounts } = useBannedAccountsStore();
 
   const { data, error, loading } = useAccountQuery({
     onCompleted: (data) => {
@@ -67,11 +69,12 @@ const ViewAccount = () => {
 
   const isDeleted = isAccountDeleted(account);
   const isBlockedByMe = account?.operations?.isBlockedByMe;
+  const isBanned = bannedAccounts.includes(account.address);
 
   const accountInfo = getAccount(account);
 
   const renderAccountDetails = () => {
-    if (isDeleted) return <DeletedDetails account={account} />;
+    if (isDeleted || isBanned) return <DeletedDetails account={account} />;
 
     return (
       <Details
@@ -85,9 +88,11 @@ const ViewAccount = () => {
   const renderEmptyState = () => {
     const message = isDeleted
       ? "Account Deleted"
-      : isBlockedByMe
-        ? getBlockedByMeMessage(account)
-        : null;
+      : isBanned
+        ? "Account Banned"
+        : isBlockedByMe
+          ? getBlockedByMeMessage(account)
+          : null;
 
     return (
       <EmptyState
@@ -106,7 +111,7 @@ const ViewAccount = () => {
         cover={account?.metadata?.coverPicture || `${STATIC_IMAGES_URL}/2.svg`}
       />
       {renderAccountDetails()}
-      {isDeleted || isBlockedByMe ? (
+      {isDeleted || isBlockedByMe || isBanned ? (
         renderEmptyState()
       ) : (
         <>

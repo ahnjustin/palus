@@ -9,6 +9,7 @@ import dayjs from "dayjs";
 import { useCallback, useMemo } from "react";
 import SinglePost from "@/components/Post/SinglePost";
 import PostFeed from "@/components/Shared/Post/PostFeed";
+import { useBannedAccountsStore } from "@/store/non-persisted/admin/useBannedAccountsStore";
 
 interface ExploreFeedProps {
   focus?: MainContentFocus;
@@ -16,6 +17,8 @@ interface ExploreFeedProps {
 }
 
 const ExploreFeed = ({ focus, onScroll }: ExploreFeedProps) => {
+  const { bannedAccounts } = useBannedAccountsStore();
+
   const request: PostsExploreRequest = useMemo(
     () => ({
       ...(focus && {
@@ -50,7 +53,8 @@ const ExploreFeed = ({ focus, onScroll }: ExploreFeedProps) => {
       (posts ?? []).filter(
         (post) =>
           !post.author.operations?.isBlockedByMe &&
-          !post.operations?.hasReported
+          !post.operations?.hasReported &&
+          !bannedAccounts.includes(post.author.address)
       ),
     [posts]
   );
