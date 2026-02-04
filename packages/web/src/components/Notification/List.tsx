@@ -4,7 +4,7 @@ import {
   NotificationType,
   useNotificationsQuery
 } from "@palus/indexer";
-import { memo, useCallback, useEffect, useRef } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef } from "react";
 import type { WindowVirtualizerHandle } from "virtua";
 import AccountActionExecutedNotification from "@/components/Notification/Type/AccountActionExecutedNotification";
 import CommentNotification from "@/components/Notification/Type/CommentNotification";
@@ -20,6 +20,7 @@ import { Card, EmptyState, ErrorMessage } from "@/components/Shared/UI";
 import { NotificationFeedType } from "@/data/enums";
 import cn from "@/helpers/cn";
 import useLoadMoreOnIntersect from "@/hooks/useLoadMoreOnIntersect";
+import { useBannedAccountsStore } from "@/store/non-persisted/admin/useBannedAccountsStore";
 import { useNotificationStore } from "@/store/persisted/useNotificationStore";
 import { usePreferencesStore } from "@/store/persisted/usePreferencesStore";
 import NotificationShimmer from "./Shimmer";
@@ -44,6 +45,7 @@ interface ListProps {
 const List = ({ feedType }: ListProps) => {
   const { setLastSeenNotificationId } = useNotificationStore();
   const { includeLowScore } = usePreferencesStore();
+  const { bannedAccounts } = useBannedAccountsStore();
 
   const getNotificationType = useCallback(() => {
     switch (feedType) {
@@ -85,6 +87,50 @@ const List = ({ feedType }: ListProps) => {
   const cacheKey = "window-list-cache-notifications";
   const ref = useRef<WindowVirtualizerHandle>(null);
 
+  const getNotificationActorAddress = useCallback(
+    (
+      notification: NonNullable<typeof notifications>[number]
+    ): string | undefined => {
+      switch (notification?.__typename) {
+        case "AccountActionExecutedNotification":
+        case "PostActionExecutedNotification":
+          return notification.actions.length === 1
+            ? notification.actions[0].executedBy.address
+            : undefined;
+        case "CommentNotification":
+          return notification.comment.author.address;
+        case "FollowNotification":
+          return notification.followers.length === 1
+            ? notification.followers[0].account.address
+            : undefined;
+        case "MentionNotification":
+          return notification.post.author.address;
+        case "QuoteNotification":
+          return notification.quote.author.address;
+        case "ReactionNotification":
+          return notification.reactions.length === 1
+            ? notification.reactions[0].account.address
+            : undefined;
+        case "RepostNotification":
+          return notification.reposts.length === 1
+            ? notification.reposts[0].account.address
+            : undefined;
+        default:
+          return undefined;
+      }
+    },
+    [notifications]
+  );
+
+  const filteredNotifications = useMemo(
+    () =>
+      notifications?.filter((notification) => {
+        const actorAddress = getNotificationActorAddress(notification);
+        return actorAddress ? !bannedAccounts.includes(actorAddress) : true;
+      }),
+    [notifications, bannedAccounts]
+  );
+
   useEffect(() => {
     const firstNotification = notifications?.[0];
     if (
@@ -125,7 +171,7 @@ const List = ({ feedType }: ListProps) => {
     return <ErrorMessage error={error} title="Failed to load notifications" />;
   }
 
-  if (!notifications?.length) {
+  if (!filteredNotifications?.length) {
     return (
       <EmptyState
         icon={<BellIcon className="size-8" />}
@@ -138,7 +184,7 @@ const List = ({ feedType }: ListProps) => {
     <PullToRefresh onRefresh={refetch}>
       <Card className="virtual-divider-list-window">
         <CachedWindowVirtualizer cacheKey={cacheKey} ref={ref}>
-          {notifications.map((notification) => {
+          {filteredNotifications.map((notification) => {
             if (!("id" in notification)) {
               return null;
             }
