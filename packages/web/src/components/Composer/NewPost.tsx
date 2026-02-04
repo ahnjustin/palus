@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 import { Card, Image } from "@/components/Shared/UI";
 import getAvatar from "@/helpers/getAvatar";
+import { useBannedAccountsStore } from "@/store/non-persisted/admin/useBannedAccountsStore";
 import { usePostStore } from "@/store/non-persisted/post/usePostStore";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
 import NewPublication from "./NewPublication";
@@ -19,6 +20,7 @@ const NewPost = ({ group }: NewPostProps) => {
 
   const { currentAccount } = useAccountStore();
   const { setPostContent } = usePostStore();
+  const { bannedAccounts } = useBannedAccountsStore();
   const [showComposer, setShowComposer] = useState(false);
 
   const handleOpenComposer = () => {
@@ -32,6 +34,10 @@ const NewPost = ({ group }: NewPostProps) => {
       setPostContent(content);
     }
   }, [text, url, via]);
+
+  if (currentAccount && bannedAccounts.includes(currentAccount.address)) {
+    return null;
+  }
 
   if (showComposer) {
     return <NewPublication group={group} />;

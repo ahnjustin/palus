@@ -41,6 +41,7 @@ import useCreatePost from "@/hooks/useCreatePost";
 import useEditPost from "@/hooks/useEditPost";
 import usePostMetadata from "@/hooks/usePostMetadata";
 import useUmami from "@/hooks/useUmami";
+import { useBannedAccountsStore } from "@/store/non-persisted/admin/useBannedAccountsStore";
 import { useNewPostModalStore } from "@/store/non-persisted/modal/useNewPostModalStore";
 import { useCollectActionStore } from "@/store/non-persisted/post/useCollectActionStore";
 import { usePostAttachmentStore } from "@/store/non-persisted/post/usePostAttachmentStore";
@@ -76,6 +77,7 @@ const NewPublication = ({
   isModal
 }: NewPublicationProps) => {
   const { currentAccount } = useAccountStore();
+  const { bannedAccounts } = useBannedAccountsStore();
 
   // New post modal store
   const { setShow: setShowNewPostModal } = useNewPostModalStore();
@@ -384,6 +386,17 @@ const NewPublication = ({
       pollConfig.options.some((option) => !option.length) ||
       pollConfig.durationInDays < 1
     : false;
+
+  if (currentAccount && bannedAccounts.includes(currentAccount.address)) {
+    return (
+      <div className={isModal ? "p-4" : ""}>
+        <WarningMessage
+          message="Your account is banned"
+          title="You cannot post"
+        />
+      </div>
+    );
+  }
 
   return canCommentIsLoading ? (
     <Shimmer />
