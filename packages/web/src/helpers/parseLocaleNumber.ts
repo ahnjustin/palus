@@ -20,13 +20,21 @@ export function parseLocaleNumber(value: string): number {
 
   const DIRECTION_MARK = /\u061c|\u200e/g;
 
-  return Number(
-    value
-      .trim()
-      .replace(DIRECTION_MARK, "")
-      .replace(group, "")
-      .replace(decimal, ".")
-      .replace(numeral, indexFn)
-      .replace(minusSign, "-")
+  const parsedValue = value
+    .trim()
+    .replace(DIRECTION_MARK, "")
+    .replace(group, "")
+    .replace(decimal, ".")
+    .replace(numeral, indexFn)
+    .replace(minusSign, "-");
+  console.log(
+    "parseLocaleNumber: locale = ",
+    locale,
+    "value = ",
+    value,
+    "parsedValue = ",
+    parsedValue
   );
+
+  return Number(parsedValue);
 }

@@ -98,6 +98,14 @@ const TokenOperation = ({
     }
 
     const parsedInput = parseLocaleNumber(inputValue);
+    console.log(
+      "handleSubmit: inputValue =",
+      inputValue,
+      "parsedInput =",
+      parsedInput,
+      "maxValue =",
+      maxValue
+    );
     if (parsedInput <= 0 || parsedInput > Number(maxValue)) {
       return;
     }
