@@ -9,6 +9,7 @@ import {
 import { type AnyBalance, useBalancesBulkQuery } from "@palus/indexer";
 import { Fragment, useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
+import { useAccount } from "wagmi";
 import MenuTransition from "@/components/Shared/MenuTransition";
 import NotLoggedIn from "@/components/Shared/NotLoggedIn";
 import PageLayout from "@/components/Shared/PageLayout";
@@ -40,6 +41,7 @@ const Wallet = () => {
   const tab = searchParams.get("tab");
 
   const { currentAccount } = useAccountStore();
+  const { address: walletAddress } = useAccount();
 
   const navigate = useNavigate();
 
@@ -88,6 +90,9 @@ const Wallet = () => {
     return <NotLoggedIn />;
   }
 
+  const loggedInAsOwner =
+    walletAddress?.toLowerCase() === currentAccount.owner.toLowerCase();
+
   return (
     <PageLayout zeroTopMargin>
       <Card>
@@ -121,7 +126,7 @@ const Wallet = () => {
                   className={({ focus }) =>
                     cn(
                       { "dropdown-active": focus },
-                      "m-2 block flex cursor-pointer items-center gap-x-2 rounded-lg px-2 py-1.5 text-sm"
+                      "m-2 flex cursor-pointer items-center gap-x-2 rounded-lg px-2 py-1.5 text-sm"
                     )
                   }
                   onClick={() => navigate("/settings/manager")}
@@ -169,17 +174,23 @@ const Wallet = () => {
           </div>
         )}
         <div className="flex justify-center gap-x-4 px-5 py-2">
-          <Deposit disabled={loading || !!error} />
+          <Deposit disabled={!loggedInAsOwner || loading || !!error} />
           <Send
             balances={data?.balancesBulk as AnyBalance[]}
-            disabled={loading || !!error}
+            disabled={!loggedInAsOwner || loading || !!error}
           />
           <Withdraw
             balances={data?.balancesBulk as AnyBalance[]}
-            disabled={loading || !!error}
+            disabled={!loggedInAsOwner || loading || !!error}
             refetch={refetch}
           />
         </div>
+        {!loggedInAsOwner && (
+          <div className="center mx-5 mt-2 flex gap-x-2 rounded-lg bg-yellow-100/50 p-3 text-sm text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
+            You are viewing this wallet as a manager. Connect the owner&apos;s
+            wallet to enable transactions.
+          </div>
+        )}
         <div className="flex flex-col gap-y-2 pt-4 sm:p-5">
           <Tabs
             active={activeTab}

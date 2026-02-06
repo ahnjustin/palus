@@ -4,9 +4,11 @@ import {
   useWrapTokensMutation
 } from "@palus/indexer";
 import { useState } from "react";
+import { useAccount } from "wagmi";
 import { Button, Image, Tooltip } from "@/components/Shared/UI";
 import { IS_TESTNET, NATIVE_TOKEN_SYMBOL } from "@/data/constants";
 import getTokenImage from "@/helpers/getTokenImage";
+import { useAccountStore } from "@/store/persisted/useAccountStore";
 import TokenOperation from "../TokenOperation";
 
 interface TokenBalanceProps {
@@ -14,13 +16,15 @@ interface TokenBalanceProps {
   symbol: string;
   onClick: () => void;
   buttonLabel: string;
+  disabled?: boolean;
 }
 
 const TokenBalance = ({
   value,
   symbol,
   onClick,
-  buttonLabel
+  buttonLabel,
+  disabled = false
 }: TokenBalanceProps) => {
   return (
     <div className="group flex flex-wrap items-center justify-between gap-5">
@@ -34,7 +38,7 @@ const TokenBalance = ({
       </div>
       <div className="flex items-center gap-x-3">
         <Button
-          disabled={Number(value) === 0}
+          disabled={disabled || Number(value) === 0}
           onClick={onClick}
           outline
           size="sm"
@@ -60,6 +64,11 @@ const Tokens = ({ balances, refetch }: TokenProps) => {
   const [showWrapModal, setShowWrapModal] = useState(false);
   const [showUnwrapModal, setShowUnwrapModal] = useState(false);
 
+  const { currentAccount } = useAccountStore();
+  const { address: walletAddress } = useAccount();
+  const loggedInAsOwner =
+    walletAddress?.toLowerCase() === currentAccount?.owner.toLowerCase();
+
   if (!balances || balances.length === 0) {
     return <div className="p-5">No tokens found.</div>;
   }
@@ -79,6 +88,7 @@ const Tokens = ({ balances, refetch }: TokenProps) => {
               {balance.__typename === "NativeAmount" && (
                 <TokenBalance
                   buttonLabel="Wrap"
+                  disabled={!loggedInAsOwner}
                   onClick={() => setShowWrapModal(true)}
                   symbol={NATIVE_TOKEN_SYMBOL}
                   value={balance.value}
@@ -87,6 +97,7 @@ const Tokens = ({ balances, refetch }: TokenProps) => {
               {balance.__typename === "Erc20Amount" && (
                 <TokenBalance
                   buttonLabel="Unwrap"
+                  disabled={!loggedInAsOwner}
                   onClick={() => setShowUnwrapModal(true)}
                   symbol={balance.asset.symbol}
                   value={balance.value}
