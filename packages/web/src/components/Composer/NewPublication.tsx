@@ -422,7 +422,11 @@ const NewPublication = ({
           <ThreadBody embedded post={parentPost} />
         </div>
       ) : null}
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+      <div
+        className={cn("min-h-0 flex-1 overflow-y-auto", {
+          isModal: "overscroll-contain"
+        })}
+      >
         <Editor
           fullHeight={
             isModal && !isQuote && attachments.length === 0 && !showPollEditor
