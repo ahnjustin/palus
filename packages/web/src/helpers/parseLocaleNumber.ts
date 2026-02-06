@@ -1,4 +1,9 @@
 export function parseLocaleNumber(value: string): number {
+  const num = Number(value);
+  if (!isNaN(num)) {
+    return num;
+  }
+
   const locale = navigator.language;
   const format = new Intl.NumberFormat(locale);
   const parts = format.formatToParts(-12345.6);
@@ -28,11 +33,11 @@ export function parseLocaleNumber(value: string): number {
     .replace(numeral, indexFn)
     .replace(minusSign, "-");
   console.log(
-    "parseLocaleNumber: locale = ",
+    "parseLocaleNumber: locale =",
     locale,
-    "value = ",
+    "value =",
     value,
-    "parsedValue = ",
+    "parsedValue =",
     parsedValue
   );
 
