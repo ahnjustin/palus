@@ -5,6 +5,7 @@ import { Button, Input, Modal, Select } from "@/components/Shared/UI";
 import { CONTRACTS } from "@/data/contracts";
 import { TOKENS } from "@/data/tokens";
 import errorToast from "@/helpers/errorToast";
+import { parseLocaleNumber } from "@/helpers/parseLocaleNumber";
 import useTransactionLifecycle from "@/hooks/useTransactionLifecycle";
 import useUmami from "@/hooks/useUmami";
 import type { ApolloClientError } from "@/types/errors";
@@ -92,9 +93,16 @@ const TokenOperation = ({
   });
 
   const handleSubmit = () => {
-    if (!inputValue || Number(inputValue) <= 0) {
+    if (!inputValue) {
       return;
     }
+
+    const parsedInput = parseLocaleNumber(inputValue);
+    if (parsedInput <= 0 || parsedInput > Number(maxValue)) {
+      return;
+    }
+
+    const value = parsedInput.toString();
 
     setIsSubmitting(true);
 
@@ -103,9 +111,9 @@ const TokenOperation = ({
         request:
           resultKey === "withdraw"
             ? selectedToken === CONTRACTS.wrappedNativeToken
-              ? { erc20: { currency: selectedToken, value: inputValue } }
-              : { native: inputValue }
-            : { amount: inputValue }
+              ? { erc20: { currency: selectedToken, value } }
+              : { native: value }
+            : { amount: value }
       }
     });
   };
