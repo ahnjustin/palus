@@ -21,6 +21,6 @@ fragment Account on Account {
   score
   createdAt
   isAdmin: isMemberOf(
-    request: { group: "0x7e4A751818969f8ba35b56B0D726FB8A5A7FA84b" }
+    request: { group: "0x3B12d0255Fe501307D3616F2CFc95398FF11e5E9" }
   )
 }
