@@ -7,6 +7,7 @@ const cache = new InMemoryCache({
   typePolicies: {
     AccountManager: { keyFields: ["manager"] },
     Account: { keyFields: ["address"] },
+    Group: { keyFields: ["address"] },
     Query: {
       fields: {
         timeline: createCursorFieldPolicy(["request", ["account", "filter"]]),
@@ -31,6 +32,8 @@ const cache = new InMemoryCache({
         notifications: createCursorFieldPolicy(["request", ["filter", "pageSize"]]),
         mlPostsExplore: createCursorFieldPolicy(["request", ["filter", "pageSize"]]),
         mlPostsForYou: createCursorFieldPolicy(["request", ["pageSize"]]),
+        groupMembershipRequests: createCursorFieldPolicy(["request", ["group"]]),
+        groupStats: createCursorFieldPolicy(["request", ["group"]]),
       }
     }
   }

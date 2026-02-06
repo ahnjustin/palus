@@ -9,6 +9,7 @@ import getAvatar from "@/helpers/getAvatar";
 import getMentions from "@/helpers/getMentions";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
 import MembersCount from "./MembersCount";
+import MembershipRequestsCount from "./MembershipRequestsCount";
 
 interface DetailsProps {
   group: GroupFragment;
@@ -65,7 +66,12 @@ const Details = ({ group }: DetailsProps) => {
           {group.metadata?.description}
         </Markup>
       ) : null}
-      <MembersCount group={group} />
+      <div className="flex flex-wrap items-center gap-x-8 gap-y-2">
+        <MembersCount group={group} />
+        {group.owner === currentAccount?.address && (
+          <MembershipRequestsCount group={group} />
+        )}
+      </div>
     </div>
   );
 };
