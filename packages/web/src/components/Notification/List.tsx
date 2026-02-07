@@ -24,12 +24,16 @@ import { useBannedAccountsStore } from "@/store/non-persisted/admin/useBannedAcc
 import { useNotificationStore } from "@/store/persisted/useNotificationStore";
 import { usePreferencesStore } from "@/store/persisted/usePreferencesStore";
 import NotificationShimmer from "./Shimmer";
+import GroupMembershipRequestApprovedNotification from "./Type/GroupMembershipRequestApprovedNotification";
+import GroupMembershipRequestRejectedNotification from "./Type/GroupMembershipRequestRejectedNotification";
 import TokenDistributedNotification from "./Type/TokenDistributedNotification";
 
 const notificationComponentMap = {
   AccountActionExecutedNotification,
   CommentNotification,
   FollowNotification,
+  GroupMembershipRequestApprovedNotification,
+  GroupMembershipRequestRejectedNotification,
   MentionNotification,
   PostActionExecutedNotification,
   QuoteNotification,

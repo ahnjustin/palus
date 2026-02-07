@@ -28,6 +28,12 @@ query NotificationIndicator($request: NotificationRequest!) {
       ... on TokenDistributedNotification {
         id
       }
+      ... on GroupMembershipRequestRejectedNotification {
+        id
+      }
+      ... on GroupMembershipRequestApprovedNotification {
+        id
+      }
     }
   }
 }
