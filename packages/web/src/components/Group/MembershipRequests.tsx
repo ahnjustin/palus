@@ -201,14 +201,14 @@ const MembershipRequests = ({ group }: Props) => {
                 </SelectTrigger>
                 <SelectContent position="popper">
                   <SelectItem
-                    className="min-w-48 hover:bg-gray-300/20"
+                    className="min-w-48"
                     disabled={Boolean(isSubmitting)}
                     value="approve"
                   >
                     Approve
                   </SelectItem>
                   <SelectItem
-                    className="min-w-48 hover:bg-gray-300/20"
+                    className="min-w-48"
                     disabled={Boolean(isSubmitting)}
                     value="reject"
                   >

@@ -22,6 +22,7 @@
   --color-secondary: #6a7282;
   --color-border: #e5e7eb;
   --color-card: #ffffff;
+  --color-accent: oklch(87.2% 0.01 258.338 / 0.2);
 }
 
 .dark {

@@ -1,4 +1,3 @@
-import { GlobeAltIcon } from "@heroicons/react/24/outline";
 import {
   type GroupFragment,
   GroupsOrderBy,
@@ -9,7 +8,10 @@ import {
 import { memo, useMemo } from "react";
 import {
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
+  SelectSeparator,
   SelectTrigger,
   SelectUI,
   SelectValue
@@ -51,7 +53,7 @@ const GroupSelector = ({ selected, onChange }: GroupSelectorProps) => {
   }, [data?.groups?.items, selected]);
 
   if (!options.length) {
-    return null;
+    return <div className="h-3" />;
   }
 
   const onValueChange = (value: string) => {
@@ -74,23 +76,26 @@ const GroupSelector = ({ selected, onChange }: GroupSelectorProps) => {
       </SelectTrigger>
       <SelectContent>
         <SelectItem className="gap-1" key="global" value="global">
-          <GlobeAltIcon className="size-5 rounded-full bg-brand-600 p-0.5 text-white" />
           Global Feed
         </SelectItem>
-        {options.map((option) => (
-          <SelectItem
-            className="min-w-48"
-            key={option.value.address}
-            value={option.value.address}
-          >
-            <img
-              alt={option.label}
-              className="size-5 rounded-full object-cover"
-              src={option.icon}
-            />
-            {option.label}
-          </SelectItem>
-        ))}
+        <SelectSeparator />
+        <SelectGroup>
+          <SelectLabel>Your Groups</SelectLabel>
+          {options.map((option) => (
+            <SelectItem
+              className="min-w-48"
+              key={option.value.address}
+              value={option.value.address}
+            >
+              <img
+                alt={option.label}
+                className="size-5 rounded-full object-cover"
+                src={option.icon}
+              />
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectGroup>
       </SelectContent>
     </SelectUI>
   );

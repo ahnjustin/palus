@@ -70,6 +70,8 @@ const Editor = ({
     };
   }, [editor]);
 
+  const hideGroupSelector = isComment || group || isQuote || isEditing;
+
   return (
     <ProseKit editor={editor}>
       <div
@@ -83,11 +85,11 @@ const Editor = ({
       >
         <Image
           alt={currentAccount?.address}
-          className="mr-3 size-11 rounded-full border border-gray-200 bg-gray-200 dark:border-gray-800"
+          className="mt-1 mr-3 size-11 rounded-full border border-gray-200 bg-gray-200 dark:border-gray-800"
           src={getAvatar(currentAccount)}
         />
         <div className="flex flex-1 flex-col overflow-x-hidden">
-          {isComment || group || isQuote || isEditing ? null : (
+          {hideGroupSelector ? null : (
             <GroupSelector
               onChange={setSelectedGroup}
               selected={selectedGroup}
@@ -96,9 +98,10 @@ const Editor = ({
           <EditorMenus />
           <div
             className={cn(
-              "ProseMirror relative mt-1 box-border min-h-20 flex-1 leading-6 outline-0 sm:leading-[26px]",
+              "ProseMirror relative box-border min-h-20 flex-1 leading-6 outline-0 sm:leading-[26px]",
               {
-                "h-full": fullHeight
+                "h-full": fullHeight,
+                "mt-3": hideGroupSelector
               }
             )}
             ref={editor.mount}
