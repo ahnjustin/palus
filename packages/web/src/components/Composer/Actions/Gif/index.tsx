@@ -8,16 +8,18 @@ import GifSelector from "./GifSelector";
 
 interface GifProps {
   setGifAttachment: (gif: IGif) => void;
+  disabled: boolean;
 }
 
-const Gif = ({ setGifAttachment }: GifProps) => {
+const Gif = ({ setGifAttachment, disabled }: GifProps) => {
   const { attachments } = usePostAttachmentStore();
   const [showModal, setShowModal] = useState(false);
   const disable =
-    attachments.length > 0 &&
-    (attachments.some((attachment) => attachment.type === "Image")
-      ? attachments.length >= 4
-      : true);
+    disabled ||
+    (attachments.length > 0 &&
+      (attachments.some((attachment) => attachment.type === "Image")
+        ? attachments.length >= 4
+        : true));
 
   return (
     <>

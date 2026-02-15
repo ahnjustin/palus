@@ -45,4 +45,31 @@ export const uploadFileToIPFS = async (file: File): Promise<UploadResult> => {
   }
 };
 
+export const uploadImage = async (
+  base64: string,
+  type = "image/png"
+): Promise<UploadResult> => {
+  try {
+    const dataUrlMatch = base64.match(/^data:(.+);base64,(.*)$/);
+    const mime = dataUrlMatch ? dataUrlMatch[1] : type;
+    const b64 = dataUrlMatch
+      ? dataUrlMatch[2]
+      : base64.replace(/^data:.+;base64,/, "");
+
+    const binary = atob(b64);
+    const len = binary.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    const file = new File([bytes], "notification-share.png", { type: mime });
+
+    const ipfsResponse = await uploadToIPFS([file]);
+    const metadata = ipfsResponse[0];
+    return { mimeType: file.type || FALLBACK_TYPE, uri: metadata.uri };
+  } catch {
+    return { mimeType: type || FALLBACK_TYPE, uri: "" };
+  }
+};
+
 export default uploadToIPFS;

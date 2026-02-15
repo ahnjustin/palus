@@ -14,11 +14,13 @@ import AggregatedNotificationTitle from "@/components/Notification/AggregatedNot
 import { TipIcon } from "@/components/Shared/Icons/TipIcon";
 import Markup from "@/components/Shared/Markup";
 import PostLink from "@/components/Shared/Post/PostLink";
-import { Tooltip } from "@/components/Shared/UI";
+import { Button, Tooltip } from "@/components/Shared/UI";
 import { CONTRACTS } from "@/data/contracts";
 import formatRelativeOrAbsolute from "@/helpers/datetime/formatRelativeOrAbsolute";
 import getPostData from "@/helpers/getPostData";
 import truncateUrl from "@/helpers/truncateUrl";
+import { useNewPostModalStore } from "@/store/non-persisted/modal/useNewPostModalStore";
+import { usePostStore } from "@/store/non-persisted/post/usePostStore";
 
 interface PostActionExecutedNotificationProps {
   notification: PostActionExecutedNotificationFragment;
@@ -58,12 +60,35 @@ const PostActionExecutedNotification = ({
 
   const type = notification.post.commentOn ? "comment" : "post";
 
-  const amount =
+  const tipAmount =
     firstAction && !moreThanOneAccount && isTippingActionExecuted(firstAction)
       ? firstAction.tipAmount
       : undefined;
+  const anyAmount =
+    firstAction.__typename === "SimpleCollectPostActionExecuted"
+      ? firstAction.action.payToCollect?.price
+      : firstAction.__typename === "TippingPostActionExecuted"
+        ? firstAction.tipAmount
+        : undefined;
 
   const timestamp = notification.actions[0].executedAt;
+
+  const { setShow: setShowNewPostModal } = useNewPostModalStore();
+  const { setNotificationShare } = usePostStore();
+
+  const handleShare = () => {
+    const action = notification.actions[0];
+    if (!anyAmount) {
+      return;
+    }
+    setNotificationShare({
+      amount: anyAmount,
+      executedBy: action.executedBy,
+      timestamp: new Date(action.executedAt),
+      type: "post-tip"
+    });
+    setShowNewPostModal(true);
+  };
 
   return (
     <div className="space-y-2">
@@ -99,7 +124,7 @@ const PostActionExecutedNotification = ({
       <div className="ml-9">
         {firstAccount && (
           <AggregatedNotificationTitle
-            amount={amount}
+            amount={tipAmount}
             firstAccount={firstAccount}
             linkToType={`/posts/${notification.post.slug}`}
             text={text}
@@ -116,6 +141,13 @@ const PostActionExecutedNotification = ({
             <span>{truncateUrl(postData.asset.uri, 30)}</span>
           ) : null}
         </PostLink>
+        {anyAmount ? (
+          <div className="flex justify-end">
+            <Button onClick={handleShare} outline size="sm">
+              Share
+            </Button>
+          </div>
+        ) : null}
       </div>
     </div>
   );

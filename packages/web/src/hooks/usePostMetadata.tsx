@@ -10,10 +10,12 @@ import { usePostAttachmentStore } from "@/store/non-persisted/post/usePostAttach
 import { usePostContentWarningStore } from "@/store/non-persisted/post/usePostContentWarningStore";
 import { usePostLicenseStore } from "@/store/non-persisted/post/usePostLicenseStore";
 import { usePostVideoStore } from "@/store/non-persisted/post/usePostVideoStore";
+import type { NewAttachment } from "@/types/misc";
 import { usePostAudioStore } from "../store/non-persisted/post/usePostAudioStore";
 
 interface UsePostMetadataProps {
   baseMetadata: any;
+  attachment?: NewAttachment;
 }
 
 const usePostMetadata = () => {
@@ -30,8 +32,8 @@ const usePostMetadata = () => {
     }));
 
   const getMetadata = useCallback(
-    ({ baseMetadata }: UsePostMetadataProps) => {
-      const primaryAttachment = attachments[0];
+    ({ baseMetadata, attachment }: UsePostMetadataProps) => {
+      const primaryAttachment = attachment ?? attachments[0];
       const hasAttachments = Boolean(primaryAttachment);
       const isImage = primaryAttachment?.type === "Image";
       const isAudio = primaryAttachment?.type === "Audio";

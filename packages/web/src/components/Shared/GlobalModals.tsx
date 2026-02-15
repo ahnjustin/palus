@@ -34,7 +34,8 @@ const GlobalModals = () => {
     setEditingPost,
     setQuotedPost,
     setPostContent,
-    setParentPost
+    setParentPost,
+    setNotificationShare
   } = usePostStore();
   const { setAttachments } = usePostAttachmentStore();
   const { authModalType, showAuthModal, setShowAuthModal } =
@@ -102,6 +103,7 @@ const GlobalModals = () => {
           setEditingPost(undefined);
           setQuotedPost(undefined);
           setParentPost(undefined);
+          setNotificationShare(undefined);
           setAttachments([]);
         }}
         onClose={() => setShowNewPostModal(false)}

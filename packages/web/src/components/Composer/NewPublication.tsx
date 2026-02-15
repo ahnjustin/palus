@@ -5,7 +5,8 @@ import {
   usePostLazyQuery
 } from "@palus/indexer";
 import { useDebounce, useMediaQuery } from "@uidotdev/usehooks";
-import { useCallback, useEffect, useState } from "react";
+import { toPng } from "html-to-image";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import Attachment from "@/components/Composer/Actions/Attachment";
@@ -16,6 +17,7 @@ import PollSettings from "@/components/Composer/Actions/PollSettings";
 import PollEditor from "@/components/Composer/Actions/PollSettings/PollEditor";
 import RulesSettings from "@/components/Composer/Actions/RulesSettings";
 import NewAttachments from "@/components/Composer/NewAttachments";
+import NotificationShare from "@/components/Composer/NotificationShare";
 import Shimmer from "@/components/Composer/Shimmer";
 import QuotedPost from "@/components/Post/QuotedPost";
 import ThreadBody from "@/components/Post/ThreadBody";
@@ -35,7 +37,9 @@ import { getPostIdFromLensUrl } from "@/helpers/lensURLs";
 import { IS_STANDALONE } from "@/helpers/mediaQueries";
 import pollActionParams from "@/helpers/pollActionParams";
 import postRuleParams from "@/helpers/postRuleParams";
+import sanitizeDStorageUrl from "@/helpers/sanitizeDStorageUrl";
 import uploadMetadata from "@/helpers/uploadMetadata";
+import { uploadImage } from "@/helpers/uploadToIPFS";
 import useCanComment from "@/hooks/useCanComment";
 import useCreatePost from "@/hooks/useCreatePost";
 import useEditPost from "@/hooks/useEditPost";
@@ -89,11 +93,13 @@ const NewPublication = ({
     quotedPost,
     parentPost,
     ignoreQuotedPostId,
+    notificationShare,
     setPostContent,
     setEditingPost,
     setParentPost,
     setQuotedPost,
-    setIgnoreQuotedPostId
+    setIgnoreQuotedPostId,
+    setNotificationShare
   } = usePostStore();
 
   // Audio store
@@ -137,6 +143,8 @@ const NewPublication = ({
     group
   );
 
+  const notificationShareRef = useRef<HTMLDivElement>(null);
+
   const editor = useEditorContext();
   const getMetadata = usePostMetadata();
 
@@ -167,6 +175,7 @@ const NewPublication = ({
     setCollectorsOnly(false);
     setContentWarning(undefined);
     setShowPollEditor(false);
+    setNotificationShare(undefined);
     resetPollConfig();
     setVideoThumbnail(DEFAULT_VIDEO_THUMBNAIL);
     setAudioPost(DEFAULT_AUDIO_POST);
@@ -268,6 +277,24 @@ const NewPublication = ({
     return isComment ? "Comment" : isQuote ? "Quote" : "Post";
   };
 
+  const getShareImage = async () => {
+    if (!notificationShare || !notificationShareRef.current) {
+      return null;
+    }
+    return await toPng(notificationShareRef.current, {
+      cacheBust: true,
+      filter: (node: HTMLElement) => {
+        const exclusionClasses = ["background-controls"];
+        return !exclusionClasses.some((classname) =>
+          node.classList?.contains(classname)
+        );
+      },
+      height: 300,
+      pixelRatio: 3,
+      width: 480
+    });
+  };
+
   const handleCreatePost = async () => {
     if (!currentAccount) {
       return toast.error(ERRORS.SignWallet);
@@ -303,7 +330,22 @@ const NewPublication = ({
           : `${getTitlePrefix()} by ${getAccount(currentAccount).username}`
       };
 
-      const metadata = getMetadata({ baseMetadata });
+      const shareImage = await getShareImage();
+      let attachment: NewAttachment | undefined;
+      if (shareImage) {
+        const upload = await uploadImage(shareImage);
+        if (!upload.uri) {
+          throw new Error("Failed to upload image");
+        }
+        attachment = {
+          mimeType: "image/png",
+          previewUri: shareImage,
+          type: "Image",
+          uri: sanitizeDStorageUrl(upload.uri)
+        };
+      }
+
+      const metadata = getMetadata({ attachment, baseMetadata });
       if (!metadata) {
         throw new Error("Failed to generate metadata");
       }
@@ -429,7 +471,11 @@ const NewPublication = ({
       >
         <Editor
           fullHeight={
-            isModal && !isQuote && attachments.length === 0 && !showPollEditor
+            isModal &&
+            !isQuote &&
+            attachments.length === 0 &&
+            !showPollEditor &&
+            !notificationShare
           }
           group={group}
           isComment={isComment}
@@ -443,7 +489,13 @@ const NewPublication = ({
           <H6 className="mt-1 px-5 pb-3 text-red-500">{postContentError}</H6>
         ) : null}
         {showPollEditor ? <PollEditor /> : null}
-        <NewAttachments attachments={attachments} />
+        {notificationShare ? (
+          <div className="px-5 pb-5 pl-16">
+            <NotificationShare ref={notificationShareRef} />
+          </div>
+        ) : (
+          <NewAttachments attachments={attachments} />
+        )}
         {quotedPost ? (
           <Wrapper className="m-5" zeroPadding>
             <QuotedPost isNew post={quotedPost} />
@@ -456,14 +508,20 @@ const NewPublication = ({
             "pb-6": isStandalone && isModal
           })}
         >
-          <Attachment anchor={isModal ? "top" : "bottom"} />
+          <Attachment
+            anchor={isModal ? "top" : "bottom"}
+            disabled={Boolean(notificationShare)}
+          />
           <EmojiPicker
             anchor={isModal ? "top start" : "bottom start"}
             setEmoji={(emoji: string) => {
               editor?.insertText(emoji);
             }}
           />
-          <Gif setGifAttachment={(gif: IGif) => setGifAttachment(gif)} />
+          <Gif
+            disabled={Boolean(notificationShare)}
+            setGifAttachment={(gif: IGif) => setGifAttachment(gif)}
+          />
           <ContentWarning />
           {editingPost ? null : (
             <>

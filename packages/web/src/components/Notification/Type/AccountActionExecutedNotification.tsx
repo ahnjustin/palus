@@ -7,8 +7,10 @@ import plur from "plur";
 import { NotificationAccountAvatar } from "@/components/Notification/Account";
 import AggregatedNotificationTitle from "@/components/Notification/AggregatedNotificationTitle";
 import { TipIcon } from "@/components/Shared/Icons/TipIcon";
-import { Tooltip } from "@/components/Shared/UI";
+import { Button, Tooltip } from "@/components/Shared/UI";
 import formatRelativeOrAbsolute from "@/helpers/datetime/formatRelativeOrAbsolute";
+import { useNewPostModalStore } from "@/store/non-persisted/modal/useNewPostModalStore";
+import { usePostStore } from "@/store/non-persisted/post/usePostStore";
 
 interface AccountActionExecutedNotificationProps {
   notification: AccountActionExecutedNotificationFragment;
@@ -46,6 +48,23 @@ const AccountActionExecutedNotification = ({
       : undefined;
 
   const timestamp = notification.actions[0].executedAt;
+
+  const { setShow: setShowNewPostModal } = useNewPostModalStore();
+  const { setNotificationShare } = usePostStore();
+
+  const handleShare = () => {
+    const action = notification.actions[0];
+    if (!amount) {
+      return;
+    }
+    setNotificationShare({
+      amount,
+      executedBy: action.executedBy,
+      timestamp: new Date(action.executedAt),
+      type: "account-tip"
+    });
+    setShowNewPostModal(true);
+  };
 
   return (
     <div className="space-y-2">
@@ -90,6 +109,13 @@ const AccountActionExecutedNotification = ({
           />
         )}
       </div>
+      {amount ? (
+        <div className="flex justify-end">
+          <Button onClick={handleShare} outline size="sm">
+            Share
+          </Button>
+        </div>
+      ) : null}
     </div>
   );
 };

@@ -1,4 +1,9 @@
-import type { PayToCollectInput } from "@palus/indexer";
+import type {
+  AccountFragment,
+  Erc20AmountFragment,
+  NativeAmountFragment,
+  PayToCollectInput
+} from "@palus/indexer";
 
 export type CollectActionType = {
   enabled?: boolean;
@@ -19,4 +24,11 @@ export type Poll = {
   id: number;
   endsAt: Date;
   options: PollOption[];
+};
+
+export type ShareAction = {
+  type: "collect" | "post-tip" | "account-tip";
+  executedBy: AccountFragment;
+  amount: Erc20AmountFragment | NativeAmountFragment;
+  timestamp: Date;
 };

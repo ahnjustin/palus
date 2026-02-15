@@ -31,9 +31,10 @@ const VideoMimeType = [
 
 interface AttachmentProps {
   anchor?: "top" | "bottom";
+  disabled: boolean;
 }
 
-const Attachment = ({ anchor = "bottom" }: AttachmentProps) => {
+const Attachment = ({ anchor = "bottom", disabled }: AttachmentProps) => {
   const { attachments, isUploading } = usePostAttachmentStore();
   const { handleUploadAttachments } = useUploadAttachments();
   const [showMenu, setShowMenu] = useState(false);
@@ -116,7 +117,8 @@ const Attachment = ({ anchor = "bottom" }: AttachmentProps) => {
       <Menu as="div" className="flex items-center">
         <MenuButton
           aria-label="More"
-          className="rounded-full outline-offset-8"
+          className="rounded-full outline-offset-8 disabled:opacity-50"
+          disabled={disabled}
           onClick={() => setShowMenu(!showMenu)}
         >
           {isUploading ? (

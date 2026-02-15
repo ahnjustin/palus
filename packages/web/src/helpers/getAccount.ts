@@ -1,4 +1,4 @@
-import type { AccountFragment } from "@palus/indexer";
+import type { Account, AccountFragment } from "@palus/indexer";
 import { LENS_NAMESPACE } from "@/data/constants";
 import { Regex } from "@/data/regex";
 import formatAddress from "./formatAddress";
@@ -30,7 +30,7 @@ const DELETED_ACCOUNT: AccountInfo = {
   username: "deleted"
 };
 
-const getAccount = (account?: AccountFragment): AccountInfo => {
+const getAccount = (account?: AccountFragment | Account): AccountInfo => {
   if (!account) {
     return UNKNOWN_ACCOUNT;
   }
