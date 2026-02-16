@@ -142,7 +142,9 @@ const PostActionExecutedNotification = ({
           ) : null}
         </PostLink>
         {anyAmount ? (
-          <div className="flex justify-end">
+          <div
+            className={`flex justify-end ${filteredContent.length ? "pt-2" : ""}`}
+          >
             <Button onClick={handleShare} outline size="sm">
               Share
             </Button>
