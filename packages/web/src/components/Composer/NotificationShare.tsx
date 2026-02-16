@@ -8,7 +8,6 @@ import {
   useState
 } from "react";
 import { Image } from "@/components/Shared/UI";
-import cn from "@/helpers/cn";
 import { formatWithZeroSubscript } from "@/helpers/formatValues";
 import getAccount from "@/helpers/getAccount";
 import getAvatar from "@/helpers/getAvatar";
@@ -24,9 +23,30 @@ const NotificationShare = forwardRef<
 >((props, ref) => {
   const [bgIndex, setBgIndex] = useState(0);
   const [scale, setScale] = useState(1);
+  const [amountFontSize, setAmountFontSize] = useState(64);
   const containerRef = useRef<HTMLDivElement>(null);
+  const amountRef = useRef<HTMLDivElement>(null);
   const { notificationShare } = usePostStore();
   const { currentAccount } = useAccountStore();
+
+  const value = notificationShare?.amount.value;
+
+  const formattedAmount = useMemo(() => {
+    if (!value) return "";
+
+    const [, frac = ""] = value.split(".");
+    const len = frac.length;
+    if (len > 5) return formatWithZeroSubscript(value);
+
+    const num = Number(value);
+    if (len <= 2) {
+      return new Intl.NumberFormat("default", {
+        minimumFractionDigits: len === 1 ? 2 : 0
+      }).format(num);
+    }
+
+    return value;
+  }, [value]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -45,27 +65,25 @@ const NotificationShare = forwardRef<
     return () => resizeObserver.disconnect();
   }, []);
 
-  const formattedAmount = useMemo(() => {
-    if (!notificationShare?.amount.value) {
-      return "";
+  // Calculate optimal font size for amount text
+  useEffect(() => {
+    const amountEl = amountRef.current;
+    if (!amountEl) return;
+
+    const containerWidth = CARD_WIDTH - 68 - 24; // left-17 (68px) and right-6 (24px)
+    const maxFontSize = 64;
+    const minFontSize = 16;
+
+    let fontSize = maxFontSize;
+    amountEl.style.fontSize = `${fontSize}px`;
+
+    while (fontSize > minFontSize && amountEl.scrollWidth > containerWidth) {
+      fontSize -= 2;
+      amountEl.style.fontSize = `${fontSize}px`;
     }
-    const amount = notificationShare.amount.value;
-    const parts = amount.split(".");
-    const frac = parts[1] ?? "";
-    if (frac.length > 6) {
-      return formatWithZeroSubscript(amount);
-    }
-    const num = Number(amount);
-    const fracNoTrailing = frac.replace(/0+$/, "");
-    if (fracNoTrailing.length <= 2) {
-      return new Intl.NumberFormat("default", {
-        minimumFractionDigits: fracNoTrailing.length === 1 ? 2 : 0
-      }).format(num);
-    }
-    const decimals =
-      fracNoTrailing.length <= 6 ? Math.min(6, fracNoTrailing.length) : 2;
-    return `${num.toFixed(decimals)}`;
-  }, [notificationShare?.amount.value]);
+
+    setAmountFontSize(fontSize);
+  }, [formattedAmount, notificationShare?.amount.asset.symbol]);
 
   if (!notificationShare || !currentAccount?.username) return null;
 
@@ -80,9 +98,6 @@ const NotificationShare = forwardRef<
         ? "tipped my post"
         : notificationShare.type === "account-tip" && "tipped me";
 
-  const amountLength =
-    formattedAmount.length + notificationShare.amount.asset.symbol.length;
-
   return (
     <div
       className="relative w-full"
@@ -90,7 +105,7 @@ const NotificationShare = forwardRef<
       style={{ height: CARD_HEIGHT * scale }}
     >
       <div
-        className={`waves-${bgIndex} relative h-75 w-120 origin-top-left rounded-xl border border-border`}
+        className={`waves-${bgIndex} relative h-75 w-120 origin-top-left overflow-hidden rounded-xl border border-border`}
         ref={ref}
         style={{ transform: `scale(${scale})` }}
         {...props}
@@ -105,7 +120,7 @@ const NotificationShare = forwardRef<
             width={64}
           />
           <div className="flex min-w-0 flex-col">
-            <div className="flex min-w-0 flex-wrap items-center gap-x-1">
+            <div className="flex min-w-0 flex-wrap items-center gap-x-1.5">
               <span className="truncate font-bold">{actor.name}</span>
               <span className="truncate pb-0.5 font-semibold text-gray-200">
                 @{getAccount(account).username}
@@ -115,24 +130,18 @@ const NotificationShare = forwardRef<
           </div>
         </div>
         <div
-          className={cn(
-            "absolute top-35 right-0 left-16 text-white leading-14 drop-shadow-black/30 drop-shadow-xs",
-            {
-              "text-2xl": amountLength > 18,
-              "text-3xl": amountLength > 14 && amountLength <= 18,
-              "text-4xl": amountLength > 10 && amountLength <= 14,
-              "text-5xl": amountLength <= 10
-            }
-          )}
+          className="-translate-y-1/2 absolute top-1/2 right-6 left-17 text-white drop-shadow-black/30 drop-shadow-xs"
+          ref={amountRef}
+          style={{ fontSize: amountFontSize, lineHeight: 1.2 }}
         >
-          <div className="flex min-w-0 flex-wrap items-center gap-x-2">
-            <span className="truncate font-bold">
+          <div className="flex items-center gap-x-2 whitespace-nowrap pt-7">
+            <span className="font-bold">
               {notificationShare.amount.__typename === "NativeAmount"
                 ? "$"
                 : ""}
               {formattedAmount}
-            </span>{" "}
-            <span className="text-gray-200">
+            </span>
+            <span className="text-gray-200 tracking-tighter">
               {notificationShare.amount.__typename === "Erc20Amount" ? "$" : ""}
               {notificationShare.amount.asset.symbol}
             </span>
@@ -146,11 +155,11 @@ const NotificationShare = forwardRef<
             src="/favicon.svg"
             width={24}
           />
-          <div className="font-semibold text-base text-black">{`palus.app/u/${currentAccount.username.localName}`}</div>
+          <div className="font-semibold text-base text-black opacity-75">{`palus.app/u/${currentAccount.username.localName}`}</div>
         </div>
         <Image
           alt="Lens Logo"
-          className="absolute right-5 bottom-3 mt-0.5 size-6 drop-shadow-sm"
+          className="absolute right-5 bottom-3 mt-0.5 size-6 drop-shadow-black/30 drop-shadow-xs"
           height={24}
           src="/images/lens.svg"
           width={24}
@@ -162,7 +171,7 @@ const NotificationShare = forwardRef<
           <button
             aria-label="Previous background"
             className="center flex rounded-full bg-black/50 p-2 text-gray-400 hover:text-white"
-            onClick={() => setBgIndex((i) => (i - 1 + 7) % 7)}
+            onClick={() => setBgIndex((i) => (i - 1 + 10) % 10)}
             type="button"
           >
             <ChevronLeftIcon className="size-3" strokeWidth={4} />
@@ -170,7 +179,7 @@ const NotificationShare = forwardRef<
           <button
             aria-label="Next background"
             className="center flex rounded-full bg-black/50 p-2 text-gray-400 hover:text-white"
-            onClick={() => setBgIndex((i) => (i + 1) % 7)}
+            onClick={() => setBgIndex((i) => (i + 1) % 10)}
             type="button"
           >
             <ChevronRightIcon className="size-3" strokeWidth={4} />
