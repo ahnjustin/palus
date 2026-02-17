@@ -1,10 +1,5 @@
 import { UserGroupIcon } from "@heroicons/react/24/outline";
-import {
-  GroupsOrderBy,
-  type GroupsRequest,
-  PageSize,
-  useGroupsQuery
-} from "@palus/indexer";
+import { type GroupsRequest, PageSize, useGroupsQuery } from "@palus/indexer";
 import { useCallback, useRef } from "react";
 import type { WindowVirtualizerHandle } from "virtua";
 import SingleGroup from "@/components/Shared/Group/SingleGroup";
@@ -20,7 +15,6 @@ interface GroupsProps {
 const Groups = ({ query }: GroupsProps) => {
   const request: GroupsRequest = {
     filter: { searchQuery: query },
-    orderBy: GroupsOrderBy.Alphabetical,
     pageSize: PageSize.Fifty
   };
 
