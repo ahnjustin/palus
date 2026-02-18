@@ -23,6 +23,7 @@ import RecentAccounts from "./RecentAccounts";
 interface SearchProps {
   placeholder?: string;
   autoFocus?: boolean;
+  query?: string | null;
 }
 
 const ValidationSchema = z.object({
@@ -35,7 +36,8 @@ const ValidationSchema = z.object({
 
 const Search = ({
   placeholder = "Search…",
-  autoFocus = false
+  autoFocus = false,
+  query: initialQuery
 }: SearchProps) => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
@@ -49,7 +51,9 @@ const Search = ({
 
   const form = useZodForm({
     defaultValues: { query: "" },
-    schema: ValidationSchema
+    resetOptions: { keepDefaultValues: true },
+    schema: ValidationSchema,
+    values: initialQuery ? { query: initialQuery } : undefined
   });
 
   const query = form.watch("query");
@@ -73,6 +77,8 @@ const Search = ({
       const search = query.trim();
       if (pathname === "/search") {
         navigate(`/search?q=${encodeURIComponent(search)}&type=${type}`);
+      } else if (pathname === "/groups") {
+        navigate(`/search?q=${encodeURIComponent(search)}&type=groups`);
       } else {
         navigate(`/search?q=${encodeURIComponent(search)}&type=accounts`);
       }

@@ -11,7 +11,7 @@ import Posts from "./Posts";
 
 const Search = () => {
   const [searchParams] = useSearchParams();
-  const q = searchParams.get("q");
+  const query = searchParams.get("q");
   const type =
     searchParams.get("type") || SearchTabFocus.Accounts.toLowerCase();
 
@@ -32,23 +32,23 @@ const Search = () => {
   return (
     <PageLayout hideSearch sidebar={<Sidebar />} title="Search">
       <div className="px-4 md:px-0">
-        <SearchInput autoFocus />
+        <SearchInput autoFocus query={query} />
       </div>
       <FeedType feedType={feedType as SearchTabFocus} />
-      {!q && (
+      {!query && (
         <EmptyState
           icon={<MagnifyingGlassIcon className="size-8" />}
           message="Search for accounts, posts, or groups"
         />
       )}
-      {q && feedType === SearchTabFocus.Accounts ? (
-        <Accounts query={q as string} />
+      {query && feedType === SearchTabFocus.Accounts ? (
+        <Accounts query={query as string} />
       ) : null}
-      {q && feedType === SearchTabFocus.Posts ? (
-        <Posts query={q as string} />
+      {query && feedType === SearchTabFocus.Posts ? (
+        <Posts query={query as string} />
       ) : null}
-      {q && feedType === SearchTabFocus.Groups ? (
-        <Groups query={q as string} />
+      {query && feedType === SearchTabFocus.Groups ? (
+        <Groups query={query as string} />
       ) : null}
     </PageLayout>
   );
