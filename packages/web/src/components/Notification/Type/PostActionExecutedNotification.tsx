@@ -145,7 +145,17 @@ const PostActionExecutedNotification = ({
           <div
             className={`flex justify-end ${filteredContent.length ? "pt-2" : ""}`}
           >
-            <Button onClick={handleShare} outline size="sm">
+            <Button
+              data-umami-event="Notification Share"
+              data-umami-event-type={
+                firstAction.__typename === "SimpleCollectPostActionExecuted"
+                  ? "post-collected"
+                  : "post-tip"
+              }
+              onClick={handleShare}
+              outline
+              size="sm"
+            >
               Share
             </Button>
           </div>

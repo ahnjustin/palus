@@ -111,7 +111,13 @@ const AccountActionExecutedNotification = ({
       </div>
       {amount ? (
         <div className="flex justify-end">
-          <Button onClick={handleShare} outline size="sm">
+          <Button
+            data-umami-event="Notification Share"
+            data-umami-event-type="account-tip"
+            onClick={handleShare}
+            outline
+            size="sm"
+          >
             Share
           </Button>
         </div>
