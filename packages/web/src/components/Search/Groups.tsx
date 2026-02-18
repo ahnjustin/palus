@@ -41,7 +41,15 @@ const Groups = ({ query }: GroupsProps) => {
   const loadMoreRef = useLoadMoreOnIntersect(handleEndReached);
 
   if (loading) {
-    return <SingleGroupShimmer isBig />;
+    return (
+      <>
+        {[...Array(3)].map((_, i) => (
+          <Card className="mb-5 p-5" key={i}>
+            <SingleGroupShimmer isBig />
+          </Card>
+        ))}
+      </>
+    );
   }
 
   if (!groups?.length) {
