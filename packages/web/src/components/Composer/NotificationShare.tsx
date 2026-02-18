@@ -112,7 +112,7 @@ const NotificationShare = forwardRef<
         <div className="absolute top-5 left-5 flex items-center gap-x-2 text-2xl text-white">
           <Image
             alt={actor.username}
-            className="size-11 flex-none rounded-full border border-border bg-gray-200"
+            className="size-11 flex-none rounded-full border border-border bg-gray-200 object-cover"
             height={64}
             loading="lazy"
             src={getAvatar(account)}

@@ -128,7 +128,7 @@ const BottomNavigation = () => {
           >
             <Image
               alt={currentAccount.address}
-              className="size-7 rounded-full border border-gray-200 dark:border-gray-800"
+              className="size-7 rounded-full border border-gray-200 object-cover dark:border-gray-800"
               src={getAvatar(currentAccount)}
             />
           </button>

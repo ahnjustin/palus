@@ -85,7 +85,7 @@ const Editor = ({
       >
         <Image
           alt={currentAccount?.address}
-          className="mt-1 mr-3 size-11 rounded-full border border-gray-200 bg-gray-200 dark:border-gray-800"
+          className="mt-1 mr-3 size-11 rounded-full border border-gray-200 bg-gray-200 object-cover dark:border-gray-800"
           src={getAvatar(currentAccount)}
         />
         <div className="flex flex-1 flex-col overflow-x-hidden">

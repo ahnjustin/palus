@@ -34,7 +34,7 @@ const Details = ({ group }: DetailsProps) => {
         <div className="-mt-24 sm:-mt-24 relative ml-5 size-32 sm:size-36">
           <Image
             alt={group.address}
-            className="size-32 cursor-pointer rounded-xl bg-gray-200 ring-3 ring-gray-50 sm:size-36 dark:bg-gray-700 dark:ring-black"
+            className="size-32 cursor-pointer rounded-xl bg-gray-200 object-cover ring-3 ring-gray-50 sm:size-36 dark:bg-gray-700 dark:ring-black"
             height={128}
             onClick={handleShowLightBox}
             src={getAvatar(group, TRANSFORMS.AVATAR_BIG)}

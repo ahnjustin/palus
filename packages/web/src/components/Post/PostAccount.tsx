@@ -61,7 +61,7 @@ const PostAccount = ({ account, group, post, timestamp }: PostAccountProps) => {
             >
               <Image
                 alt={group.metadata.name}
-                className="size-4 rounded-sm"
+                className="size-4 rounded-sm object-cover"
                 src={getAvatar(group, TRANSFORMS.AVATAR_TINY)}
               />
               <span className="truncate text-sm">{group.metadata.name}</span>

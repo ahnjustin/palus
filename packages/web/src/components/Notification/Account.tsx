@@ -26,7 +26,7 @@ export const NotificationAccountAvatar = memo(
         >
           <Image
             alt={account.address}
-            className="size-7 rounded-full border border-gray-200 bg-gray-200 sm:size-8 dark:border-gray-800"
+            className="size-7 rounded-full border border-gray-200 bg-gray-200 object-cover sm:size-8 dark:border-gray-800"
             height={32}
             src={getAvatar(account)}
             width={32}
