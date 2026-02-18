@@ -15,8 +15,8 @@ import { Regex } from "@/data/regex";
 import errorToast from "@/helpers/errorToast";
 import uploadMetadata from "@/helpers/uploadMetadata";
 import useTransactionLifecycle from "@/hooks/useTransactionLifecycle";
+import { useCreateGroupStore } from "@/store/non-persisted/modal/useCreateGroupStore";
 import type { ApolloClientError } from "@/types/errors";
-import { useCreateGroupStore } from "./CreateGroup";
 
 const ValidationSchema = z.object({
   description: z.string().max(260, {
@@ -24,6 +24,7 @@ const ValidationSchema = z.object({
   }),
   name: z
     .string()
+    .min(1, { message: "Name is required" })
     .max(50, { message: "Name cannot exceed 50 characters" })
     .regex(Regex.usernameValidator, {
       message: "Name may contain only alphanumeric characters and hyphens"

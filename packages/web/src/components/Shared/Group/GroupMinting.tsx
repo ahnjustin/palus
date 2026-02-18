@@ -1,8 +1,8 @@
 import { useGroupQuery } from "@palus/indexer";
 import { H4, Spinner } from "@/components/Shared/UI";
-import { useCreateGroupStore } from "./CreateGroup";
+import { useCreateGroupStore } from "@/store/non-persisted/modal/useCreateGroupStore";
 
-const Minting = () => {
+const GroupMinting = () => {
   const { setScreen, transactionHash, setGroupAddress } = useCreateGroupStore();
 
   useGroupQuery({
@@ -22,11 +22,11 @@ const Minting = () => {
     <div className="m-8 flex flex-col items-center justify-center">
       <H4>We are preparing your group!</H4>
       <div className="mt-3 text-center font-semibold text-gray-500 dark:text-gray-200">
-        This will take a few seconds to a few minutes. Please be patient.
+        This may take a few moments…
       </div>
       <Spinner className="mt-8" />
     </div>
   );
 };
 
-export default Minting;
+export default GroupMinting;

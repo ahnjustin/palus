@@ -76,6 +76,7 @@ const Leave = ({ group, small }: LeaveProps) => {
       disabled={isSubmitting}
       loading={isSubmitting}
       onClick={handleLeave}
+      outline
       size={small ? "sm" : "md"}
     >
       Leave

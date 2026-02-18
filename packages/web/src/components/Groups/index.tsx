@@ -1,5 +1,5 @@
 import { useState } from "react";
-import CreateGroup from "@/components/Groups/Sidebar/Create/CreateGroup";
+import CreateGroup from "@/components/Groups/CreateGroup";
 import Footer from "@/components/Shared/Footer";
 import NotLoggedIn from "@/components/Shared/NotLoggedIn";
 import PageLayout from "@/components/Shared/PageLayout";

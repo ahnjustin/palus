@@ -4,6 +4,9 @@ import SuperFollow from "@/components/Shared/Account/SuperFollow";
 import SwitchAccounts from "@/components/Shared/Account/SwitchAccounts";
 import TopUp from "@/components/Shared/Account/TopUp";
 import { useSignupStore } from "@/components/Shared/Auth/Signup";
+import CreateGroupModal from "@/components/Shared/Group/CreateGroupModal";
+import GroupMinting from "@/components/Shared/Group/GroupMinting";
+import GroupSuccess from "@/components/Shared/Group/GroupSuccess";
 import SuperJoin from "@/components/Shared/Group/SuperJoin";
 import ReportAccount from "@/components/Shared/Modal/ReportAccount";
 import ReportPost from "@/components/Shared/Modal/ReportPost";
@@ -11,6 +14,7 @@ import { Modal } from "@/components/Shared/UI";
 import getAccount from "@/helpers/getAccount";
 import { IS_MOBILE } from "@/helpers/mediaQueries";
 import { useAuthModalStore } from "@/store/non-persisted/modal/useAuthModalStore";
+import { useCreateGroupStore } from "@/store/non-persisted/modal/useCreateGroupStore";
 import { useFundModalStore } from "@/store/non-persisted/modal/useFundModalStore";
 import { useNewPostModalStore } from "@/store/non-persisted/modal/useNewPostModalStore";
 import { useReportAccountModalStore } from "@/store/non-persisted/modal/useReportAccountModalStore";
@@ -56,6 +60,12 @@ const GlobalModals = () => {
     superFollowingAccount
   } = useSuperFollowModalStore();
   const { screen: signupScreen } = useSignupStore();
+  const {
+    screen: groupScreen,
+    setScreen: setGroupScreen,
+    showCreateGroupModal,
+    setShowCreateGroupModal
+  } = useCreateGroupStore();
 
   const authModalTitle =
     authModalType === "signup"
@@ -146,6 +156,22 @@ const GlobalModals = () => {
         title="Super Follow"
       >
         <SuperFollow />
+      </Modal>
+      <Modal
+        afterLeave={() => {
+          setGroupScreen("details");
+        }}
+        onClose={() => setShowCreateGroupModal(false)}
+        show={showCreateGroupModal}
+        title={groupScreen === "details" ? "Create a group" : undefined}
+      >
+        {groupScreen === "details" ? (
+          <CreateGroupModal />
+        ) : groupScreen === "minting" ? (
+          <GroupMinting />
+        ) : (
+          <GroupSuccess />
+        )}
       </Modal>
     </>
   );
