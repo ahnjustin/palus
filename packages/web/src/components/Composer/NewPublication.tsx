@@ -37,7 +37,6 @@ import { getPostIdFromLensUrl } from "@/helpers/lensURLs";
 import { IS_STANDALONE } from "@/helpers/mediaQueries";
 import pollActionParams from "@/helpers/pollActionParams";
 import postRuleParams from "@/helpers/postRuleParams";
-import sanitizeDStorageUrl from "@/helpers/sanitizeDStorageUrl";
 import uploadMetadata from "@/helpers/uploadMetadata";
 import { uploadImage } from "@/helpers/uploadToIPFS";
 import useCanComment from "@/hooks/useCanComment";
@@ -341,7 +340,7 @@ const NewPublication = ({
           mimeType: "image/png",
           previewUri: shareImage,
           type: "Image",
-          uri: sanitizeDStorageUrl(upload.uri)
+          uri: upload.uri
         };
       }
 

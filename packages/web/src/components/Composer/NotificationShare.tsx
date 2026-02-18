@@ -89,7 +89,6 @@ const NotificationShare = forwardRef<
 
   const account = notificationShare.executedBy;
   const actor = getAccount(account);
-  const avatar = getAvatar(account);
 
   const title =
     notificationShare.type === "collect"
@@ -112,18 +111,18 @@ const NotificationShare = forwardRef<
       >
         <div className="absolute top-5 left-5 flex items-center gap-x-2 text-2xl text-white">
           <Image
-            alt={account.address}
+            alt={actor.username}
             className="size-11 flex-none rounded-full border border-border bg-gray-200"
             height={64}
             loading="lazy"
-            src={avatar}
+            src={getAvatar(account)}
             width={64}
           />
           <div className="flex min-w-0 flex-col">
             <div className="flex min-w-0 flex-wrap items-center gap-x-1.5">
               <span className="truncate font-bold">{actor.name}</span>
               <span className="truncate pb-0.5 font-semibold text-gray-200">
-                @{getAccount(account).username}
+                @{actor.username}
               </span>
             </div>
             <div className="text-white text-xl">{title}!</div>
