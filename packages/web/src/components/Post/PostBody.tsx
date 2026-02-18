@@ -2,6 +2,7 @@ import { ExclamationCircleIcon, EyeIcon } from "@heroicons/react/24/outline";
 import { getSrc } from "@livepeer/react/external";
 import { type AnyPostFragment, ContentWarning } from "@palus/indexer";
 import { memo, useState } from "react";
+import HiddenPost from "@/components/Post/HiddenPost";
 import PollAction from "@/components/Post/OpenAction/PollAction";
 import Quote from "@/components/Shared/Embed/Quote";
 import Markup from "@/components/Shared/Markup";
@@ -87,55 +88,59 @@ const PostBody = ({
           </Button>
         </div>
       )}
-      <div
-        className={cn("break-words", {
-          "opacity-50 blur-2xl": contentWarning && !showCensored
-        })}
-      >
-        <Markup
-          className={cn(
-            { "line-clamp-2": embedded, "line-clamp-5": canShowMore },
-            "markup linkify break-words",
-            contentClassName
-          )}
-          mentions={targetPost.mentions}
+      {targetPost.isDeleted ? (
+        <HiddenPost />
+      ) : (
+        <div
+          className={cn("break-words", {
+            "opacity-50 blur-2xl": contentWarning && !showCensored
+          })}
         >
-          {content}
-        </Markup>
-        {canShowMore ? (
-          <H6 className="mt-4 flex items-center space-x-1 text-gray-500 dark:text-gray-200">
-            <EyeIcon className="size-4" />
-            <PostLink post={post}>Show more</PostLink>
-          </H6>
-        ) : null}
-        {unknownActions?.length && !embedded ? (
-          pollAction && post.__typename === "Post" ? (
-            <div className="pt-3 pb-2">
-              <PollAction post={post} />
+          <Markup
+            className={cn(
+              { "line-clamp-2": embedded, "line-clamp-5": canShowMore },
+              "markup linkify break-words",
+              contentClassName
+            )}
+            mentions={targetPost.mentions}
+          >
+            {content}
+          </Markup>
+          {canShowMore ? (
+            <H6 className="mt-4 flex items-center space-x-1 text-gray-500 dark:text-gray-200">
+              <EyeIcon className="size-4" />
+              <PostLink post={post}>Show more</PostLink>
+            </H6>
+          ) : null}
+          {unknownActions?.length && !embedded ? (
+            pollAction && post.__typename === "Post" ? (
+              <div className="pt-3 pb-2">
+                <PollAction post={post} />
+              </div>
+            ) : (
+              <div className="mt-3 flex items-center gap-x-2 rounded-xl border border-gray-200 px-4 py-2 text-gray-700 text-sm md:w-3/4 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
+                <ExclamationCircleIcon className="size-4" />
+                Includes unsupported actions
+              </div>
+            )
+          ) : null}
+          {/* Attachments and Quotes */}
+          {showAttachments && !embedded ? (
+            <Attachments
+              asset={filteredAsset}
+              attachments={filteredAttachments}
+            />
+          ) : null}
+          {showLive && !embedded ? (
+            <div className="mt-3">
+              <Video src={getSrc(metadata.liveUrl || metadata.playbackUrl)} />
             </div>
-          ) : (
-            <div className="mt-3 flex items-center gap-x-2 rounded-xl border border-gray-200 px-4 py-2 text-gray-700 text-sm md:w-3/4 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
-              <ExclamationCircleIcon className="size-4" />
-              Includes unsupported actions
-            </div>
-          )
-        ) : null}
-        {/* Attachments and Quotes */}
-        {showAttachments && !embedded ? (
-          <Attachments
-            asset={filteredAsset}
-            attachments={filteredAttachments}
-          />
-        ) : null}
-        {showLive && !embedded ? (
-          <div className="mt-3">
-            <Video src={getSrc(metadata.liveUrl || metadata.playbackUrl)} />
-          </div>
-        ) : null}
-        {targetPost.quoteOf && !embedded ? (
-          <Quote post={targetPost.quoteOf} />
-        ) : null}
-      </div>
+          ) : null}
+          {targetPost.quoteOf && !embedded ? (
+            <Quote post={targetPost.quoteOf} />
+          ) : null}
+        </div>
+      )}
     </div>
   );
 };
