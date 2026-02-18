@@ -1,4 +1,4 @@
-import { GroupsOrderBy, useGroupsLazyQuery } from "@palus/indexer";
+import { useGroupsLazyQuery } from "@palus/indexer";
 import { useEffect, useState } from "react";
 
 const SUGGESTION_LIST_LENGTH_LIMIT = 5;
@@ -23,8 +23,8 @@ const useGroupMentionQuery = (query: string): MentionGroup[] => {
     searchGroups({
       variables: {
         request: {
-          filter: { searchQuery: query },
-          orderBy: GroupsOrderBy.Alphabetical
+          filter: { searchQuery: query }
+          // orderBy: GroupsOrderBy.Alphabetical
         }
       }
     }).then(({ data }) => {
