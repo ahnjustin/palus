@@ -32,7 +32,7 @@ const Search = () => {
   return (
     <PageLayout hideSearch sidebar={<Sidebar />} title="Search">
       <div className="px-4 md:px-0">
-        <SearchInput />
+        <SearchInput autoFocus />
       </div>
       <FeedType feedType={feedType as SearchTabFocus} />
       {!q && (

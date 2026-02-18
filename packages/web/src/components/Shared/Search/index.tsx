@@ -22,6 +22,7 @@ import RecentAccounts from "./RecentAccounts";
 
 interface SearchProps {
   placeholder?: string;
+  autoFocus?: boolean;
 }
 
 const ValidationSchema = z.object({
@@ -32,7 +33,10 @@ const ValidationSchema = z.object({
     .max(100, { message: "Query should not exceed 100 characters" })
 });
 
-const Search = ({ placeholder = "Search…" }: SearchProps) => {
+const Search = ({
+  placeholder = "Search…",
+  autoFocus = false
+}: SearchProps) => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -157,6 +161,7 @@ const Search = ({ placeholder = "Search…" }: SearchProps) => {
     <div className="w-full">
       <Form form={form} onSubmit={handleSubmit}>
         <Input
+          autoFocus={autoFocus}
           className="px-3 py-3 text-base sm:text-sm"
           iconLeft={<MagnifyingGlassIcon />}
           iconRight={
