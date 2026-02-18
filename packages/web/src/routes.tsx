@@ -45,7 +45,9 @@ const Routes = () => {
     setVvh();
     window.addEventListener("resize", setVvh);
     window.visualViewport?.addEventListener("resize", setVvh);
-    window.visualViewport?.addEventListener("scroll", setVvh);
+    window.visualViewport?.addEventListener("scroll", setVvh, {
+      passive: true
+    });
 
     return () => {
       window.removeEventListener("resize", setVvh);
