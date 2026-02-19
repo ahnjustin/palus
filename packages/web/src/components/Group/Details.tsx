@@ -1,6 +1,7 @@
 import type { GroupFragment } from "@palus/indexer";
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router";
+import LazySmallSingleAccount from "@/components/Shared/Account/LazySmallSingleAccount";
 import JoinLeaveButton from "@/components/Shared/Group/JoinLeaveButton";
 import Markup from "@/components/Shared/Markup";
 import { Button, H3, Image, LightBox } from "@/components/Shared/UI";
@@ -66,6 +67,27 @@ const Details = ({ group }: DetailsProps) => {
           {group.metadata?.description}
         </Markup>
       ) : null}
+      <div className="flex items-center gap-x-4">
+        {group.owner ? (
+          <div className="flex items-center gap-x-2">
+            <span className="text-secondary">Owned by</span>
+            <LazySmallSingleAccount
+              address={group.owner}
+              hideSlug
+              linkToAccount
+              smallAvatar={false}
+            />
+          </div>
+        ) : null}
+        <div className="flex items-center gap-x-2">
+          <span className="text-secondary">Created</span>
+          <span>
+            {Intl.DateTimeFormat("default", { dateStyle: "medium" }).format(
+              new Date(group.timestamp)
+            )}
+          </span>
+        </div>
+      </div>
       <div className="flex flex-wrap items-center gap-x-8 gap-y-2">
         <MembersCount group={group} />
         {group.owner === currentAccount?.address && (

@@ -43,7 +43,7 @@ const SmallSingleAccount = ({
       <div
         className={cn(
           !hideSlug && "max-w-[75%]",
-          "mr-1 flex items-center gap-x-1 truncate"
+          "mr-1 flex items-center gap-x-0.5 truncate"
         )}
       >
         {getAccount(account).name}
@@ -66,7 +66,7 @@ const SmallSingleAccount = ({
   );
 
   const AccountInfo = () => (
-    <div className="flex items-center space-x-2">
+    <div className="flex items-center space-x-1">
       <UserAvatar />
       <UserName />
     </div>

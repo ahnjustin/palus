@@ -6,12 +6,14 @@ interface LazySmallSingleAccountProps {
   hideSlug?: boolean;
   address: string;
   linkToAccount?: boolean;
+  smallAvatar?: boolean;
 }
 
 const LazySmallSingleAccount = ({
   hideSlug = false,
   address,
-  linkToAccount = false
+  linkToAccount = false,
+  smallAvatar = true
 }: LazySmallSingleAccountProps) => {
   const { data, loading } = useAccountQuery({
     variables: { request: { address } }
@@ -30,7 +32,7 @@ const LazySmallSingleAccount = ({
       account={data.account}
       hideSlug={hideSlug}
       linkToAccount={linkToAccount}
-      smallAvatar
+      smallAvatar={smallAvatar}
     />
   );
 };
