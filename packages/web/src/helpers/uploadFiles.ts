@@ -9,7 +9,7 @@ interface UploadResult {
 
 const FALLBACK_TYPE = "image/jpeg";
 
-const uploadToIPFS = async (
+const uploadFiles = async (
   data: FileList | File[]
 ): Promise<UploadResult[]> => {
   try {
@@ -34,10 +34,10 @@ const uploadToIPFS = async (
   }
 };
 
-export const uploadFileToIPFS = async (file: File): Promise<UploadResult> => {
+export const uploadFile = async (file: File): Promise<UploadResult> => {
   try {
-    const ipfsResponse = await uploadToIPFS([file]);
-    const metadata = ipfsResponse[0];
+    const uploadResults = await uploadFiles([file]);
+    const metadata = uploadResults[0];
 
     return { mimeType: file.type || FALLBACK_TYPE, uri: metadata.uri };
   } catch {
@@ -64,12 +64,12 @@ export const uploadImage = async (
     }
     const file = new File([bytes], "notification-share.png", { type: mime });
 
-    const ipfsResponse = await uploadToIPFS([file]);
-    const metadata = ipfsResponse[0];
+    const uploadResults = await uploadFiles([file]);
+    const metadata = uploadResults[0];
     return { mimeType: file.type || FALLBACK_TYPE, uri: metadata.uri };
   } catch {
     return { mimeType: type || FALLBACK_TYPE, uri: "" };
   }
 };
 
-export default uploadToIPFS;
+export default uploadFiles;

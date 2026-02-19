@@ -5,7 +5,7 @@ import {
   createPreviewAttachments,
   validateFileSize
 } from "@/helpers/attachmentUtils";
-import uploadToIPFS from "@/helpers/uploadToIPFS";
+import uploadFiles from "@/helpers/uploadFiles";
 import { usePostAttachmentStore } from "@/store/non-persisted/post/usePostAttachmentStore";
 import type { NewAttachment } from "@/types/misc";
 
@@ -35,7 +35,7 @@ const useUploadAttachments = () => {
       addAttachments(previewAttachments);
 
       try {
-        const uploaded = await uploadToIPFS(compressedFiles);
+        const uploaded = await uploadFiles(compressedFiles);
         const result = uploaded.map((file, index) => ({
           ...previewAttachments[index],
           mimeType: file.mimeType,

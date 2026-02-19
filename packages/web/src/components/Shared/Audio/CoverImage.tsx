@@ -7,7 +7,7 @@ import cn from "@/helpers/cn";
 import errorToast from "@/helpers/errorToast";
 import imageKit from "@/helpers/imageKit";
 import sanitizeDStorageUrl from "@/helpers/sanitizeDStorageUrl";
-import { uploadFileToIPFS } from "@/helpers/uploadToIPFS";
+import { uploadFile } from "@/helpers/uploadFiles";
 import type { ApolloClientError } from "@/types/errors";
 
 interface CoverImageProps {
@@ -35,7 +35,7 @@ const CoverImage = ({
       try {
         setIsSubmitting(true);
         const file = event.target.files[0];
-        const attachment = await uploadFileToIPFS(file);
+        const attachment = await uploadFile(file);
         setCover(
           URL.createObjectURL(file),
           attachment.uri,

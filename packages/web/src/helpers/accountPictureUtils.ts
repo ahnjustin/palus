@@ -1,5 +1,5 @@
 import compressImage from "./compressImage";
-import { uploadFileToIPFS } from "./uploadToIPFS";
+import { uploadFile } from "./uploadFiles";
 
 export const readFile = (file: Blob): Promise<string> => {
   return new Promise((resolve) => {
@@ -24,7 +24,7 @@ const uploadCroppedImage = async (
     maxSizeMB: 6,
     maxWidthOrHeight: 3000
   });
-  const attachment = await uploadFileToIPFS(cleanedFile);
+  const attachment = await uploadFile(cleanedFile);
   const decentralizedUrl = attachment.uri;
   if (!decentralizedUrl) {
     throw new Error("uploadFileToIPFS failed");

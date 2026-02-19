@@ -1,6 +1,7 @@
 import { immutable } from "@lens-chain/storage-client";
-import { CHAIN } from "@/data/constants";
-import { ERRORS } from "@/data/errors";
+import { createThirdwebClient } from "thirdweb";
+import { upload as uploadJson } from "thirdweb/storage";
+import { CHAIN, THIRD_WEB_CLIENT_ID } from "@/data/constants";
 import { storageClient } from "./storageClient";
 
 interface MetadataPayload {
@@ -10,15 +11,38 @@ interface MetadataPayload {
 const uploadMetadata = async (
   data: MetadataPayload | null
 ): Promise<string> => {
+  let uri: string | undefined;
   try {
-    const { uri } = await storageClient.uploadAsJson(data, {
+    const upload = await storageClient.uploadAsJson(data, {
       acl: immutable(CHAIN.id)
     });
-
-    return uri;
-  } catch {
-    throw new Error(ERRORS.SomethingWentWrong);
+    uri = upload.uri;
+  } catch (e) {
+    console.error("Failed to upload metadata to grove", e);
   }
+
+  if (!uri) {
+    // Fallback to thirdweb if grove upload fails
+    const thirdWebClient = createThirdwebClient({
+      clientId: THIRD_WEB_CLIENT_ID
+    });
+    try {
+      const file = new File([JSON.stringify(data)], "metadata.json", {
+        type: "application/json"
+      });
+      const upload = await uploadJson({
+        client: thirdWebClient,
+        files: [file],
+        uploadWithoutDirectory: true
+      });
+      uri = upload;
+    } catch (e) {
+      console.error("Failed to upload metadata to thirdweb", e);
+      throw new Error("Failed to upload metadata");
+    }
+  }
+
+  return uri;
 };
 
 export default uploadMetadata;

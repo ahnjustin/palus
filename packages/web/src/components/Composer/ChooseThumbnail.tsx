@@ -6,7 +6,7 @@ import ThumbnailsShimmer from "@/components/Shared/Shimmer/ThumbnailsShimmer";
 import { Spinner } from "@/components/Shared/UI";
 import generateVideoThumbnails from "@/helpers/generateVideoThumbnails";
 import getFileFromDataURL from "@/helpers/getFileFromDataURL";
-import { uploadFileToIPFS } from "@/helpers/uploadToIPFS";
+import { uploadFile } from "@/helpers/uploadFiles";
 import { usePostAttachmentStore } from "@/store/non-persisted/post/usePostAttachmentStore";
 import { usePostVideoStore } from "@/store/non-persisted/post/usePostVideoStore";
 
@@ -29,7 +29,7 @@ const ChooseThumbnail = () => {
 
   const uploadThumbnailToStorageNode = async (fileToUpload: File) => {
     setVideoThumbnail({ ...videoThumbnail, uploading: true });
-    const result = await uploadFileToIPFS(fileToUpload);
+    const result = await uploadFile(fileToUpload);
     if (!result.uri) {
       toast.error("Failed to upload thumbnail");
     }
