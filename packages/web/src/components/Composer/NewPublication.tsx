@@ -290,6 +290,9 @@ const NewPublication = ({
       },
       height: 300,
       pixelRatio: 3,
+      style: {
+        transform: "scale(1)"
+      },
       width: 480
     });
   };
