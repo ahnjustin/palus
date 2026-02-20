@@ -13,6 +13,7 @@ import getCroppedImg from "@/helpers/cropUtils";
 import errorToast from "@/helpers/errorToast";
 import imageKit from "@/helpers/imageKit";
 import sanitizeDStorageUrl from "@/helpers/sanitizeDStorageUrl";
+import { useAccountStore } from "@/store/persisted/useAccountStore";
 import type { ApolloClientError } from "@/types/errors";
 
 interface UseImageCropUploadProps {
@@ -38,6 +39,8 @@ const useImageCropUpload = ({
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
 
+  const { currentAccount } = useAccountStore();
+
   const onError = useCallback((error: ApolloClientError) => {
     errorToast(error);
   }, []);
@@ -51,7 +54,10 @@ const useImageCropUpload = ({
         return toast.error(ERRORS.SomethingWentWrong);
       }
 
-      const decentralizedUrl = await uploadCroppedImage(croppedImage);
+      const decentralizedUrl = await uploadCroppedImage(
+        croppedImage,
+        currentAccount?.address
+      );
       const dataUrl = croppedImage.toDataURL("image/png");
 
       setSrc(decentralizedUrl);

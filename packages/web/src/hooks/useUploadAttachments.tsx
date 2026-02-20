@@ -7,9 +7,11 @@ import {
 } from "@/helpers/attachmentUtils";
 import uploadFiles from "@/helpers/uploadFiles";
 import { usePostAttachmentStore } from "@/store/non-persisted/post/usePostAttachmentStore";
+import { useAccountStore } from "@/store/persisted/useAccountStore";
 import type { NewAttachment } from "@/types/misc";
 
 const useUploadAttachments = () => {
+  const { currentAccount } = useAccountStore();
   const {
     addAttachments,
     removeAttachments,
@@ -35,7 +37,10 @@ const useUploadAttachments = () => {
       addAttachments(previewAttachments);
 
       try {
-        const uploaded = await uploadFiles(compressedFiles);
+        const uploaded = await uploadFiles(
+          compressedFiles,
+          currentAccount?.address
+        );
         const result = uploaded.map((file, index) => ({
           ...previewAttachments[index],
           mimeType: file.mimeType,

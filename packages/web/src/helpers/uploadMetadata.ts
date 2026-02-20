@@ -1,4 +1,8 @@
-import { immutable } from "@lens-chain/storage-client";
+import {
+  type EvmAddress,
+  immutable,
+  lensAccountOnly
+} from "@lens-chain/storage-client";
 import { createThirdwebClient } from "thirdweb";
 import { upload as uploadJson } from "thirdweb/storage";
 import { CHAIN, THIRD_WEB_CLIENT_ID } from "@/data/constants";
@@ -9,13 +13,17 @@ interface MetadataPayload {
 }
 
 const uploadMetadata = async (
-  data: MetadataPayload | null
+  data: MetadataPayload | null,
+  account?: string
 ): Promise<string> => {
   let uri: string | undefined;
+
+  const acl = account
+    ? lensAccountOnly(account as EvmAddress, CHAIN.id)
+    : immutable(CHAIN.id);
+
   try {
-    const upload = await storageClient.uploadAsJson(data, {
-      acl: immutable(CHAIN.id)
-    });
+    const upload = await storageClient.uploadAsJson(data, { acl });
     uri = upload.uri;
   } catch (e) {
     console.error("Failed to upload metadata to grove", e);

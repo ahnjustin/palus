@@ -8,6 +8,7 @@ import errorToast from "@/helpers/errorToast";
 import imageKit from "@/helpers/imageKit";
 import sanitizeDStorageUrl from "@/helpers/sanitizeDStorageUrl";
 import { uploadFile } from "@/helpers/uploadFiles";
+import { useAccountStore } from "@/store/persisted/useAccountStore";
 import type { ApolloClientError } from "@/types/errors";
 
 interface CoverImageProps {
@@ -23,6 +24,7 @@ const CoverImage = ({
   isNew = false,
   setCover
 }: CoverImageProps) => {
+  const { currentAccount } = useAccountStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onError = useCallback((error: ApolloClientError) => {
@@ -35,7 +37,7 @@ const CoverImage = ({
       try {
         setIsSubmitting(true);
         const file = event.target.files[0];
-        const attachment = await uploadFile(file);
+        const attachment = await uploadFile(file, currentAccount?.address);
         setCover(
           URL.createObjectURL(file),
           attachment.uri,

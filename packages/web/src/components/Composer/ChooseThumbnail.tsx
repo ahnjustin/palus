@@ -9,6 +9,7 @@ import getFileFromDataURL from "@/helpers/getFileFromDataURL";
 import { uploadFile } from "@/helpers/uploadFiles";
 import { usePostAttachmentStore } from "@/store/non-persisted/post/usePostAttachmentStore";
 import { usePostVideoStore } from "@/store/non-persisted/post/usePostVideoStore";
+import { useAccountStore } from "@/store/persisted/useAccountStore";
 
 const DEFAULT_THUMBNAIL_INDEX = 0;
 export const THUMBNAIL_GENERATE_COUNT = 4;
@@ -27,9 +28,11 @@ const ChooseThumbnail = () => {
   const { setVideoThumbnail, videoThumbnail } = usePostVideoStore();
   const { file } = attachments[0];
 
+  const { currentAccount } = useAccountStore();
+
   const uploadThumbnailToStorageNode = async (fileToUpload: File) => {
     setVideoThumbnail({ ...videoThumbnail, uploading: true });
-    const result = await uploadFile(fileToUpload);
+    const result = await uploadFile(fileToUpload, currentAccount?.address);
     if (!result.uri) {
       toast.error("Failed to upload thumbnail");
     }

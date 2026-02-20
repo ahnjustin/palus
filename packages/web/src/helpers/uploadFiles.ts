@@ -1,4 +1,8 @@
-import { immutable } from "@lens-chain/storage-client";
+import {
+  type EvmAddress,
+  immutable,
+  lensAccountOnly
+} from "@lens-chain/storage-client";
 import { CHAIN } from "@/data/constants";
 import { storageClient } from "./storageClient";
 
@@ -10,15 +14,20 @@ interface UploadResult {
 const FALLBACK_TYPE = "image/jpeg";
 
 const uploadFiles = async (
-  data: FileList | File[]
+  data: FileList | File[],
+  account?: string
 ): Promise<UploadResult[]> => {
   try {
     const files = Array.from(data) as File[];
 
+    const acl = account
+      ? lensAccountOnly(account as EvmAddress, CHAIN.id)
+      : immutable(CHAIN.id);
+
     const attachments = await Promise.all(
       files.map(async (file: File) => {
         const storageNodeResponse = await storageClient.uploadFile(file, {
-          acl: immutable(CHAIN.id)
+          acl
         });
 
         return {
@@ -34,9 +43,12 @@ const uploadFiles = async (
   }
 };
 
-export const uploadFile = async (file: File): Promise<UploadResult> => {
+export const uploadFile = async (
+  file: File,
+  account?: string
+): Promise<UploadResult> => {
   try {
-    const uploadResults = await uploadFiles([file]);
+    const uploadResults = await uploadFiles([file], account);
     const metadata = uploadResults[0];
 
     return { mimeType: file.type || FALLBACK_TYPE, uri: metadata.uri };
@@ -47,7 +59,8 @@ export const uploadFile = async (file: File): Promise<UploadResult> => {
 
 export const uploadImage = async (
   base64: string,
-  type = "image/png"
+  type = "image/png",
+  account?: string
 ): Promise<UploadResult> => {
   try {
     const dataUrlMatch = base64.match(/^data:(.+);base64,(.*)$/);
@@ -64,7 +77,7 @@ export const uploadImage = async (
     }
     const file = new File([bytes], "notification-share.png", { type: mime });
 
-    const uploadResults = await uploadFiles([file]);
+    const uploadResults = await uploadFiles([file], account);
     const metadata = uploadResults[0];
     return { mimeType: file.type || FALLBACK_TYPE, uri: metadata.uri };
   } catch {

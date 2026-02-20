@@ -335,7 +335,7 @@ const NewPublication = ({
       const shareImage = await getShareImage();
       let attachment: NewAttachment | undefined;
       if (shareImage) {
-        const upload = await uploadImage(shareImage);
+        const upload = await uploadImage(shareImage, currentAccount.address);
         if (!upload.uri) {
           throw new Error("Failed to upload image");
         }
@@ -351,7 +351,7 @@ const NewPublication = ({
       if (!metadata) {
         throw new Error("Failed to generate metadata");
       }
-      const contentUri = await uploadMetadata(metadata);
+      const contentUri = await uploadMetadata(metadata, currentAccount.address);
 
       if (editingPost) {
         return await editPost({

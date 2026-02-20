@@ -14,7 +14,8 @@ export const readFile = (file: Blob): Promise<string> => {
 };
 
 const uploadCroppedImage = async (
-  image: HTMLCanvasElement
+  image: HTMLCanvasElement,
+  account?: string
 ): Promise<string> => {
   const blob = await new Promise((resolve) => image.toBlob(resolve));
   const file = new File([blob as Blob], "cropped_image.png", {
@@ -24,7 +25,7 @@ const uploadCroppedImage = async (
     maxSizeMB: 6,
     maxWidthOrHeight: 3000
   });
-  const attachment = await uploadFile(cleanedFile);
+  const attachment = await uploadFile(cleanedFile, account);
   const decentralizedUrl = attachment.uri;
   if (!decentralizedUrl) {
     throw new Error("uploadFileToIPFS failed");
