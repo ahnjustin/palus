@@ -1,4 +1,5 @@
 import type { AnyPostFragment } from "@palus/indexer";
+import { isRepost } from "@/helpers/postHelpers";
 import stopEventPropagation from "@/helpers/stopEventPropagation";
 import Commented from "./Commented";
 import Reposted from "./Reposted";
@@ -11,6 +12,7 @@ interface PostTypeProps {
 
 const PostType = ({ post, showType }: PostTypeProps) => {
   const type = post.__typename;
+  const targetPost = isRepost(post) ? post?.repostOf : post;
 
   if (!showType) {
     return null;
@@ -22,8 +24,8 @@ const PostType = ({ post, showType }: PostTypeProps) => {
         <Root root={post.root} />
       ) : null}
       {type === "Repost" ? <Reposted account={post.author} /> : null}
-      {type === "Post" && post.commentOn ? (
-        <Commented commentOn={post.commentOn} />
+      {targetPost.commentOn ? (
+        <Commented commentOn={targetPost.commentOn} />
       ) : null}
     </span>
   );
