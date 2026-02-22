@@ -10,8 +10,8 @@ import { TRANSFORMS } from "@/data/constants";
 import getAvatar from "@/helpers/getAvatar";
 import getMentions from "@/helpers/getMentions";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
-import MembersCount from "./MembersCount";
-import MembershipRequestsCount from "./MembershipRequestsCount";
+import MembersCount from "./Members";
+import RequestsCount from "./Requests";
 
 interface DetailsProps {
   group: GroupFragment;
@@ -93,7 +93,7 @@ const Details = ({ group }: DetailsProps) => {
         <MembersCount group={group} />
         <AdminCount groupAddress={group.address} />
         {group.owner === currentAccount?.address && (
-          <MembershipRequestsCount group={group} />
+          <RequestsCount groupAddress={group.address} />
         )}
       </div>
     </div>

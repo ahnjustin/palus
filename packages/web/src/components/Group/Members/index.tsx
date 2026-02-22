@@ -1,10 +1,10 @@
 import { type GroupFragment, useGroupStatsQuery } from "@palus/indexer";
 import plur from "plur";
 import { useState } from "react";
-import Members from "@/components/Shared/Modal/Members";
 import GraphStatsShimmer from "@/components/Shared/Shimmer/GraphStatsShimmer";
 import { Modal } from "@/components/Shared/UI";
 import humanize from "@/helpers/humanize";
+import Members from "./Members";
 
 interface MembersCountProps {
   group: GroupFragment;

@@ -1,23 +1,20 @@
-import {
-  type GroupFragment,
-  useGroupMembershipRequestsQuery
-} from "@palus/indexer";
+import { useGroupMembershipRequestsQuery } from "@palus/indexer";
 import plur from "plur";
 import { useState } from "react";
 import GraphStatsShimmer from "@/components/Shared/Shimmer/GraphStatsShimmer";
 import { Modal } from "@/components/Shared/UI";
 import humanize from "@/helpers/humanize";
-import MembershipRequests from "./MembershipRequests";
+import Requests from "./Requests";
 
 interface Props {
-  group: GroupFragment;
+  groupAddress: string;
 }
 
-const MembershipRequestsCount = ({ group }: Props) => {
+const RequestsCount = ({ groupAddress }: Props) => {
   const [showMemberRequestsModal, setShowMemberRequestsModal] = useState(false);
 
   const { data, loading } = useGroupMembershipRequestsQuery({
-    variables: { request: { group: group.address } }
+    variables: { request: { group: groupAddress } }
   });
 
   if (loading) {
@@ -52,10 +49,10 @@ const MembershipRequestsCount = ({ group }: Props) => {
         size="xs"
         title="Membership Requests"
       >
-        <MembershipRequests group={group} />
+        <Requests groupAddress={groupAddress} />
       </Modal>
     </div>
   );
 };
 
-export default MembershipRequestsCount;
+export default RequestsCount;

@@ -2,7 +2,6 @@ import type { ApolloCache, NormalizedCacheObject } from "@apollo/client";
 import { UsersIcon } from "@heroicons/react/24/outline";
 import {
   type ApproveGroupMembershipRequest,
-  type GroupFragment,
   type GroupMembershipRequestsRequest,
   type RejectGroupMembershipRequest,
   useApproveGroupMembershipRequestsMutation,
@@ -31,12 +30,12 @@ import useLoadMoreOnIntersect from "@/hooks/useLoadMoreOnIntersect";
 import type { ApolloClientError } from "@/types/errors";
 
 interface Props {
-  group: GroupFragment;
+  groupAddress: string;
 }
 
-const MembershipRequests = ({ group }: Props) => {
+const Requests = ({ groupAddress }: Props) => {
   const [isSubmitting, setIsSubmitting] = useState<string | null>(null);
-  const request: GroupMembershipRequestsRequest = { group: group.address };
+  const request: GroupMembershipRequestsRequest = { group: groupAddress };
 
   const { data, loading, error, fetchMore } = useGroupMembershipRequestsQuery({
     variables: { request }
@@ -150,7 +149,7 @@ const MembershipRequests = ({ group }: Props) => {
         variables: {
           request: {
             accounts: [account],
-            group: group.address
+            group: groupAddress
           } as ApproveGroupMembershipRequest
         }
       });
@@ -160,7 +159,7 @@ const MembershipRequests = ({ group }: Props) => {
         variables: {
           request: {
             accounts: [account],
-            group: group.address
+            group: groupAddress
           } as RejectGroupMembershipRequest
         }
       });
@@ -225,4 +224,4 @@ const MembershipRequests = ({ group }: Props) => {
   );
 };
 
-export default MembershipRequests;
+export default Requests;
