@@ -15,6 +15,7 @@ import cn from "@/helpers/cn";
 import { accountsList } from "@/helpers/variants";
 import useLoadMoreOnIntersect from "@/hooks/useLoadMoreOnIntersect";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
+import AdminActions from "./Actions";
 
 interface MembersProps {
   group: GroupFragment;
@@ -87,6 +88,7 @@ const Members = ({ group }: MembersProps) => {
           >
             <SingleAccount
               account={member.account}
+              action={<AdminActions group={group} member={member} />}
               hideFollowButton={
                 currentAccount?.address === member.account.address
               }

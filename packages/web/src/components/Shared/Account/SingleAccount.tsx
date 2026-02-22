@@ -1,6 +1,6 @@
 import { Square2StackIcon } from "@heroicons/react/24/outline";
 import type { AccountFragment } from "@palus/indexer";
-import { memo } from "react";
+import { memo, type ReactNode } from "react";
 import TopAccount from "@/components/Shared/Badges/TopAccount";
 import Markup from "@/components/Shared/Markup";
 import Slug from "@/components/Shared/Slug";
@@ -26,6 +26,7 @@ interface SingleAccountProps {
   showBio?: boolean;
   showUserPreview?: boolean;
   showAddress?: boolean;
+  action?: ReactNode;
 }
 
 const SingleAccount = ({
@@ -37,7 +38,8 @@ const SingleAccount = ({
   account,
   showBio = false,
   showUserPreview = true,
-  showAddress = false
+  showAddress = false,
+  action
 }: SingleAccountProps) => {
   const UserAvatar = () => (
     <Image
@@ -117,12 +119,15 @@ const SingleAccount = ({
         ) : (
           <AccountInfo />
         )}
-        <FollowUnfollowButton
-          account={account}
-          hideFollowButton={hideFollowButton}
-          hideUnfollowButton={hideUnfollowButton}
-          small
-        />
+        <div className="flex items-center gap-x-2">
+          <FollowUnfollowButton
+            account={account}
+            hideFollowButton={hideFollowButton}
+            hideUnfollowButton={hideUnfollowButton}
+            small
+          />
+          {action}
+        </div>
       </div>
       {showBio && account?.metadata?.bio && (
         <div
