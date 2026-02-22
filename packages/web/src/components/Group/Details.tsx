@@ -1,6 +1,7 @@
 import type { GroupFragment } from "@palus/indexer";
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router";
+import AdminCount from "@/components/Group/Admins";
 import LazySmallSingleAccount from "@/components/Shared/Account/LazySmallSingleAccount";
 import JoinLeaveButton from "@/components/Shared/Group/JoinLeaveButton";
 import Markup from "@/components/Shared/Markup";
@@ -90,6 +91,7 @@ const Details = ({ group }: DetailsProps) => {
       </div>
       <div className="flex flex-wrap items-center gap-x-8 gap-y-2">
         <MembersCount group={group} />
+        <AdminCount groupAddress={group.address} />
         {group.owner === currentAccount?.address && (
           <MembershipRequestsCount group={group} />
         )}

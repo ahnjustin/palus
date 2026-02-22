@@ -93,8 +93,6 @@ const Members = ({ group }: MembersProps) => {
               hideUnfollowButton={
                 currentAccount?.address === member.account.address
               }
-              showBio
-              showUserPreview={false}
             />
           </motion.div>
         ))}

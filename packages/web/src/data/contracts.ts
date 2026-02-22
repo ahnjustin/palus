@@ -9,6 +9,9 @@ export const CONTRACTS = {
   app: IS_TESTNET
     ? "0xC75A89145d765c396fd75CbD16380Eb184Bd2ca7"
     : "0xCa01Da446811d76aa7aD885e5fa39DF2031096cB",
+  banMemberGroupRule: IS_TESTNET
+    ? lensDeployments.testnet.BanMemberGroupRule.address
+    : lensDeployments.mainnet.BanMemberGroupRule.address,
   collectorOnlyPostRule: IS_TESTNET
     ? "0xD9e2306525a4b2B379A4a602684ff805a3A6aE88"
     : "0x322437950F4066b8771a3C07C8B8Dd1135979a9a",
