@@ -3,6 +3,7 @@ import {
   type GroupFragment,
   type GroupMembersRequest,
   PageSize,
+  useAdminsForQuery,
   useGroupMembersQuery
 } from "@palus/indexer";
 import { motion } from "motion/react";
@@ -11,6 +12,7 @@ import { Virtualizer } from "virtua";
 import SingleAccount from "@/components/Shared/Account/SingleAccount";
 import AccountListShimmer from "@/components/Shared/Shimmer/AccountListShimmer";
 import { EmptyState, ErrorMessage } from "@/components/Shared/UI";
+import { CONTRACTS } from "@/data/contracts";
 import cn from "@/helpers/cn";
 import { accountsList } from "@/helpers/variants";
 import useLoadMoreOnIntersect from "@/hooks/useLoadMoreOnIntersect";
@@ -47,6 +49,17 @@ const Members = ({ group }: MembersProps) => {
   }, [fetchMore, hasMore, pageInfo?.next, request]);
 
   const loadMoreRef = useLoadMoreOnIntersect(handleEndReached);
+
+  const { data: admins } = useAdminsForQuery({
+    variables: { request: { address: group.address } }
+  });
+
+  const adminAccounts = admins?.adminsFor?.items
+    .map((item) => item.account.address)
+    .filter(
+      (account) =>
+        account.toLowerCase() !== CONTRACTS.banMemberGroupRule.toLowerCase()
+    );
 
   if (loading) {
     return <AccountListShimmer />;
@@ -88,7 +101,13 @@ const Members = ({ group }: MembersProps) => {
           >
             <SingleAccount
               account={member.account}
-              action={<AdminActions group={group} member={member} />}
+              action={
+                <AdminActions
+                  account={member.account}
+                  admins={adminAccounts}
+                  group={group}
+                />
+              }
               hideFollowButton={
                 currentAccount?.address === member.account.address
               }

@@ -34,6 +34,7 @@ const cache = new InMemoryCache({
         mlPostsForYou: createCursorFieldPolicy(["request", ["pageSize"]]),
         groupMembershipRequests: createCursorFieldPolicy(["request", ["group"]]),
         groupStats: createCursorFieldPolicy(["request", ["group"]]),
+        adminsFor: createCursorFieldPolicy(["request", ["address"]]),
       }
     }
   }

@@ -91,7 +91,7 @@ const Details = ({ group }: DetailsProps) => {
       </div>
       <div className="flex flex-wrap items-center gap-x-8 gap-y-2">
         <MembersCount group={group} />
-        <AdminCount groupAddress={group.address} />
+        <AdminCount group={group} />
         {group.owner === currentAccount?.address && (
           <RequestsCount groupAddress={group.address} />
         )}

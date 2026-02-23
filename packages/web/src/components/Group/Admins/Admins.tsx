@@ -1,7 +1,8 @@
 import { UserGroupIcon } from "@heroicons/react/24/outline";
-import type { AccountFragment } from "@palus/indexer";
+import type { AccountFragment, GroupFragment } from "@palus/indexer";
 import { motion } from "motion/react";
 import { Virtualizer } from "virtua";
+import AdminActions from "@/components/Group/Members/Actions";
 import SingleAccount from "@/components/Shared/Account/SingleAccount";
 import AccountListShimmer from "@/components/Shared/Shimmer/AccountListShimmer";
 import { EmptyState, ErrorMessage } from "@/components/Shared/UI";
@@ -11,11 +12,12 @@ import { useAccountStore } from "@/store/persisted/useAccountStore";
 
 interface AdminAccountsProps {
   accounts: AccountFragment[] | undefined;
+  group: GroupFragment;
   loading: boolean;
   error?: Error;
 }
 
-const Admins = ({ accounts, loading, error }: AdminAccountsProps) => {
+const Admins = ({ accounts, group, loading, error }: AdminAccountsProps) => {
   const { currentAccount } = useAccountStore();
 
   if (loading) {
@@ -60,6 +62,13 @@ const Admins = ({ accounts, loading, error }: AdminAccountsProps) => {
           >
             <SingleAccount
               account={account}
+              action={
+                <AdminActions
+                  account={account}
+                  admins={accounts}
+                  group={group}
+                />
+              }
               hideFollowButton={currentAccount?.address === account.address}
               hideUnfollowButton={currentAccount?.address === account.address}
             />

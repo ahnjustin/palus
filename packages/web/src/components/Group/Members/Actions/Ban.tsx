@@ -2,11 +2,11 @@ import type { ApolloCache, NormalizedCacheObject } from "@apollo/client";
 import { MenuItem } from "@headlessui/react";
 import { NoSymbolIcon } from "@heroicons/react/24/outline";
 import {
-  type GroupFragment,
-  type GroupMemberFragment,
+  type AccountFragment,
   useBanGroupAccountsMutation
 } from "@palus/indexer";
 import { type MouseEvent, useCallback } from "react";
+import { toast } from "sonner";
 import Loader from "@/components/Shared/Loader";
 import cn from "@/helpers/cn";
 import errorToast from "@/helpers/errorToast";
@@ -15,8 +15,8 @@ import useTransactionLifecycle from "@/hooks/useTransactionLifecycle";
 import type { ApolloClientError } from "@/types/errors";
 
 interface Props {
-  member: GroupMemberFragment;
-  group: GroupFragment;
+  account: AccountFragment;
+  groupAddress: string;
   setIsSubmitting: (isSubmitting: boolean) => void;
   isSubmitting: boolean;
 }
@@ -27,7 +27,12 @@ const menuItemClassName = ({ focus }: { focus: boolean }) =>
     "m-2 flex cursor-pointer items-center space-x-2 rounded-lg px-2 py-1.5 text-sm text-red-500"
   );
 
-const BanMember = ({ member, group, setIsSubmitting, isSubmitting }: Props) => {
+const BanMember = ({
+  account,
+  groupAddress,
+  setIsSubmitting,
+  isSubmitting
+}: Props) => {
   const handleTransactionLifecycle = useTransactionLifecycle();
 
   const onError = useCallback((error: ApolloClientError) => {
@@ -35,14 +40,15 @@ const BanMember = ({ member, group, setIsSubmitting, isSubmitting }: Props) => {
     errorToast(error);
   }, []);
 
-  const onCompleted = (hash: string) => {
+  const onCompleted = () => {
     setIsSubmitting(false);
+    toast.success("Account banned");
   };
 
   const [banAccounts] = useBanGroupAccountsMutation({
     onCompleted: async ({ banGroupAccounts }) => {
       if (banGroupAccounts.__typename === "BanGroupAccountsResponse") {
-        return onCompleted(banGroupAccounts.hash);
+        return onCompleted();
       }
 
       return await handleTransactionLifecycle({
@@ -64,7 +70,7 @@ const BanMember = ({ member, group, setIsSubmitting, isSubmitting }: Props) => {
             items: existing.items.filter(
               (itemRef: any) =>
                 readField("address", readField("account", itemRef)) !==
-                member.account.address
+                account.address
             )
           };
         },
@@ -88,13 +94,13 @@ const BanMember = ({ member, group, setIsSubmitting, isSubmitting }: Props) => {
         update: updateCache,
         variables: {
           request: {
-            accounts: [member.account.address],
-            group: group.address
+            accounts: [account.address],
+            group: groupAddress
           }
         }
       });
     },
-    [member.account]
+    [account, groupAddress]
   );
 
   return (

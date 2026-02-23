@@ -1,4 +1,4 @@
-import { useAdminsForQuery } from "@palus/indexer";
+import { type GroupFragment, useAdminsForQuery } from "@palus/indexer";
 import plur from "plur";
 import { useState } from "react";
 import { Modal } from "@/components/Shared/UI";
@@ -7,14 +7,14 @@ import humanize from "@/helpers/humanize";
 import Admins from "./Admins";
 
 interface AdminsProps {
-  groupAddress: string;
+  group: GroupFragment;
 }
 
-const AdminCount = ({ groupAddress }: AdminsProps) => {
+const AdminCount = ({ group }: AdminsProps) => {
   const [showModal, setShowModal] = useState(false);
 
   const { data, loading, error } = useAdminsForQuery({
-    variables: { request: { address: groupAddress } }
+    variables: { request: { address: group.address } }
   });
 
   const accounts = data?.adminsFor?.items
@@ -47,7 +47,12 @@ const AdminCount = ({ groupAddress }: AdminsProps) => {
         show={showModal}
         title="Group Admins"
       >
-        <Admins accounts={accounts} error={error} loading={loading} />
+        <Admins
+          accounts={accounts}
+          error={error}
+          group={group}
+          loading={loading}
+        />
       </Modal>
     </div>
   );
