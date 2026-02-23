@@ -30,6 +30,26 @@ const Join = ({
   const { cache } = useApolloClient();
   const handleTransactionLifecycle = useTransactionLifecycle();
   const updateCache = () => {
+    cache.modify({
+      fields: {
+        groupStats: (existingGroupStats, { storeFieldName }) => {
+          if (!storeFieldName.includes(group.address)) {
+            return existingGroupStats;
+          }
+
+          if (!existingGroupStats) {
+            return existingGroupStats;
+          }
+
+          const totalMembers = existingGroupStats.totalMembers ?? 1;
+          return {
+            ...existingGroupStats,
+            totalMembers: totalMembers + 1
+          };
+        }
+      }
+    });
+
     if (!group.operations) {
       return;
     }
