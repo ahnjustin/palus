@@ -2,12 +2,11 @@ import { Menu, MenuButton, MenuItems } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import type { AccountFragment, GroupFragment } from "@palus/indexer";
 import { Fragment, useState } from "react";
+import UnbanAccount from "@/components/Group/Menu/Banned/Actions/Unban";
 import Loader from "@/components/Shared/Loader";
 import MenuTransition from "@/components/Shared/MenuTransition";
 import stopEventPropagation from "@/helpers/stopEventPropagation";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
-import AddRemoveAdmin from "./AddRemoveAdmin";
-import BanMember from "./Ban";
 
 interface Props {
   account: AccountFragment;
@@ -48,15 +47,7 @@ const AdminActions = ({ account, group, admins }: Props) => {
           className="mt-2 w-48 origin-top-right rounded-xl border border-gray-200 bg-white shadow-xs focus:outline-hidden dark:border-gray-800 dark:bg-gray-900"
           static
         >
-          <AddRemoveAdmin
-            account={account}
-            admins={admins}
-            groupAddress={group.address}
-            isSubmitting={isSubmitting}
-            setIsSubmitting={setIsSubmitting}
-          />
-          <div className="divider" />
-          <BanMember
+          <UnbanAccount
             account={account}
             groupAddress={group.address}
             isSubmitting={isSubmitting}

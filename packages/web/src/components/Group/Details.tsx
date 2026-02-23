@@ -1,16 +1,16 @@
 import type { GroupFragment } from "@palus/indexer";
 import { useCallback, useState } from "react";
-import { useNavigate } from "react-router";
 import AdminCount from "@/components/Group/Admins";
 import LazySmallSingleAccount from "@/components/Shared/Account/LazySmallSingleAccount";
 import JoinLeaveButton from "@/components/Shared/Group/JoinLeaveButton";
 import Markup from "@/components/Shared/Markup";
-import { Button, H3, Image, LightBox } from "@/components/Shared/UI";
+import { H3, Image, LightBox } from "@/components/Shared/UI";
 import { TRANSFORMS } from "@/data/constants";
 import getAvatar from "@/helpers/getAvatar";
 import getMentions from "@/helpers/getMentions";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
 import MembersCount from "./Members";
+import GroupMenu from "./Menu";
 import RequestsCount from "./Requests";
 
 interface DetailsProps {
@@ -18,7 +18,6 @@ interface DetailsProps {
 }
 
 const Details = ({ group }: DetailsProps) => {
-  const navigate = useNavigate();
   const { currentAccount } = useAccountStore();
   const [showLightBox, setShowLightBox] = useState<boolean>(false);
 
@@ -49,12 +48,7 @@ const Details = ({ group }: DetailsProps) => {
           />
         </div>
         {currentAccount?.address === group.owner ? (
-          <Button
-            onClick={() => navigate(`/g/${group.address}/settings`)}
-            outline
-          >
-            Edit Group
-          </Button>
+          <GroupMenu group={group} />
         ) : (
           <JoinLeaveButton group={group} />
         )}
