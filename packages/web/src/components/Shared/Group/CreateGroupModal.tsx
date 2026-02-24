@@ -104,7 +104,7 @@ const CreateGroupModal = () => {
         {...form.register("description")}
       />
       <Checkbox
-        label="Restrict replies to group members"
+        label="Restrict comments to group members"
         {...form.register("repliesRestricted")}
       />
       <AvatarUpload

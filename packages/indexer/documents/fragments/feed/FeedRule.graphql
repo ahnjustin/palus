@@ -6,4 +6,5 @@ fragment FeedRule on FeedRule {
       boolean
     }
   }
+  id
 }

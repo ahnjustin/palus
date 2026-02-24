@@ -62,18 +62,16 @@ const Details = ({ group }: DetailsProps) => {
           {group.metadata?.description}
         </Markup>
       ) : null}
-      <div className="flex items-center gap-x-4">
-        {group.owner ? (
-          <div className="flex items-center gap-x-2">
-            <span className="text-secondary">Owned by</span>
-            <LazySmallSingleAccount
-              address={group.owner}
-              hideSlug
-              linkToAccount
-              smallAvatar={false}
-            />
-          </div>
-        ) : null}
+      <div className="flex flex-wrap items-center gap-x-6">
+        <div className="flex items-center gap-x-2">
+          <span className="text-secondary">Owned by</span>
+          <LazySmallSingleAccount
+            address={group.owner}
+            hideSlug
+            linkToAccount
+            smallAvatar={false}
+          />
+        </div>
         <div className="flex items-center gap-x-2">
           <span className="text-secondary">Created</span>
           <span>

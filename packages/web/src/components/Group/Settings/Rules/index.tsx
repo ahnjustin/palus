@@ -1,5 +1,6 @@
 import { useGroupQuery } from "@palus/indexer";
 import { useParams } from "react-router";
+import GatedFeedRule from "@/components/Group/Settings/Rules/GatedFeedRule";
 import Custom404 from "@/components/Shared/404";
 import Custom500 from "@/components/Shared/500";
 import BackButton from "@/components/Shared/BackButton";
@@ -44,6 +45,7 @@ const RulesSettings = () => {
           title="Rules"
         />
         <ApprovalRule group={group} />
+        <GatedFeedRule group={group} />
       </Card>
     </PageLayout>
   );
