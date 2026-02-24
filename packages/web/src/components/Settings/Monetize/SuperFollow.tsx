@@ -1,74 +1,97 @@
 import {
   type AccountFollowRules,
   AccountFollowRuleType,
-  type AccountFragment,
   useMeLazyQuery,
   useUpdateAccountFollowRulesMutation
 } from "@palus/indexer";
-import {
-  type RefObject,
-  useCallback,
-  useEffect,
-  useRef,
-  useState
-} from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
+import { z } from "zod";
+import Custom404 from "@/components/Shared/404";
 import BackButton from "@/components/Shared/BackButton";
 import {
   Button,
   Card,
   CardHeader,
+  Form,
   Image,
   Input,
-  Tooltip
+  Tooltip,
+  useZodForm
 } from "@/components/Shared/UI";
-import {
-  STATIC_IMAGES_URL,
-  WRAPPED_NATIVE_TOKEN_SYMBOL
-} from "@/data/constants";
+import { NATIVE_TOKEN_SYMBOL, STATIC_IMAGES_URL } from "@/data/constants";
 import errorToast from "@/helpers/errorToast";
 import { getSimplePaymentDetails } from "@/helpers/rules";
-import usePreventScrollOnNumberInput from "@/hooks/usePreventScrollOnNumberInput";
 import useTransactionLifecycle from "@/hooks/useTransactionLifecycle";
 import useWaitForTransactionToBeIndexed from "@/hooks/useWaitForTransactionToBeIndexed";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
 import type { ApolloClientError } from "@/types/errors";
 
+const ValidationSchema = z.object({
+  amount: z
+    .string()
+    .min(1, { message: "Amount is required" })
+    .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
+      message: "Amount must be greater than zero"
+    })
+});
+
 const SuperFollow = () => {
   const { currentAccount, setCurrentAccount } = useAccountStore();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [amount, setAmount] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState<
+    "update" | "remove" | undefined
+  >();
   const handleTransactionLifecycle = useTransactionLifecycle();
   const waitForTransactionToComplete = useWaitForTransactionToBeIndexed();
-  const inputRef = useRef<HTMLInputElement>(null);
-  usePreventScrollOnNumberInput(inputRef as RefObject<HTMLInputElement>);
   const [getCurrentAccountDetails] = useMeLazyQuery({
     fetchPolicy: "no-cache"
   });
 
-  const account = currentAccount as AccountFragment;
-  const simplePaymentRule = [
-    ...account.rules.required,
-    ...account.rules.anyOf
-  ].find((rule) => rule.type === AccountFollowRuleType.SimplePayment);
-  const { amount: simplePaymentAmount } = getSimplePaymentDetails(
-    account.rules as AccountFollowRules
+  const simplePaymentRule = useMemo(
+    () =>
+      currentAccount &&
+      [...currentAccount.rules.required, ...currentAccount.rules.anyOf].find(
+        (rule) => rule.type === AccountFollowRuleType.SimplePayment
+      ),
+    [currentAccount]
   );
 
+  const simplePaymentAmount = useMemo(() => {
+    if (!currentAccount) {
+      return undefined;
+    }
+
+    const details = getSimplePaymentDetails(
+      currentAccount.rules as AccountFollowRules
+    );
+    return details?.amount;
+  }, [currentAccount]);
+
+  const form = useZodForm({
+    defaultValues: { amount: simplePaymentAmount?.toString() ?? "" },
+    schema: ValidationSchema
+  });
+
   useEffect(() => {
-    setAmount(simplePaymentAmount || 0);
-  }, [simplePaymentAmount]);
+    form.reset({ amount: simplePaymentAmount?.toString() ?? "" });
+  }, [simplePaymentAmount, form]);
 
   const onCompleted = async (hash: string) => {
     await waitForTransactionToComplete(hash);
     const accountData = await getCurrentAccountDetails();
     setCurrentAccount(accountData?.data?.me.loggedInAs.account);
-    location.reload();
+    toast.success("Setting updated");
+    setIsSubmitting(undefined);
   };
 
-  const onError = useCallback((error: ApolloClientError) => {
-    setIsSubmitting(false);
-    errorToast(error);
-  }, []);
+  const onError = useCallback(
+    (error: ApolloClientError) => {
+      form.reset();
+      errorToast(error);
+      setIsSubmitting(undefined);
+    },
+    [form]
+  );
 
   const [updateAccountFollowRules] = useUpdateAccountFollowRulesMutation({
     onCompleted: async ({ updateAccountFollowRules }) => {
@@ -88,8 +111,15 @@ const SuperFollow = () => {
     onError
   });
 
-  const handleUpdateRule = (remove: boolean) => {
-    setIsSubmitting(true);
+  if (!currentAccount) {
+    return <Custom404 />;
+  }
+
+  const handleUpdateRule = (
+    data: z.infer<typeof ValidationSchema>,
+    remove: boolean
+  ) => {
+    setIsSubmitting(remove ? "remove" : "update");
 
     return updateAccountFollowRules({
       variables: {
@@ -104,8 +134,8 @@ const SuperFollow = () => {
                   required: [
                     {
                       simplePaymentRule: {
-                        native: amount.toString(),
-                        recipient: account.address
+                        native: data.amount,
+                        recipient: currentAccount.address
                       }
                     }
                   ]
@@ -116,51 +146,68 @@ const SuperFollow = () => {
     });
   };
 
+  const handleRemove = async () => {
+    const data = form.getValues();
+    form.clearErrors();
+
+    await form.handleSubmit(async () => {
+      await handleUpdateRule(data, true);
+    })();
+  };
+
   return (
     <Card>
       <CardHeader icon={<BackButton path="/settings" />} title="Super follow" />
-      <div className="m-5 flex flex-col gap-y-4">
+      <Form
+        className="m-5 flex flex-col gap-y-4"
+        form={form}
+        onSubmit={(data) => handleUpdateRule(data, false)}
+      >
+        <div>
+          Set an amount that accounts must to pay to follow you. You can update
+          this amount or remove it anytime.
+        </div>
         <Input
           className="no-spinner"
           label="Amount"
-          onChange={(e) => setAmount(Number(e.target.value))}
           placeholder="1"
           prefix={
             <Tooltip
-              content={`Payable in ${WRAPPED_NATIVE_TOKEN_SYMBOL}`}
+              content={`Payable in ${NATIVE_TOKEN_SYMBOL}`}
               placement="top"
             >
               <Image
-                alt={WRAPPED_NATIVE_TOKEN_SYMBOL}
+                alt={NATIVE_TOKEN_SYMBOL}
                 className="size-5 rounded-full"
                 src={`${STATIC_IMAGES_URL}/gho.svg`}
               />
             </Tooltip>
           }
-          ref={inputRef}
+          step="any"
           type="number"
-          value={amount}
+          {...form.register("amount")}
         />
         <div className="flex justify-end space-x-2">
           {simplePaymentRule && (
             <Button
-              disabled={isSubmitting}
-              loading={isSubmitting}
-              onClick={() => handleUpdateRule(true)}
+              disabled={Boolean(isSubmitting)}
+              loading={isSubmitting === "remove"}
+              onClick={handleRemove}
               outline
+              type="button"
             >
               Remove
             </Button>
           )}
           <Button
-            disabled={isSubmitting}
-            loading={isSubmitting}
-            onClick={() => handleUpdateRule(false)}
+            disabled={Boolean(isSubmitting)}
+            loading={isSubmitting === "update"}
+            type="submit"
           >
             Update
           </Button>
         </div>
-      </div>
+      </Form>
     </Card>
   );
 };
