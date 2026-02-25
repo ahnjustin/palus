@@ -54,7 +54,7 @@ const NotificationShare = forwardRef<
 
     const updateScale = () => {
       const containerWidth = container.offsetWidth;
-      setScale(Math.min(1, containerWidth / CARD_WIDTH));
+      setScale(containerWidth / CARD_WIDTH);
     };
 
     updateScale();
@@ -103,11 +103,13 @@ const NotificationShare = forwardRef<
       ref={containerRef}
       style={{ height: CARD_HEIGHT * scale }}
     >
-      <div className="w-fit rounded-xl border border-border">
+      <div
+        className="h-fit w-fit origin-top-left rounded-xl border border-border"
+        style={{ transform: `scale(${scale})` }}
+      >
         <div
-          className={`waves-${bgIndex} relative h-75 w-120 origin-top-left overflow-hidden rounded-xl`}
+          className={`waves-${bgIndex} relative h-75 w-120 overflow-hidden rounded-xl`}
           ref={ref}
-          style={{ transform: `scale(${scale})` }}
           {...props}
         >
           <div className="absolute top-5 left-5 flex items-center gap-x-2 text-2xl text-white">
