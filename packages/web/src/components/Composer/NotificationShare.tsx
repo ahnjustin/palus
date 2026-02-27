@@ -1,4 +1,8 @@
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowDownTrayIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon
+} from "@heroicons/react/24/outline";
 import {
   forwardRef,
   type HTMLAttributes,
@@ -7,7 +11,8 @@ import {
   useRef,
   useState
 } from "react";
-import { Image } from "@/components/Shared/UI";
+import { Image, Tooltip } from "@/components/Shared/UI";
+import { componentToPng } from "@/helpers/componentToPng";
 import { formatWithZeroSubscript } from "@/helpers/formatValues";
 import getAccount from "@/helpers/getAccount";
 import getAvatar from "@/helpers/getAvatar";
@@ -86,6 +91,18 @@ const NotificationShare = forwardRef<
   }, [formattedAmount, notificationShare?.amount.asset.symbol]);
 
   if (!notificationShare || !currentAccount?.username) return null;
+
+  const downloadImage = async () => {
+    if (!ref || typeof ref === "function") return;
+    const element = ref.current;
+    if (!element) return;
+    const dataUrl = await componentToPng(element);
+    if (!dataUrl) return;
+    const link = document.createElement("a");
+    link.download = "palus-share.png";
+    link.href = dataUrl;
+    link.click();
+  };
 
   const account = notificationShare.executedBy;
   const actor = getAccount(account);
@@ -169,25 +186,39 @@ const NotificationShare = forwardRef<
             width={24}
           />
           <div
-            className="background-controls absolute top-3 right-3 flex origin-top-right gap-2"
+            className="controls absolute top-3 right-3 flex origin-top-right gap-2"
             style={{ transform: `scale(${1 / scale})` }}
           >
-            <button
-              aria-label="Previous background"
-              className="center flex rounded-full bg-black/50 p-2 text-gray-400 hover:text-white"
-              onClick={() => setBgIndex((i) => (i - 1 + 10) % 10)}
-              type="button"
-            >
-              <ChevronLeftIcon className="size-3" strokeWidth={4} />
-            </button>
-            <button
-              aria-label="Next background"
-              className="center flex rounded-full bg-black/50 p-2 text-gray-400 hover:text-white"
-              onClick={() => setBgIndex((i) => (i + 1) % 10)}
-              type="button"
-            >
-              <ChevronRightIcon className="size-3" strokeWidth={4} />
-            </button>
+            <Tooltip content="Previous background" placement="top" withDelay>
+              <button
+                aria-label="Previous background"
+                className="center flex rounded-full bg-black/30 p-2 text-gray-400 hover:text-white"
+                onClick={() => setBgIndex((i) => (i - 1 + 10) % 10)}
+                type="button"
+              >
+                <ChevronLeftIcon className="size-3" strokeWidth={4} />
+              </button>
+            </Tooltip>
+            <Tooltip content="Next background" placement="top" withDelay>
+              <button
+                aria-label="Next background"
+                className="center flex rounded-full bg-black/30 p-2 text-gray-400 hover:text-white"
+                onClick={() => setBgIndex((i) => (i + 1) % 10)}
+                type="button"
+              >
+                <ChevronRightIcon className="size-3" strokeWidth={4} />
+              </button>
+            </Tooltip>
+            <Tooltip content="Download image" placement="top">
+              <button
+                aria-label="Download"
+                className="center flex rounded-full bg-black/30 p-2 text-gray-400 hover:text-white"
+                onClick={downloadImage}
+                type="button"
+              >
+                <ArrowDownTrayIcon className="size-3" strokeWidth={3} />
+              </button>
+            </Tooltip>
           </div>
         </div>
       </div>

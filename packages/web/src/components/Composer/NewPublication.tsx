@@ -5,7 +5,6 @@ import {
   usePostLazyQuery
 } from "@palus/indexer";
 import { useDebounce, useMediaQuery } from "@uidotdev/usehooks";
-import { toPng } from "html-to-image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
@@ -28,6 +27,7 @@ import { Button, Card, H6, WarningMessage } from "@/components/Shared/UI";
 import { ERRORS } from "@/data/errors";
 import cn from "@/helpers/cn";
 import collectActionParams from "@/helpers/collectActionParams";
+import { componentToPng } from "@/helpers/componentToPng";
 import errorToast from "@/helpers/errorToast";
 import getAccount from "@/helpers/getAccount";
 import getMentions from "@/helpers/getMentions";
@@ -276,27 +276,6 @@ const NewPublication = ({
     return isComment ? "Comment" : isQuote ? "Quote" : "Post";
   };
 
-  const getShareImage = async () => {
-    if (!notificationShare || !notificationShareRef.current) {
-      return null;
-    }
-    return await toPng(notificationShareRef.current, {
-      cacheBust: true,
-      filter: (node: HTMLElement) => {
-        const exclusionClasses = ["background-controls"];
-        return !exclusionClasses.some((classname) =>
-          node.classList?.contains(classname)
-        );
-      },
-      height: 300,
-      pixelRatio: 3,
-      style: {
-        transform: "scale(1)"
-      },
-      width: 480
-    });
-  };
-
   const handleCreatePost = async () => {
     if (!currentAccount) {
       return toast.error(ERRORS.SignWallet);
@@ -332,7 +311,7 @@ const NewPublication = ({
           : `${getTitlePrefix()} by ${getAccount(currentAccount).username}`
       };
 
-      const shareImage = await getShareImage();
+      const shareImage = await componentToPng(notificationShareRef.current);
       let attachment: NewAttachment | undefined;
       if (shareImage) {
         const upload = await uploadImage(shareImage, currentAccount.address);
