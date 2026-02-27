@@ -21,8 +21,8 @@ export const LENS_MEDIA_SNAPSHOT_URL = "https://ik.imagekit.io/lens";
 export const DEFAULT_AVATAR = `${STATIC_IMAGES_URL}/default.webp`;
 export const PLACEHOLDER_IMAGE = `${STATIC_IMAGES_URL}/placeholder.webp`;
 export const BLOCK_EXPLORER_URL = IS_TESTNET
-  ? "https://explorer.testnet.lens.xyz/"
-  : "https://explorer.lens.xyz/";
+  ? "https://explorer.testnet.lens.xyz"
+  : "https://explorer.lens.xyz";
 export const BLOCK_EXPLORER_API_URL = IS_TESTNET
   ? "https://explorer-api.testnet.lens.xyz/api/"
   : "https://explorer-api.lens.xyz/api/";
