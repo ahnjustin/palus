@@ -9,7 +9,7 @@ import {
 import { type AnyBalance, useBalancesBulkQuery } from "@palus/indexer";
 import { Fragment, useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
-import { useAccount } from "wagmi";
+import { useConnection } from "wagmi";
 import MenuTransition from "@/components/Shared/MenuTransition";
 import NotLoggedIn from "@/components/Shared/NotLoggedIn";
 import PageLayout from "@/components/Shared/PageLayout";
@@ -41,7 +41,7 @@ const Wallet = () => {
   const tab = searchParams.get("tab");
 
   const { currentAccount } = useAccountStore();
-  const { address: walletAddress } = useAccount();
+  const { address: walletAddress } = useConnection();
 
   const navigate = useNavigate();
 

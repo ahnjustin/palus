@@ -8,7 +8,7 @@ interface HandleWrongNetworkParams {
 
 const useHandleWrongNetwork = () => {
   const activeConnection = useConnections();
-  const { switchChainAsync } = useSwitchChain();
+  const { mutateAsync: switchChainAsync } = useSwitchChain();
   const isConnected = () => activeConnection[0] !== undefined;
 
   const handleWrongNetwork = async (params?: HandleWrongNetworkParams) => {

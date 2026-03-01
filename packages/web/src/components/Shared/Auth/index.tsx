@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAccount } from "wagmi";
+import { useConnection } from "wagmi";
 import Login from "@/components/Shared/Auth/Login";
 import { SignupMessage } from "@/components/Shared/Auth/Signup/ChooseUsername";
 import { useAuthModalStore } from "@/store/non-persisted/modal/useAuthModalStore";
@@ -16,7 +16,7 @@ const NotConnected = ({ isLogin }: { isLogin?: boolean }) => (
 const Auth = () => {
   const { authModalType } = useAuthModalStore();
   const [hasAccounts, setHasAccounts] = useState(true);
-  const { isConnected } = useAccount();
+  const { isConnected } = useConnection();
 
   return (
     <div className="m-5">

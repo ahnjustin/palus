@@ -28,7 +28,7 @@ const Send = ({ balances, disabled }: SendProps) => {
   const { currentAccount } = useAccountStore();
   const { track } = useUmami();
 
-  const { writeContractAsync, isPending } = useWriteContract();
+  const { mutateAsync: writeContractAsync, isPending } = useWriteContract();
 
   const balance = useMemo(() => {
     return balances?.find(

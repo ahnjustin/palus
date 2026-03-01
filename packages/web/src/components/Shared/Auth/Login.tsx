@@ -15,7 +15,7 @@ import {
   useState
 } from "react";
 import { toast } from "sonner";
-import { useAccount, useDisconnect, useSignMessage } from "wagmi";
+import { useConnection, useDisconnect, useSignMessage } from "wagmi";
 import SingleAccount from "@/components/Shared/Account/SingleAccount";
 import Loader from "@/components/Shared/Loader";
 import { Button, Card, ErrorMessage } from "@/components/Shared/UI";
@@ -46,9 +46,9 @@ const Login = ({ setHasAccounts }: LoginProps) => {
     errorToast(error);
   }, []);
 
-  const { disconnect } = useDisconnect();
-  const { address, connector: activeConnector } = useAccount();
-  const { signMessageAsync } = useSignMessage({
+  const { mutate: disconnect } = useDisconnect();
+  const { address, connector: activeConnector } = useConnection();
+  const { mutateAsync: signMessageAsync } = useSignMessage({
     mutation: { onError }
   });
   const [loadChallenge, { error: errorChallenge }] = useChallengeMutation({

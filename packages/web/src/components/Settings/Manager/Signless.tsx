@@ -4,7 +4,7 @@ import {
 } from "@palus/indexer";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
-import { useAccount } from "wagmi";
+import { useConnection } from "wagmi";
 import { Button, Card } from "@/components/Shared/UI";
 import errorToast from "@/helpers/errorToast";
 import useTransactionLifecycle from "@/hooks/useTransactionLifecycle";
@@ -20,7 +20,7 @@ const Signless = ({ isCard }: Props) => {
   const handleTransactionLifecycle = useTransactionLifecycle();
 
   const { currentAccount, isSignless, setIsSignless } = useAccountStore();
-  const { address } = useAccount();
+  const { address } = useConnection();
   const disabled = currentAccount?.owner !== address;
 
   const onCompleted = (enabled: boolean) => {

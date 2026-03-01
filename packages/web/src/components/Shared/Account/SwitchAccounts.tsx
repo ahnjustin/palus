@@ -6,7 +6,7 @@ import {
   useSwitchAccountMutation
 } from "@palus/indexer";
 import { useCallback, useState } from "react";
-import { useAccount } from "wagmi";
+import { useConnection } from "wagmi";
 import Loader from "@/components/Shared/Loader";
 import { ErrorMessage, Spinner, WarningMessage } from "@/components/Shared/UI";
 import { ERRORS } from "@/data/errors";
@@ -24,7 +24,7 @@ const SwitchAccounts = () => {
   const [loggingInAccountId, setLoggingInAccountId] = useState<null | string>(
     null
   );
-  const { address } = useAccount();
+  const { address } = useConnection();
   const { setShowAuthModal } = useAuthModalStore();
 
   const onError = useCallback((error?: unknown) => {

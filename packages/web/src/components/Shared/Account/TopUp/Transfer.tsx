@@ -10,7 +10,7 @@ import {
 } from "react";
 import { toast } from "sonner";
 import type { Hex } from "viem";
-import { useAccount, useWaitForTransactionReceipt } from "wagmi";
+import { useConnection, useWaitForTransactionReceipt } from "wagmi";
 import Skeleton from "@/components/Shared/Skeleton";
 import { Button, Card, Input, Spinner } from "@/components/Shared/UI";
 import { NATIVE_TOKEN_SYMBOL } from "@/data/constants";
@@ -39,7 +39,7 @@ const Transfer = ({ token }: TransferProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   usePreventScrollOnNumberInput(inputRef as RefObject<HTMLInputElement>);
 
-  const { address } = useAccount();
+  const { address } = useConnection();
   const handleTransactionLifecycle = useTransactionLifecycle();
 
   const { track } = useUmami();

@@ -13,7 +13,7 @@ import {
 } from "@palus/indexer";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
-import { useAccount, useSignMessage } from "wagmi";
+import { useConnection, useSignMessage } from "wagmi";
 import { z } from "zod";
 import AuthMessage from "@/components/Shared/Auth/AuthMessage";
 import { Button, Form, Input, useZodForm } from "@/components/Shared/UI";
@@ -53,7 +53,7 @@ const ChooseUsername = () => {
   } = useSignupStore();
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { address } = useAccount();
+  const { address } = useConnection();
   const handleWrongNetwork = useHandleWrongNetwork();
   const handleTransactionLifecycle = useTransactionLifecycle();
   const form = useZodForm({ mode: "onChange", schema: ValidationSchema });
@@ -70,7 +70,9 @@ const ChooseUsername = () => {
     errorToast(error);
   }, []);
 
-  const { signMessageAsync } = useSignMessage({ mutation: { onError } });
+  const { mutateAsync: signMessageAsync } = useSignMessage({
+    mutation: { onError }
+  });
   const [loadChallenge] = useChallengeMutation({ onError });
   const [authenticate] = useAuthenticateMutation({ onError });
 

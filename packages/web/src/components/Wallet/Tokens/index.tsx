@@ -4,7 +4,7 @@ import {
   useWrapTokensMutation
 } from "@palus/indexer";
 import { useState } from "react";
-import { useAccount } from "wagmi";
+import { useConnection } from "wagmi";
 import { Button, Image, Tooltip } from "@/components/Shared/UI";
 import { IS_TESTNET, NATIVE_TOKEN_SYMBOL } from "@/data/constants";
 import getTokenImage from "@/helpers/getTokenImage";
@@ -65,7 +65,7 @@ const Tokens = ({ balances, refetch }: TokenProps) => {
   const [showUnwrapModal, setShowUnwrapModal] = useState(false);
 
   const { currentAccount } = useAccountStore();
-  const { address: walletAddress } = useAccount();
+  const { address: walletAddress } = useConnection();
   const loggedInAsOwner =
     walletAddress?.toLowerCase() === currentAccount?.owner.toLowerCase();
 

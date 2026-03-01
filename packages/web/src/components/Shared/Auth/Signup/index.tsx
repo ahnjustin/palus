@@ -1,5 +1,5 @@
 import { createTrackedSelector } from "react-tracked";
-import { useAccount } from "wagmi";
+import { useConnection } from "wagmi";
 import { create } from "zustand";
 import WalletSelector from "@/components/Shared/Auth/WalletSelector";
 import ChooseUsername from "./ChooseUsername";
@@ -36,7 +36,7 @@ export const useSignupStore = createTrackedSelector(store);
 
 const Signup = () => {
   const { screen } = useSignupStore();
-  const { connector: activeConnector } = useAccount();
+  const { connector: activeConnector } = useConnection();
 
   return activeConnector?.id ? (
     <div className="space-y-2.5">
