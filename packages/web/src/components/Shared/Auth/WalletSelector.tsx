@@ -2,7 +2,7 @@ import { KeyIcon } from "@heroicons/react/24/outline";
 import type { FC } from "react";
 import { Link } from "react-router";
 import type { Connector } from "wagmi";
-import { useAccount, useConnect, useDisconnect } from "wagmi";
+import { useAccount, useConnect, useConnectors, useDisconnect } from "wagmi";
 import cn from "@/helpers/cn";
 import getWalletDetails from "@/helpers/getWalletDetails";
 
@@ -10,9 +10,10 @@ const isMobileAndroid =
   typeof navigator !== "undefined" && /android/i.test(navigator.userAgent);
 
 const WalletSelector: FC = () => {
-  const { connectAsync, connectors, isPending } = useConnect();
+  const { connectAsync, isPending } = useConnect();
   const { disconnect } = useDisconnect();
   const { connector: activeConnector } = useAccount();
+  const connectors = useConnectors();
 
   const allowedConnectors = [
     "metaMaskSDK",
