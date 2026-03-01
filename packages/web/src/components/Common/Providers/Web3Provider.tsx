@@ -33,7 +33,7 @@ const config = createConfig({
     [CHAIN.id]: IS_TESTNET
       ? http("https://rpc.testnet.lens.xyz")
       : http("https://rpc.lens.xyz"),
-    [mainnet.id]: http()
+    [mainnet.id]: http(`https://mainnet.infura.io/v3/${INFURA_API_KEY}`)
   }
 });
 
