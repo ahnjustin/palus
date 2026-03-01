@@ -2,9 +2,10 @@ import type { AccountFragment, PostFragment } from "@palus/indexer";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { decodeAbiParameters, keccak256, stringToBytes } from "viem";
-import { useChainId, useConfig, useReadContracts } from "wagmi";
+import { useConfig, useReadContracts } from "wagmi";
 import { readContractsQueryOptions } from "wagmi/query";
 import { pollVoteActionAbi } from "@/data/abis/pollVoteActionAbi";
+import { CHAIN } from "@/data/constants";
 import { CONTRACTS } from "@/data/contracts";
 import type { Poll } from "@/types/palus";
 
@@ -13,14 +14,14 @@ const END_TS_KEY = keccak256(stringToBytes("lens.param.endTimestamp"));
 
 const contract = {
   abi: pollVoteActionAbi,
-  address: CONTRACTS.pollVoteAction
+  address: CONTRACTS.pollVoteAction,
+  chainId: CHAIN.id
 } as const;
 
 const useDecodePoll = (
   post: PostFragment,
   account: AccountFragment | undefined
 ) => {
-  const chainId = useChainId();
   const config = useConfig();
   const queryClient = useQueryClient();
 
@@ -103,7 +104,7 @@ const useDecodePoll = (
   const updatePollCache = (votedOptionIndex: number) => {
     const { queryKey } = readContractsQueryOptions(config, {
       ...queryOptions,
-      chainId
+      chainId: CHAIN.id
     });
 
     queryClient.setQueryData(queryKey, (oldData: any) => {

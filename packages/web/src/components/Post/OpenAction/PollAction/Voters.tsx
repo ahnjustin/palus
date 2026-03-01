@@ -13,6 +13,7 @@ import SingleAccount from "@/components/Shared/Account/SingleAccount";
 import AccountListShimmer from "@/components/Shared/Shimmer/AccountListShimmer";
 import { EmptyState, ErrorMessage, Tabs } from "@/components/Shared/UI";
 import { pollVoteActionAbi } from "@/data/abis/pollVoteActionAbi";
+import { CHAIN } from "@/data/constants";
 import { CONTRACTS } from "@/data/contracts";
 import cn from "@/helpers/cn";
 import useLoadMoreOnIntersect from "@/hooks/useLoadMoreOnIntersect";
@@ -26,7 +27,8 @@ interface VotersProps {
 
 const contract = {
   abi: pollVoteActionAbi,
-  address: CONTRACTS.pollVoteAction
+  address: CONTRACTS.pollVoteAction,
+  chainId: CHAIN.id
 } as const;
 
 const Voters = ({ poll, post }: VotersProps) => {
