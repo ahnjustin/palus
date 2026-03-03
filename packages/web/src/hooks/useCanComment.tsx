@@ -5,6 +5,7 @@ import { useConfig } from "wagmi";
 import { collectorOnlyPostRuleAbi } from "@/data/abis/colletorOnlyPostRuleAbi";
 import { followingOnlyPostRuleAbi } from "@/data/abis/followingOnlyPostRuleAbi";
 import { groupGatedPostRuleAbi } from "@/data/abis/groupGatedPostRuleAbi";
+import { CHAIN } from "@/data/constants";
 import { CONTRACTS } from "@/data/contracts";
 import { useAccountStore } from "@/store/persisted/useAccountStore";
 
@@ -14,17 +15,20 @@ interface PostRuleValidationProps {
 
 const followingOnlyPostRuleContract = {
   abi: followingOnlyPostRuleAbi,
-  address: CONTRACTS.followingOnlyPostRule
+  address: CONTRACTS.followingOnlyPostRule,
+  chainId: CHAIN.id
 };
 
 const groupGatedPostRuleContract = {
   abi: groupGatedPostRuleAbi,
-  address: CONTRACTS.groupGatedPostRule
+  address: CONTRACTS.groupGatedPostRule,
+  chainId: CHAIN.id
 };
 
 const collectorOnlyPostRuleContract = {
   abi: collectorOnlyPostRuleAbi,
-  address: CONTRACTS.collectorOnlyPostRule
+  address: CONTRACTS.collectorOnlyPostRule,
+  chainId: CHAIN.id
 };
 
 const useCanComment = ({ post }: PostRuleValidationProps) => {
