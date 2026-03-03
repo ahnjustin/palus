@@ -326,7 +326,11 @@ const NewPublication = ({
         };
       }
 
-      const metadata = getMetadata({ attachment, baseMetadata });
+      const metadata = getMetadata({
+        attachment,
+        baseMetadata,
+        isCollectible: Boolean(collectAction.enabled)
+      });
       if (!metadata) {
         throw new Error("Failed to generate metadata");
       }

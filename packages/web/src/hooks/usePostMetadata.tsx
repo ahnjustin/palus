@@ -16,6 +16,7 @@ import { usePostAudioStore } from "../store/non-persisted/post/usePostAudioStore
 interface UsePostMetadataProps {
   baseMetadata: any;
   attachment?: NewAttachment;
+  isCollectible: boolean;
 }
 
 const usePostMetadata = () => {
@@ -32,7 +33,7 @@ const usePostMetadata = () => {
     }));
 
   const getMetadata = useCallback(
-    ({ baseMetadata, attachment }: UsePostMetadataProps) => {
+    ({ baseMetadata, attachment, isCollectible }: UsePostMetadataProps) => {
       const primaryAttachment = attachment ?? attachments[0];
       const hasAttachments = Boolean(primaryAttachment);
       const isImage = primaryAttachment?.type === "Image";
@@ -64,7 +65,14 @@ const usePostMetadata = () => {
             ...(license && { license }),
             item: primaryAttachment.uri,
             type: primaryAttachment.mimeType
-          }
+          },
+          ...(isCollectible && {
+            nft: {
+              description: baseMetadata.content,
+              image: primaryAttachment.uri,
+              name: baseMetadata.title
+            }
+          })
         });
       }
 
@@ -83,7 +91,15 @@ const usePostMetadata = () => {
             item: primaryAttachment.uri,
             type: primaryAttachment.mimeType,
             ...(license && { license })
-          }
+          },
+          ...(isCollectible && {
+            nft: {
+              animation_url: primaryAttachment.uri,
+              description: baseMetadata.content,
+              image: audioPost.cover,
+              name: baseMetadata.title
+            }
+          })
         });
       }
 
@@ -100,7 +116,15 @@ const usePostMetadata = () => {
             item: primaryAttachment.uri,
             type: primaryAttachment.mimeType,
             ...(license && { license })
-          }
+          },
+          ...(isCollectible && {
+            nft: {
+              animation_url: primaryAttachment.uri,
+              description: baseMetadata.content,
+              image: audioPost.cover,
+              name: baseMetadata.title
+            }
+          })
         });
       }
 
