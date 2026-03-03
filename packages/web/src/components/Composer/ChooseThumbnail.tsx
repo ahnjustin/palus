@@ -24,6 +24,8 @@ const ChooseThumbnail = () => {
   const [thumbnails, setThumbnails] = useState<Thumbnail[]>([]);
   const [imageUploading, setImageUploading] = useState(false);
   const [selectedThumbnailIndex, setSelectedThumbnailIndex] = useState(-1);
+  const [hidden, setHidden] = useState(false);
+
   const { attachments } = usePostAttachmentStore();
   const { setVideoThumbnail, videoThumbnail } = usePostVideoStore();
   const { file } = attachments[0];
@@ -53,15 +55,19 @@ const ChooseThumbnail = () => {
         thumbnails[index].blobUrl,
         "thumbnail.jpeg",
         async (file: File) => {
-          const result = await uploadThumbnailToStorageNode(file);
-          setThumbnails(
-            thumbnails.map((thumbnail, i) => {
-              if (i === index) {
-                thumbnail.decentralizedUrl = result.uri;
-              }
-              return thumbnail;
-            })
+          setVideoThumbnail({ ...videoThumbnail, uploading: true });
+          const result = await uploadFile(file, currentAccount?.address);
+          if (!result.uri) {
+            toast.error("Failed to upload thumbnail");
+          }
+          const url = result.uri;
+          const mimeType = file.type || "image/jpeg";
+          setThumbnails((prev) =>
+            prev.map((thumbnail, i) =>
+              i === index ? { ...thumbnail, decentralizedUrl: url } : thumbnail
+            )
           );
+          setVideoThumbnail({ mimeType, uploading: false, url });
         }
       );
     } else {
@@ -85,7 +91,9 @@ const ChooseThumbnail = () => {
       }
       setThumbnails(thumbnailList);
       setSelectedThumbnailIndex(DEFAULT_THUMBNAIL_INDEX);
-    } catch {}
+    } catch {
+      setHidden(true);
+    }
   };
 
   useEffect(() => {
@@ -95,6 +103,8 @@ const ChooseThumbnail = () => {
   useEffect(() => {
     if (file) {
       generateThumbnails(file);
+    } else {
+      setHidden(true);
     }
     return () => {
       setSelectedThumbnailIndex(-1);
@@ -131,11 +141,11 @@ const ChooseThumbnail = () => {
       <div className="mt-1 grid grid-cols-3 gap-3 py-0.5 md:grid-cols-5">
         <label
           className="flex h-24 w-full max-w-32 flex-none cursor-pointer flex-col items-center justify-center rounded-xl border border-gray-200 dark:border-gray-800"
-          htmlFor="chooseThumbnail"
+          htmlFor={inputId}
         >
           <input
             accept=".png, .jpg, .jpeg"
-            className="hidden w-full"
+            className="sr-only"
             id={inputId}
             onChange={handleUpload}
             type="file"
@@ -149,7 +159,7 @@ const ChooseThumbnail = () => {
             </>
           )}
         </label>
-        {thumbnails.length ? null : <ThumbnailsShimmer />}
+        {thumbnails.length || hidden ? null : <ThumbnailsShimmer />}
         {thumbnails.map(({ blobUrl, decentralizedUrl }, index) => {
           const isSelected = selectedThumbnailIndex === index;
           const isUploaded = decentralizedUrl === videoThumbnail.url;

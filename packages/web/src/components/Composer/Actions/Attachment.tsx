@@ -18,6 +18,8 @@ import { MAX_IMAGE_UPLOAD } from "@/data/constants";
 import cn from "@/helpers/cn";
 import useUploadAttachments from "@/hooks/useUploadAttachments";
 import { usePostAttachmentStore } from "@/store/non-persisted/post/usePostAttachmentStore";
+import UrlAttachment from "./UrlAttachment";
+import UrlAttachmentModal from "./UrlAttachment/Modal";
 
 const ImageMimeType = Object.values(MediaImageMimeType);
 const AudioMimeType = Object.values(MediaAudioMimeType);
@@ -38,6 +40,7 @@ const Attachment = ({ anchor = "bottom", disabled }: AttachmentProps) => {
   const { attachments, isUploading } = usePostAttachmentStore();
   const { handleUploadAttachments } = useUploadAttachments();
   const [showMenu, setShowMenu] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const id = useId();
   const dropdownRef = useClickAway(() =>
     setShowMenu(false)
@@ -113,20 +116,27 @@ const Attachment = ({ anchor = "bottom", disabled }: AttachmentProps) => {
   );
 
   return (
-    <Tooltip content="Media" placement="top" withDelay>
-      <Menu as="div" className="flex items-center">
-        <MenuButton
-          aria-label="More"
-          className="rounded-full outline-offset-8 disabled:opacity-50"
-          disabled={disabled}
-          onClick={() => setShowMenu(!showMenu)}
+    <>
+      <Menu as="div">
+        <Tooltip
+          className="flex items-center"
+          content="Media"
+          placement="top"
+          withDelay
         >
-          {isUploading ? (
-            <Spinner size="sm" />
-          ) : (
-            <PhotoIcon className="size-5" />
-          )}
-        </MenuButton>
+          <MenuButton
+            aria-label="More"
+            className="rounded-full outline-offset-8 disabled:opacity-50"
+            disabled={disabled}
+            onClick={() => setShowMenu(!showMenu)}
+          >
+            {isUploading ? (
+              <Spinner size="sm" />
+            ) : (
+              <PhotoIcon className="size-5" />
+            )}
+          </MenuButton>
+        </Tooltip>
         <MenuTransition show={showMenu}>
           <MenuItems
             anchor={anchor}
@@ -155,10 +165,16 @@ const Attachment = ({ anchor = "bottom", disabled }: AttachmentProps) => {
               AudioMimeType,
               disableOtherUpload
             )}
+            <div className="divider" />
+            <UrlAttachment
+              disabled={disableOtherUpload}
+              setShowModal={setShowModal}
+            />
           </MenuItems>
         </MenuTransition>
       </Menu>
-    </Tooltip>
+      <UrlAttachmentModal setShowModal={setShowModal} showModal={showModal} />
+    </>
   );
 };
 

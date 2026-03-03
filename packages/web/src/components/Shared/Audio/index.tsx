@@ -57,7 +57,7 @@ const Audio = ({ artist, isNew = false, poster, src, title }: AudioProps) => {
       onClick={stopEventPropagation}
       style={{ backgroundImage: `url(${isNew ? newPreviewUri : poster})` }}
     >
-      <div className="flex flex-wrap px-3 pt-5 pb-1 backdrop-blur-2xl backdrop-brightness-50 md:flex-nowrap md:space-x-2 md:p-0">
+      <div className="flex flex-wrap rounded-xl px-3 pt-5 pb-1 backdrop-blur-2xl backdrop-brightness-50 md:flex-nowrap md:space-x-2 md:p-0">
         <CoverImage
           cover={isNew ? (newPreviewUri as string) : poster}
           imageRef={imageRef}
