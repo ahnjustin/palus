@@ -121,105 +121,99 @@ const NotificationShare = forwardRef<
       style={{ height: CARD_HEIGHT * scale }}
     >
       <div
-        className="h-fit w-fit origin-top-left rounded-xl border border-border"
+        className={`waves-${bgIndex} relative h-75 w-120 origin-top-left overflow-hidden rounded-xl border border-border`}
+        ref={ref}
+        {...props}
         style={{ transform: `scale(${scale})` }}
       >
-        <div
-          className={`waves-${bgIndex} relative h-75 w-120 overflow-hidden rounded-xl`}
-          ref={ref}
-          {...props}
-        >
-          <div className="absolute top-5 left-5 flex items-center gap-x-2 text-2xl text-white">
-            <Image
-              alt={actor.username}
-              className="size-11 flex-none rounded-full border border-border bg-gray-200 object-cover"
-              height={64}
-              loading="lazy"
-              src={getAvatar(account)}
-              width={64}
-            />
-            <div className="flex min-w-0 flex-col">
-              <div className="flex min-w-0 flex-wrap items-center gap-x-1.5">
-                <span className="truncate font-bold">{actor.name}</span>
-                <span className="truncate pb-0.5 font-semibold text-gray-200">
-                  @{actor.username}
-                </span>
-              </div>
-              <div className="text-white text-xl">{title}!</div>
-            </div>
-          </div>
-          <div
-            className="-translate-y-1/2 absolute top-1/2 right-6 left-17 text-white drop-shadow-black/30 drop-shadow-xs"
-            ref={amountRef}
-            style={{ fontSize: amountFontSize, lineHeight: 1.2 }}
-          >
-            <div className="flex items-center gap-x-2 whitespace-nowrap pt-7">
-              <span className="font-bold">
-                {notificationShare.amount.__typename === "NativeAmount"
-                  ? "$"
-                  : ""}
-                {formattedAmount}
-              </span>
-              <span className="text-gray-200 tracking-tighter">
-                {notificationShare.amount.__typename === "Erc20Amount"
-                  ? "$"
-                  : ""}
-                {notificationShare.amount.asset.symbol}
-              </span>
-            </div>
-          </div>
-          <div className="absolute bottom-3 left-5 flex items-center gap-x-2">
-            <Image
-              alt="Palus Logo"
-              className="mt-0.5 size-6"
-              height={24}
-              src="/favicon.svg"
-              width={24}
-            />
-            <div className="font-semibold text-base text-black opacity-75">{`palus.app/u/${currentAccount.username.localName}`}</div>
-          </div>
+        <div className="absolute top-5 left-5 flex items-center gap-x-2 text-2xl text-white">
           <Image
-            alt="Lens Logo"
-            className="absolute right-5 bottom-3 mt-0.5 size-6 drop-shadow-black/30 drop-shadow-xs"
+            alt={actor.username}
+            className="size-11 flex-none rounded-full border border-border bg-gray-200 object-cover"
+            height={64}
+            loading="lazy"
+            src={getAvatar(account)}
+            width={64}
+          />
+          <div className="flex min-w-0 flex-col">
+            <div className="flex min-w-0 flex-wrap items-center gap-x-1.5">
+              <span className="truncate font-bold">{actor.name}</span>
+              <span className="truncate pb-0.5 font-semibold text-gray-200">
+                @{actor.username}
+              </span>
+            </div>
+            <div className="text-white text-xl">{title}!</div>
+          </div>
+        </div>
+        <div
+          className="-translate-y-1/2 absolute top-1/2 right-6 left-17 text-white drop-shadow-black/30 drop-shadow-xs"
+          ref={amountRef}
+          style={{ fontSize: amountFontSize, lineHeight: 1.2 }}
+        >
+          <div className="flex items-center gap-x-2 whitespace-nowrap pt-7">
+            <span className="font-bold">
+              {notificationShare.amount.__typename === "NativeAmount"
+                ? "$"
+                : ""}
+              {formattedAmount}
+            </span>
+            <span className="text-gray-200 tracking-tighter">
+              {notificationShare.amount.__typename === "Erc20Amount" ? "$" : ""}
+              {notificationShare.amount.asset.symbol}
+            </span>
+          </div>
+        </div>
+        <div className="absolute bottom-3 left-5 flex items-center gap-x-2">
+          <Image
+            alt="Palus Logo"
+            className="mt-0.5 size-6"
             height={24}
-            src="/images/lens.svg"
+            src="/favicon.svg"
             width={24}
           />
-          <div
-            className="controls absolute top-3 right-3 flex origin-top-right gap-2"
-            style={{ transform: `scale(${1 / scale})` }}
-          >
-            <Tooltip content="Previous background" placement="top" withDelay>
-              <button
-                aria-label="Previous background"
-                className="center flex rounded-full bg-black/30 p-2 text-gray-400 hover:text-white"
-                onClick={() => setBgIndex((i) => (i - 1 + 10) % 10)}
-                type="button"
-              >
-                <ChevronLeftIcon className="size-3" strokeWidth={4} />
-              </button>
-            </Tooltip>
-            <Tooltip content="Next background" placement="top" withDelay>
-              <button
-                aria-label="Next background"
-                className="center flex rounded-full bg-black/30 p-2 text-gray-400 hover:text-white"
-                onClick={() => setBgIndex((i) => (i + 1) % 10)}
-                type="button"
-              >
-                <ChevronRightIcon className="size-3" strokeWidth={4} />
-              </button>
-            </Tooltip>
-            <Tooltip content="Download image" placement="top">
-              <button
-                aria-label="Download"
-                className="center flex rounded-full bg-black/30 p-2 text-gray-400 hover:text-white"
-                onClick={downloadImage}
-                type="button"
-              >
-                <ArrowDownTrayIcon className="size-3" strokeWidth={3} />
-              </button>
-            </Tooltip>
-          </div>
+          <div className="font-semibold text-base text-black opacity-75">{`palus.app/u/${currentAccount.username.localName}`}</div>
+        </div>
+        <Image
+          alt="Lens Logo"
+          className="absolute right-5 bottom-3 mt-0.5 size-6 drop-shadow-black/30 drop-shadow-xs"
+          height={24}
+          src="/images/lens.svg"
+          width={24}
+        />
+        <div
+          className="controls absolute top-3 right-3 flex origin-top-right gap-2"
+          style={{ transform: `scale(${1 / scale})` }}
+        >
+          <Tooltip content="Previous background" placement="top" withDelay>
+            <button
+              aria-label="Previous background"
+              className="center flex rounded-full bg-black/30 p-2 text-gray-400 hover:text-white"
+              onClick={() => setBgIndex((i) => (i - 1 + 10) % 10)}
+              type="button"
+            >
+              <ChevronLeftIcon className="size-3" strokeWidth={4} />
+            </button>
+          </Tooltip>
+          <Tooltip content="Next background" placement="top" withDelay>
+            <button
+              aria-label="Next background"
+              className="center flex rounded-full bg-black/30 p-2 text-gray-400 hover:text-white"
+              onClick={() => setBgIndex((i) => (i + 1) % 10)}
+              type="button"
+            >
+              <ChevronRightIcon className="size-3" strokeWidth={4} />
+            </button>
+          </Tooltip>
+          <Tooltip content="Download image" placement="top">
+            <button
+              aria-label="Download"
+              className="center flex rounded-full bg-black/30 p-2 text-gray-400 hover:text-white"
+              onClick={downloadImage}
+              type="button"
+            >
+              <ArrowDownTrayIcon className="size-3" strokeWidth={3} />
+            </button>
+          </Tooltip>
         </div>
       </div>
     </div>

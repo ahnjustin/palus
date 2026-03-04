@@ -44,7 +44,14 @@ const dependenciesToChunk = {
     "sonner",
     "motion"
   ],
-  wevm: ["wagmi", "family", "@metamask/sdk", "viem", "viem/zksync"]
+  wevm: [
+    "wagmi",
+    "family",
+    "@metamask/sdk",
+    "viem",
+    "viem/zksync",
+    "@walletconnect/ethereum-provider"
+  ]
 };
 
 export default defineConfig({
