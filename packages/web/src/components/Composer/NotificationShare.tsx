@@ -121,7 +121,7 @@ const NotificationShare = forwardRef<
       style={{ height: CARD_HEIGHT * scale }}
     >
       <div
-        className={`waves-${bgIndex} relative h-75 w-120 origin-top-left overflow-hidden rounded-xl border border-border`}
+        className={`waves-${bgIndex} relative h-75 w-120 origin-top-left overflow-hidden rounded-xl`}
         ref={ref}
         {...props}
         style={{ transform: `scale(${scale})` }}

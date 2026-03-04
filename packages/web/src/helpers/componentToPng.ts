@@ -25,7 +25,6 @@ export const componentToPng = async (
     height: options.height,
     pixelRatio: 3,
     style: {
-      border: "none",
       transform: "scale(1)"
     },
     width: options.width
