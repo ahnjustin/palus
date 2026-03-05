@@ -76,6 +76,34 @@ const dependenciesToChunk = {
   ]
 };
 
+const packageChunkEntries = Object.entries(dependenciesToChunk).flatMap(
+  ([chunk, pkgs]) => pkgs.map((pkg) => [pkg, chunk])
+);
+
+function manualChunks(id) {
+  if (!id.includes("/node_modules/")) return;
+
+  if (id.includes("/@phosphor-icons/")) return "icons";
+
+  if (id.includes("/@walletconnect/") || id.includes("/w3m-")) {
+    return "wevm-wallet";
+  }
+
+  if (id.includes("/thirdweb/")) return "wevm-thirdweb";
+
+  if (
+    id.includes("/viem/") ||
+    id.includes("/wagmi/") ||
+    id.includes("/@wagmi/")
+  ) {
+    return "wevm-core";
+  }
+
+  for (const [pkg, chunk] of packageChunkEntries) {
+    if (id.includes(`/node_modules/${pkg}/`)) return chunk;
+  }
+}
+
 export default defineConfig({
   build: {
     cssMinify: "lightningcss",
@@ -88,10 +116,10 @@ export default defineConfig({
 
           return "assets/[name]-[hash][extname]";
         },
-        manualChunks: dependenciesToChunk
+        manualChunks
       }
     },
-    sourcemap: "hidden",
+    sourcemap: process.env.VITE_SOURCEMAP === "1" ? "hidden" : false,
     target: "esnext"
   },
   plugins: [tsconfigPaths(), react(), tailwindcss()],
