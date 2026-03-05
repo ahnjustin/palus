@@ -6,12 +6,12 @@ const RESTRICTED_SYMBOLS = "☑️✓✔✅";
 // line or immediately after whitespace.
 const MATCH_BEHIND = regexLookbehindAvailable ? "(?<=^|\\s)" : "";
 
-const MENTION_NAMESPACE = "\\w+\\/";
+const MENTION_NAMESPACE = "(?:\\w+\\/)?"; // Make namespace optional
 const MENTION_BODY = "([\\dA-Za-z]\\w{1,25})";
 const EDITOR_MENTION = "([\\dA-Za-z]\\w*)"; // This will start searching for mentions after the first character
 
 export const Regex = {
-  // Match string like @lens/someone.
+  // Match string like @lens/someone or @someone.
   accountMention: new RegExp(
     `${MATCH_BEHIND}@${MENTION_NAMESPACE}${MENTION_BODY}`,
     "g"

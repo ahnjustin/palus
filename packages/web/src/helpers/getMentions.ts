@@ -10,14 +10,25 @@ const getMentions = (text: string): PostMentionFragment[] => {
   const mentions = text.match(Regex.accountMention) ?? [];
 
   return mentions.map((mention) => {
-    const handle = mention
-      .substring(mention.lastIndexOf("/") + 1)
-      .toLowerCase();
+    const hasSeparator = mention.includes("/");
+    let namespace = "";
+    let handle = "";
+
+    if (hasSeparator) {
+      // Format: @namespace/handle
+      const parts = mention.substring(1).split("/"); // Remove @ and split
+      namespace = parts[0].toLowerCase();
+      handle = parts[1].toLowerCase();
+    } else {
+      // Format: @handle
+      handle = mention.substring(1).toLowerCase(); // Remove @ 
+      namespace = handle; // Use handle as namespace for simple mentions
+    }
 
     return {
-      account: "",
-      namespace: "",
-      replace: { from: handle, to: handle }
+      account: handle,
+      namespace: namespace,
+      replace: { from: mention, to: mention }
     } as AccountMentionFragment;
   });
 };
