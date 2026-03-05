@@ -1,6 +1,6 @@
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 const dependenciesToChunk = {
@@ -19,6 +19,7 @@ const dependenciesToChunk = {
     "unified",
     "unist-util-visit-parents"
   ],
+  icons: ["@phosphor-icons/webcomponents"],
   indexer: ["@palus/indexer"],
   media: ["plyr-react", "@livepeer/react", "browser-image-compression"],
   misc: [
@@ -62,68 +63,36 @@ const dependenciesToChunk = {
     "tailwindcss",
     "motion"
   ],
-  wevm: [
-    "@lens-chain/sdk/viem",
-    "@metamask/sdk",
-    "@walletconnect/ethereum-provider",
-    "@wagmi/core",
-    "family",
-    "lens-modules",
-    "thirdweb",
-    "viem",
-    "viem/zksync",
-    "wagmi"
-  ]
+  viem: ["viem", "viem/zksync", "@lens-chain/sdk/viem"],
+  wagmi: ["wagmi", "@wagmi/core"],
+  wallets: ["@metamask/sdk", "@walletconnect/ethereum-provider", "family"],
+  wevm: ["lens-modules", "@thirdweb-dev/storage"]
 };
 
-const packageChunkEntries = Object.entries(dependenciesToChunk).flatMap(
-  ([chunk, pkgs]) => pkgs.map((pkg) => [pkg, chunk])
-);
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), "");
 
-function manualChunks(id) {
-  if (!id.includes("/node_modules/")) return;
+  return {
+    build: {
+      cssMinify: "lightningcss",
+      rollupOptions: {
+        output: {
+          assetFileNames: (assetInfo) => {
+            if (/\.woff2$/.test(assetInfo.name ?? "")) {
+              return "assets/fonts/[name][extname]";
+            }
 
-  if (id.includes("/@phosphor-icons/")) return "icons";
-
-  if (id.includes("/@walletconnect/") || id.includes("/w3m-")) {
-    return "wevm-wallet";
-  }
-
-  if (id.includes("/thirdweb/")) return "wevm-thirdweb";
-
-  if (
-    id.includes("/viem/") ||
-    id.includes("/wagmi/") ||
-    id.includes("/@wagmi/")
-  ) {
-    return "wevm-core";
-  }
-
-  for (const [pkg, chunk] of packageChunkEntries) {
-    if (id.includes(`/node_modules/${pkg}/`)) return chunk;
-  }
-}
-
-export default defineConfig({
-  build: {
-    cssMinify: "lightningcss",
-    rollupOptions: {
-      output: {
-        assetFileNames: (assetInfo) => {
-          if (/\.woff2$/.test(assetInfo.name ?? "")) {
-            return "assets/fonts/[name][extname]";
-          }
-
-          return "assets/[name]-[hash][extname]";
-        },
-        manualChunks
-      }
+            return "assets/[name]-[hash][extname]";
+          },
+          manualChunks: dependenciesToChunk
+        }
+      },
+      sourcemap: env.VITE_SOURCEMAP === "1" ? "hidden" : false,
+      target: "esnext"
     },
-    sourcemap: process.env.VITE_SOURCEMAP === "1" ? "hidden" : false,
-    target: "esnext"
-  },
-  plugins: [tsconfigPaths(), react(), tailwindcss()],
-  preview: {
-    allowedHosts: ["palus.app", "www.palus.app"]
-  }
+    plugins: [tsconfigPaths(), react(), tailwindcss()],
+    preview: {
+      allowedHosts: ["palus.app", "www.palus.app"]
+    }
+  };
 });

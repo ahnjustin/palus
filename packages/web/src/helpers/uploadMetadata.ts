@@ -3,8 +3,7 @@ import {
   immutable,
   lensAccountOnly
 } from "@lens-chain/storage-client";
-import { createThirdwebClient } from "thirdweb";
-import { upload as uploadJson } from "thirdweb/storage";
+import { ThirdwebStorage } from "@thirdweb-dev/storage";
 import { CHAIN, THIRD_WEB_CLIENT_ID } from "@/data/constants";
 import { storageClient } from "./storageClient";
 
@@ -31,16 +30,15 @@ const uploadMetadata = async (
 
   if (!uri) {
     // Fallback to thirdweb if grove upload fails
-    const thirdWebClient = createThirdwebClient({
+    const storage = new ThirdwebStorage({
       clientId: THIRD_WEB_CLIENT_ID
     });
+
     try {
       const file = new File([JSON.stringify(data)], "metadata.json", {
         type: "application/json"
       });
-      const upload = await uploadJson({
-        client: thirdWebClient,
-        files: [file],
+      const upload = await storage.upload(file, {
         uploadWithoutDirectory: true
       });
       uri = upload;
