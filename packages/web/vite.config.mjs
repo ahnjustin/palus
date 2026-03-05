@@ -5,52 +5,74 @@ import tsconfigPaths from "vite-tsconfig-paths";
 
 const dependenciesToChunk = {
   editor: [
+    "mdast-util-to-markdown",
     "react-markdown",
-    "unified",
     "rehype-parse",
     "rehype-remark",
     "remark-breaks",
+    "remark-gfm",
     "remark-html",
     "remark-linkify-regex",
+    "remark-parse",
     "remark-stringify",
-    "strip-markdown"
+    "strip-markdown",
+    "unified",
+    "unist-util-visit-parents"
   ],
   indexer: ["@palus/indexer"],
   media: ["plyr-react", "@livepeer/react", "browser-image-compression"],
   misc: [
+    "@apollo/client",
     "@lens-chain/storage-client",
     "@lens-protocol/metadata",
-    "@apollo/client",
-    "zustand",
+    "dayjs",
+    "html-to-image",
     "tailwind-merge",
+    "@tanstack/react-query",
     "virtua",
-    "zod"
+    "zod",
+    "zustand"
   ],
   prosekit: ["prosekit", "prosekit/core", "prosekit/react"],
   react: [
     "react",
     "react-dom",
+    "react-helmet-async",
     "react-easy-crop",
     "react-hook-form",
+    "react-hotkeys-hook",
     "react-router",
+    "react-simple-pull-to-refresh",
     "react-tracked"
   ],
   ui: [
     "@headlessui/react",
+    "@heroicons/react",
+    "@hookform/resolvers",
     "@radix-ui/react-hover-card",
+    "@radix-ui/react-scroll-area",
+    "@radix-ui/react-select",
     "@radix-ui/react-slider",
     "@radix-ui/react-tooltip",
     "@uidotdev/usehooks",
+    "class-variance-authority",
+    "clsx",
+    "plur",
     "sonner",
+    "tailwindcss",
     "motion"
   ],
   wevm: [
-    "wagmi",
-    "family",
+    "@lens-chain/sdk/viem",
     "@metamask/sdk",
+    "@walletconnect/ethereum-provider",
+    "@wagmi/core",
+    "family",
+    "lens-modules",
+    "thirdweb",
     "viem",
     "viem/zksync",
-    "@walletconnect/ethereum-provider"
+    "wagmi"
   ]
 };
 
@@ -69,7 +91,7 @@ export default defineConfig({
         manualChunks: dependenciesToChunk
       }
     },
-    sourcemap: true,
+    sourcemap: "hidden",
     target: "esnext"
   },
   plugins: [tsconfigPaths(), react(), tailwindcss()],
